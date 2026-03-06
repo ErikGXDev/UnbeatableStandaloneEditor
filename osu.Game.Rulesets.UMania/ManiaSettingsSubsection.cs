@@ -1,0 +1,65 @@
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
+using System.Linq;
+using osu.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Localisation;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
+using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.UMania.Configuration;
+using osu.Game.Rulesets.UMania.UI;
+
+namespace osu.Game.Rulesets.UMania
+{
+    public partial class ManiaSettingsSubsection : RulesetSettingsSubsection
+    {
+        protected override LocalisableString Header => "unbeatable";
+
+        public ManiaSettingsSubsection(UManiaRuleset ruleset)
+            : base(ruleset)
+        {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            var config = (ManiaRulesetConfigManager)Config;
+
+            Children = new Drawable[]
+            {
+                new SettingsEnumDropdown<ManiaScrollingDirection>
+                {
+                    LabelText = RulesetSettingsStrings.ScrollingDirection,
+                    Current = config.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection)
+                },
+                new SettingsSlider<double, ManiaScrollSlider>
+                {
+                    LabelText = RulesetSettingsStrings.ScrollSpeed,
+                    Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollSpeed),
+                    KeyboardStep = 1
+                },
+                new SettingsCheckbox
+                {
+                    Keywords = new[] { "color" },
+                    LabelText = RulesetSettingsStrings.TimingBasedColouring,
+                    Current = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring),
+                },
+            };
+
+            Add(new SettingsCheckbox
+            {
+                LabelText = RulesetSettingsStrings.TouchOverlay,
+                Current = config.GetBindable<bool>(ManiaRulesetSetting.TouchOverlay)
+            });
+        }
+
+        private partial class ManiaScrollSlider : RoundedSliderBar<double>
+        {
+            public override LocalisableString TooltipText => RulesetSettingsStrings.ScrollSpeedTooltip((int)DrawableManiaRuleset.ComputeScrollTime(Current.Value), Current.Value);
+        }
+    }
+}
