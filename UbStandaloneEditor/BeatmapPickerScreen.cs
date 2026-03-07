@@ -44,8 +44,8 @@ public partial class BeatmapPickerScreen : OsuScreen
     [BackgroundDependencyLoader]
     private void load()
     {
-        InternalChildren = new Drawable[]
-        {
+        InternalChildren =
+        [
             new Box { RelativeSizeAxes = Axes.Both, Colour = colours.Background5 },
             new Container
             {
@@ -54,15 +54,15 @@ public partial class BeatmapPickerScreen : OsuScreen
                 RelativeSizeAxes = Axes.Y,
                 Width = 840,
                 Padding = new MarginPadding { Vertical = 16 },
-                Children = new Drawable[]
-                {
+                Children =
+                [
                     // Header
                     new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 34,
-                        Children = new Drawable[]
-                        {
+                        Children =
+                        [
                             new OsuSpriteText
                             {
                                 Anchor = Anchor.CentreLeft,
@@ -78,8 +78,8 @@ public partial class BeatmapPickerScreen : OsuScreen
                                 Height = 28,
                                 Text = "+ New Beatmap",
                                 Action = createNewBeatmap,
-                            },
-                        },
+                            }
+                        ],
                     },
                     // Scrollable list
                     new Container
@@ -109,15 +109,15 @@ public partial class BeatmapPickerScreen : OsuScreen
                         Height = 44,
                         Masking = true,
                         CornerRadius = 8,
-                        Children = new Drawable[]
-                        {
+                        Children =
+                        [
                             new Box { RelativeSizeAxes = Axes.Both, Colour = colours.Background4 },
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding { Horizontal = 10 },
-                                Children = new Drawable[]
-                                {
+                                Children =
+                                [
                                     deleteButton = new RoundedButton
                                     {
                                         Anchor = Anchor.CentreLeft,
@@ -135,14 +135,14 @@ public partial class BeatmapPickerScreen : OsuScreen
                                         Height = 28,
                                         Text = "Edit Beatmap",
                                         Action = openEditor,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        };
+                                    }
+                                ],
+                            }
+                        ],
+                    }
+                ],
+            }
+        ];
     }
 
     protected override void LoadComplete()
@@ -166,6 +166,7 @@ public partial class BeatmapPickerScreen : OsuScreen
             deleteButton.Enabled.Value = has;
         }, true);
 
+        // Load all the beatmap sets
         realm.RegisterForNotifications(
             r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending),
             (sets, _) =>
@@ -181,6 +182,8 @@ public partial class BeatmapPickerScreen : OsuScreen
                 }
 
                 BeatmapSetInfo? newSelection = null;
+
+
 
                 foreach (var set in sets.OrderBy(s => s.Metadata.Artist).ThenBy(s => s.Metadata.Title))
                 {
@@ -234,8 +237,8 @@ public partial class BeatmapPickerScreen : OsuScreen
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 8),
                 Padding = new MarginPadding { Top = 48 },
-                Children = new Drawable[]
-                {
+                Children =
+                [
                     new SpriteIcon
                     {
                         Anchor = Anchor.TopCentre,
@@ -251,8 +254,8 @@ public partial class BeatmapPickerScreen : OsuScreen
                         Text = @"No beatmaps yet. Click ""+ New Beatmap"" to get started.",
                         Font = OsuFont.GetFont(size: 13),
                         Alpha = 0.4f,
-                    },
-                },
+                    }
+                ],
             };
         }
     }

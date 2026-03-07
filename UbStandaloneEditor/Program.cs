@@ -1,5 +1,5 @@
 ﻿namespace UbStandaloneEditor;
-       
+
 using osu.Framework;
 using osu.Framework.Platform;
 

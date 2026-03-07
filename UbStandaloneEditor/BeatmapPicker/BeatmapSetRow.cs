@@ -15,10 +15,7 @@ using osuTK.Graphics;
 
 namespace UbStandaloneEditor.BeatmapPicker;
 
-/// <summary>
-/// A selectable row representing a single <see cref="BeatmapSetInfo"/> in the picker list.
-/// Selection state is shared via the <paramref name="selectedSet"/> bindable passed at construction.
-/// </summary>
+
 public partial class BeatmapSetRow : OsuClickableContainer
 {
     private readonly BeatmapSetInfo set;
@@ -46,8 +43,8 @@ public partial class BeatmapSetRow : OsuClickableContainer
 
         Action = () => selectedSet.Value = set;
 
-        Children = new Drawable[]
-        {
+        Children =
+        [
             new Box { RelativeSizeAxes = Axes.Both, Colour = colours.Background3 },
             selectionOverlay = new Box
             {
@@ -82,8 +79,8 @@ public partial class BeatmapSetRow : OsuClickableContainer
                     Origin = Anchor.CentreLeft,
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0, 2),
-                    Children = new Drawable[]
-                    {
+                    Children =
+                    [
                         new OsuSpriteText
                         {
                             Text = $"{set.Metadata.Artist} \u2014 {set.Metadata.Title}",
@@ -94,11 +91,11 @@ public partial class BeatmapSetRow : OsuClickableContainer
                             Text = $"by {set.Metadata.Author.Username}  \u2022  {diffLabel}",
                             Font = OsuFont.GetFont(size: 10),
                             Alpha = 0.55f,
-                        },
-                    },
+                        }
+                    ],
                 },
-            },
-        };
+            }
+        ];
     }
 
     protected override void LoadComplete()
