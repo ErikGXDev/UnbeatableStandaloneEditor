@@ -181,18 +181,20 @@ public partial class BeatmapPickerScreen : OsuScreen
                 }
 
                 BeatmapSetInfo? newSelection = null;
-
-
+                BeatmapSetInfo? firstSet = null;
 
                 foreach (var set in sets.OrderBy(s => s.Metadata.Artist).ThenBy(s => s.Metadata.Title))
                 {
                     var detached = set.Detach();
+                    firstSet ??= detached;
                     if (prevId.HasValue && detached.ID == prevId.Value)
                         newSelection = detached;
                     setsFlow.Add(new BeatmapSetRow(detached, selectedSet));
                 }
 
-                selectedSet.Value = newSelection;
+                // If nothing was previously selected (e.g. first beatmap just created),
+                // fall back to the first set so the buttons activate automatically.
+                selectedSet.Value = newSelection ?? firstSet;
             }
         );
     }
