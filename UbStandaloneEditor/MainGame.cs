@@ -1,8 +1,10 @@
 ﻿using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -23,10 +25,12 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
     private VolumeOverlay volumeOverlay = new VolumeOverlay();
 
     private OsuScreenStack screenStack = null!;
+    private EditorConfigManager editorConfig = null!;
 
     [BackgroundDependencyLoader]
-    private void load()
+    private void load(Storage storage)
     {
+        editorConfig = new EditorConfigManager(storage);
 
         Add(screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both });
 
@@ -72,7 +76,15 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
     {
         base.LoadComplete();
 
-
+        // Set default volume levels on first launch
+        if (editorConfig.Get<bool>(EditorSetting.FirstLaunch))
+        {
+            Audio.Volume.Value = 0.5;
+            Audio.VolumeSample.Value = 0.7;
+            Audio.VolumeTrack.Value = 0.7;
+            editorConfig.SetValue(EditorSetting.FirstLaunch, false);
+            editorConfig.Save();
+        }
 
         var maniaRuleset = UbRuleset.GetRulesetInfo();
         Ruleset.Value = maniaRuleset;
