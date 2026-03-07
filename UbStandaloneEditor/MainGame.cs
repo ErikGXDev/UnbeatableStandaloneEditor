@@ -6,6 +6,7 @@ using osu.Framework.Logging;
 using osu.Game;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.UMania;
 using osu.Game.Screens;
 
 namespace UbStandaloneEditor;
@@ -20,7 +21,7 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
 
     [Cached]
     private VolumeOverlay volumeOverlay = new VolumeOverlay();
-    
+
     private OsuScreenStack screenStack = null!;
 
     [BackgroundDependencyLoader]
@@ -33,7 +34,7 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
         Add(notificationOverlay);
         Add(volumeOverlay);
     }
-    
+
     public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
     {
         if (e.Repeat) return false;
@@ -50,7 +51,7 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
     }
 
     public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
-    
+
     // Volume controls
     protected override bool OnScroll(ScrollEvent e)
     {
@@ -71,14 +72,16 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
     {
         base.LoadComplete();
 
-        var maniaRuleset = RulesetStore.GetRuleset("umania")!;
+
+
+        var maniaRuleset = UbRuleset.GetRulesetInfo();
         Ruleset.Value = maniaRuleset;
 
         // DummyWorkingBeatmap triggers the editor to auto-create a new blank beatmap.
         // To open an existing one: Beatmap.Value = BeatmapManager.GetWorkingBeatmap(info);
          // leaves it as DummyWorkingBeatmap
         Beatmap.SetDefault();
-         
+
 
         //screenStack.Push(new DirectEditorLoader());
         screenStack.Push(new BeatmapPickerScreen());
