@@ -27,11 +27,10 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
     private void load()
     {
 
+        Add(screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both });
+
         Add(dialogOverlay);
         Add(notificationOverlay);
-
-        Add(screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both });
-        
         Add(volumeOverlay);
     }
     
