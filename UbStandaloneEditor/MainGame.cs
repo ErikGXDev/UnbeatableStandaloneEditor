@@ -80,7 +80,7 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
         if (editorConfig.Get<bool>(EditorSetting.FirstLaunch))
         {
             Audio.Volume.Value = 0.5;
-            Audio.VolumeSample.Value = 0.7;
+            Audio.VolumeSample.Value = 0.3;
             Audio.VolumeTrack.Value = 0.7;
             editorConfig.SetValue(EditorSetting.FirstLaunch, false);
             editorConfig.Save();
