@@ -27,7 +27,6 @@ public partial class BeatmapPickerScreen : OsuScreen
 {
     [Resolved] private BeatmapManager beatmapManager { get; set; } = null!;
     [Resolved] private IAPIProvider api { get; set; } = null!;
-    [Resolved] private RulesetStore rulesets { get; set; } = null!;
     [Resolved] private RealmAccess realm { get; set; } = null!;
     [Resolved] private IDialogOverlay? dialogOverlay { get; set; }
 
@@ -68,14 +67,14 @@ public partial class BeatmapPickerScreen : OsuScreen
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Text = "Your Beatmaps",
-                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
+                                Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                             },
                             new RoundedButton
                             {
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
                                 Width = 148,
-                                Height = 28,
+                                Height = 32,
                                 Text = "+ New Beatmap",
                                 Action = createNewBeatmap,
                             }
@@ -123,7 +122,7 @@ public partial class BeatmapPickerScreen : OsuScreen
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         Width = 36,
-                                        Height = 28,
+                                        Height = 32,
                                         BackgroundColour = new Color4(170, 50, 50, 255),
                                         Action = promptDelete,
                                     },
@@ -132,7 +131,7 @@ public partial class BeatmapPickerScreen : OsuScreen
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
                                         Width = 148,
-                                        Height = 28,
+                                        Height = 32,
                                         Text = "Edit Beatmap",
                                         Action = openEditor,
                                     }
@@ -200,7 +199,7 @@ public partial class BeatmapPickerScreen : OsuScreen
 
     private void createNewBeatmap()
     {
-        var ruleset = rulesets.GetRuleset("umania")!;
+        var ruleset = UbRuleset.GetRulesetInfo();
         var working = beatmapManager.CreateNew(ruleset, api.LocalUser.Value);
         Beatmap.Value = working;
         Ruleset.Value = ruleset;
@@ -213,7 +212,7 @@ public partial class BeatmapPickerScreen : OsuScreen
         var beatmap = selectedSet.Value.Beatmaps.OrderBy(b => b.StarRating).First();
         var working = beatmapManager.GetWorkingBeatmap(beatmap);
         Beatmap.Value = working;
-        Ruleset.Value = rulesets.GetRuleset("umania")!;
+        Ruleset.Value = UbRuleset.GetRulesetInfo();
         this.Push(new EditorLoader());
     }
 
@@ -223,6 +222,7 @@ public partial class BeatmapPickerScreen : OsuScreen
         dialogOverlay?.Push(new BeatmapDeleteDialog(selectedSet.Value));
     }
 
+    // For when there are no beatmaps
     private partial class EmptyState : CompositeDrawable
     {
         [BackgroundDependencyLoader]
@@ -252,7 +252,7 @@ public partial class BeatmapPickerScreen : OsuScreen
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Text = @"No beatmaps yet. Click ""+ New Beatmap"" to get started.",
-                        Font = OsuFont.GetFont(size: 13),
+                        Font = OsuFont.GetFont(size: 16),
                         Alpha = 0.4f,
                     }
                 ],

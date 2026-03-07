@@ -31,7 +31,7 @@ public partial class BeatmapSetRow : OsuClickableContainer
         this.selectedSet = selectedSet;
 
         RelativeSizeAxes = Axes.X;
-        Height = 44;
+        Height = 56;
         Masking = true;
         CornerRadius = 5;
     }
@@ -84,12 +84,12 @@ public partial class BeatmapSetRow : OsuClickableContainer
                         new OsuSpriteText
                         {
                             Text = $"{set.Metadata.Artist} \u2014 {set.Metadata.Title}",
-                            Font = OsuFont.GetFont(size: 13, weight: FontWeight.SemiBold),
+                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold),
                         },
                         new OsuSpriteText
                         {
                             Text = $"by {set.Metadata.Author.Username}  \u2022  {diffLabel}",
-                            Font = OsuFont.GetFont(size: 10),
+                            Font = OsuFont.GetFont(size: 14),
                             Alpha = 0.55f,
                         }
                     ],
