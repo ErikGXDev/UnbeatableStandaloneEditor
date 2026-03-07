@@ -1,4 +1,5 @@
-﻿using osu.Game.Graphics.UserInterfaceV2;
+﻿using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -35,6 +36,8 @@ public partial class BeatmapPickerScreen : OsuScreen
 
 
     public override bool AllowUserExit { get; } = false;
+    
+
 
     [BackgroundDependencyLoader]
     private void load()
@@ -42,17 +45,17 @@ public partial class BeatmapPickerScreen : OsuScreen
         InternalChildren = new Drawable[]
         {
             new Box { RelativeSizeAxes = Axes.Both, Colour = colours.Background4 },
-            new Container
+            new FillFlowContainer()
             {
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding(10),
+                
                 Children = new Drawable[]
                 {
                     new FillFlowContainer
                     {
-                        RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
+                        Direction = FillDirection.Horizontal,
                         Spacing = new Vector2(0, 8),
                         Children = new Drawable[]
                         {
@@ -61,10 +64,9 @@ public partial class BeatmapPickerScreen : OsuScreen
                                 Text = "Select a beatmap to edit",
                                 Font = OsuFont.GetFont(size: 24, weight: FontWeight.SemiBold),
                             },
-                            new FormButton
+                            new RoundedButton()
                             {
-                                Caption = "Create a new beatmap",
-                                ButtonText = "New",
+                                Text = "New beatmap",
                                 Action = createNewBeatmap,
                             },
                         }

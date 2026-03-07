@@ -55,7 +55,7 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
     // Volume controls
     protected override bool OnScroll(ScrollEvent e)
     {
-        if (e.ControlPressed && e.ShiftPressed)
+        if (e.AltPressed && e.ShiftPressed)
         {
             float delta = e.ScrollDelta.Y != 0 ? e.ScrollDelta.Y : e.ScrollDelta.X;
 
