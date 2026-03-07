@@ -11,7 +11,8 @@
         <EmbeddedResource Include="Resources\**"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="ppy.osu.Game" Version="2026.303.0" />
+        <!--<PackageReference Include="ppy.osu.Game" Version="2026.303.0" />-->
+        <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
         <Reference Include="WebSocketSharp">
             <HintPath>lib\websocket-sharp.dll</HintPath>
         </Reference>

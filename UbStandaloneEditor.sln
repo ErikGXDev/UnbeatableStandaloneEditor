@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UbStandaloneEditor", "UbSta
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Rulesets.UMania", "osu.Game.Rulesets.UMania\osu.Game.Rulesets.UMania.csproj", "{A8CFD859-4561-4DB5-BDC6-BCD5C289D8AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game", "osu.Game\osu.Game.csproj", "{D309DBFE-1338-4EB2-8AFD-1401E1C69DCA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{A8CFD859-4561-4DB5-BDC6-BCD5C289D8AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8CFD859-4561-4DB5-BDC6-BCD5C289D8AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8CFD859-4561-4DB5-BDC6-BCD5C289D8AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D309DBFE-1338-4EB2-8AFD-1401E1C69DCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D309DBFE-1338-4EB2-8AFD-1401E1C69DCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D309DBFE-1338-4EB2-8AFD-1401E1C69DCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D309DBFE-1338-4EB2-8AFD-1401E1C69DCA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

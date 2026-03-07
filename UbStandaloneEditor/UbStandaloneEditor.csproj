@@ -11,11 +11,12 @@
 
     <ItemGroup>
       <PackageReference Include="ppy.osu.Framework" Version="2026.303.0" />
-      <PackageReference Include="ppy.osu.Game" Version="2026.303.0" />
+      <!--<PackageReference Include="ppy.osu.Game" Version="2026.303.0" />-->
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\osu.Game.Rulesets.UMania\osu.Game.Rulesets.UMania.csproj" />
+      <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
     </ItemGroup>
 
     <!-- Keep these DLLs as separate files outside the single-file bundle -->
