@@ -19,12 +19,5 @@
             <HintPath>lib\0Harmony.dll</HintPath>
         </Reference>
     </ItemGroup>
-    <ItemGroup>
-        <None Include="lib\websocket-sharp.dll" Link="websocket-sharp.dll">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Include="lib\0Harmony.dll" Link="0Harmony.dll">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-    </ItemGroup>
+
 </Project>

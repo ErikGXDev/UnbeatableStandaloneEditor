@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using HarmonyLib;
+
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
@@ -47,8 +47,8 @@ namespace osu.Game.Rulesets.UMania
                 if (!hasPatched)
                 {
                     // Patch the ManiaBeatmapConverter to use UManiaRuleset instead of ManiaRuleset
-                    var harmony = new Harmony("umania.ruleset.patch");
-                    harmony.PatchAll();
+                    //var harmony = new Harmony("umania.ruleset.patch");
+                    //harmony.PatchAll();
                     hasPatched = true;
                     Logger.Log("+++ Successfully applied Harmony patches for UManiaRuleset - " + nameof(OnlinePatch));
                 }
@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.UMania
         // Legacy support
 
         public ILegacyScoreSimulator CreateLegacyScoreSimulator() => new ManiaLegacyScoreSimulator();
-        public int LegacyID => 5;
+        public int LegacyID => 3;
 
 
         // Leave this line intact. It will bake the correct version into the ruleset on each build/release.

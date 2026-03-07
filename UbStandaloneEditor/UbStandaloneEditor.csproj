@@ -5,17 +5,31 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <!-- Only include English satellite assemblies; strips all non-en locale folders from publish output -->
+        <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="ppy.osu.Framework" Version="2026.303.0" />
       <PackageReference Include="ppy.osu.Game" Version="2026.303.0" />
-      <PackageReference Include="ppy.osu.Game.Rulesets.Mania" Version="2026.303.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\osu.Game.Rulesets.UMania\osu.Game.Rulesets.UMania.csproj" />
     </ItemGroup>
 
+    <!-- Keep these DLLs as separate files outside the single-file bundle -->
+    <Target Name="_ExcludeUserDllsFromSingleFile"
+            AfterTargets="ComputeResolvedFilesToPublishList">
+      <ItemGroup>
+        <ResolvedFileToPublish Condition="
+            '%(Filename)%(Extension)' == 'osu.Game.Resources.dll' Or
+            '%(Filename)%(Extension)' == 'osu.Game.Rulesets.UMania.dll' Or
+            '%(Filename)%(Extension)' == '0Harmony.dll' Or
+            '%(Filename)%(Extension)' == 'websocket-sharp.dll'">
+          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        </ResolvedFileToPublish>
+      </ItemGroup>
+    </Target>
 
 </Project>
