@@ -24,12 +24,11 @@
     <Target Name="_ExcludeUserDllsFromSingleFile"
             AfterTargets="ComputeResolvedFilesToPublishList">
       <ItemGroup>
-        <!--<ResolvedFileToPublish Condition="
+        <ResolvedFileToPublish Condition="
             '%(Filename)%(Extension)' == 'osu.Game.Resources.dll' Or
-            '%(Filename)%(Extension)' == 'osu.Game.Rulesets.UMania.dll' Or
-            '%(Filename)%(Extension)' == 'websocket-sharp.dll'">
+            '%(Filename)%(Extension)' == 'osu.Game.Rulesets.UMania.dll'">
           <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        </ResolvedFileToPublish>-->
+        </ResolvedFileToPublish>
       </ItemGroup>
     </Target>
 
