@@ -1,9 +1,7 @@
-﻿
-using osu.Framework.Screens;
-
+﻿using osu.Framework.Screens;
 using osu.Game.Screens.Edit;
 
-namespace UbStandaloneEditor;
+namespace UnbeatableStandaloneEditor;
 
 
 public partial class EditorLoader : osu.Game.Screens.Edit.EditorLoader

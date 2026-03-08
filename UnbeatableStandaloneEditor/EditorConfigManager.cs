@@ -1,7 +1,7 @@
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
 
-namespace UbStandaloneEditor;
+namespace UnbeatableStandaloneEditor;
 
 public class EditorConfigManager : IniConfigManager<EditorSetting>
 {

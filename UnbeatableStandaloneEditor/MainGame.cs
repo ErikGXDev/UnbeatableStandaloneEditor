@@ -1,5 +1,4 @@
 ﻿using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -8,10 +7,10 @@ using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
-using osu.Game.Rulesets.UMania;
 using osu.Game.Screens;
+using UnbeatableStandaloneEditor.BeatmapPicker;
 
-namespace UbStandaloneEditor;
+namespace UnbeatableStandaloneEditor;
 
 public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
 {

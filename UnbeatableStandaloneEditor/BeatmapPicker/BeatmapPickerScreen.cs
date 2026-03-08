@@ -13,15 +13,12 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Dialog;
-using osu.Game.Rulesets;
 using osu.Game.Screens;
 using osu.Game.Screens.Select;
 using osuTK;
 using osuTK.Graphics;
-using UbStandaloneEditor.BeatmapPicker;
 
-namespace UbStandaloneEditor;
+namespace UnbeatableStandaloneEditor.BeatmapPicker;
 
 public partial class BeatmapPickerScreen : OsuScreen
 {

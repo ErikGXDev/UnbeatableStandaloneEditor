@@ -1,7 +1,7 @@
 ﻿using osu.Game.Rulesets;
 using osu.Game.Rulesets.UMania;
 
-namespace UbStandaloneEditor;
+namespace UnbeatableStandaloneEditor;
 
 public class UbRuleset
 {

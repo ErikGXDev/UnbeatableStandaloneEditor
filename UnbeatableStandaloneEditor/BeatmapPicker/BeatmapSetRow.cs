@@ -13,7 +13,7 @@ using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
-namespace UbStandaloneEditor.BeatmapPicker;
+namespace UnbeatableStandaloneEditor.BeatmapPicker;
 
 
 public partial class BeatmapSetRow : OsuClickableContainer

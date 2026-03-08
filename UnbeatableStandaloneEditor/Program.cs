@@ -1,7 +1,6 @@
-﻿namespace UbStandaloneEditor;
+﻿using osu.Framework;
 
-using osu.Framework;
-using osu.Framework.Platform;
+namespace UnbeatableStandaloneEditor;
 
 class Program
 {
