@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UbStandaloneEditor", "UbStandaloneEditor\UbStandaloneEditor.csproj", "{872E2A20-1527-4474-A606-9DFB677EF512}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnbeatableStandaloneEditor", "UnbeatableStandaloneEditor\UnbeatableStandaloneEditor.csproj", "{872E2A20-1527-4474-A606-9DFB677EF512}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Rulesets.UMania", "osu.Game.Rulesets.UMania\osu.Game.Rulesets.UMania.csproj", "{A8CFD859-4561-4DB5-BDC6-BCD5C289D8AE}"
 EndProject
