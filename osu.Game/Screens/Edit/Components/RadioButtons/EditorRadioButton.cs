@@ -52,6 +52,9 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             defaultIconColour = defaultBackgroundColour.Darken(0.5f);
             selectedIconColour = selectedBackgroundColour.Lighten(0.5f);
 
+            // Fix: Make EditorRadioButton (and DrawableTernaryButton) more compact so it all fits on one page.
+            Height = 32;
+
             Add(icon = (Button.CreateIcon?.Invoke() ?? new Circle()).With(b =>
             {
                 b.Blending = BlendingParameters.Additive;

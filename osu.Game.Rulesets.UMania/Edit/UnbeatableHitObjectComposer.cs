@@ -116,6 +116,9 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     {
         return new DrawableTernaryButton
         {
+            // Fix: Make EditorRadioButton (and DrawableTernaryButton) more compact so it all fits on one page.
+            Height = 32,
+            
             Current = new Bindable<TernaryState>(),
             Description = description,
             CreateIcon = () => new SpriteIcon { Icon = icon },
