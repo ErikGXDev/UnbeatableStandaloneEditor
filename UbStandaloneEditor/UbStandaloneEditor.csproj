@@ -26,7 +26,6 @@
         <ResolvedFileToPublish Condition="
             '%(Filename)%(Extension)' == 'osu.Game.Resources.dll' Or
             '%(Filename)%(Extension)' == 'osu.Game.Rulesets.UMania.dll' Or
-            '%(Filename)%(Extension)' == '0Harmony.dll' Or
             '%(Filename)%(Extension)' == 'websocket-sharp.dll'">
           <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         </ResolvedFileToPublish>

@@ -16,9 +16,6 @@
         <Reference Include="WebSocketSharp">
             <HintPath>lib\websocket-sharp.dll</HintPath>
         </Reference>
-        <Reference Include="0Harmony">
-            <HintPath>lib\0Harmony.dll</HintPath>
-        </Reference>
     </ItemGroup>
 
 </Project>
