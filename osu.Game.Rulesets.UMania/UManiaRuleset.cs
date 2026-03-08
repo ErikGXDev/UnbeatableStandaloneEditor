@@ -28,7 +28,6 @@ using osu.Game.Rulesets.UMania.Edit.Setup;
 using osu.Game.Rulesets.UMania.Skinning.Argon;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Skinning;
-using osu.Game.Rulesets.UMania.Patches;
 
 namespace osu.Game.Rulesets.UMania
 {
@@ -38,25 +37,9 @@ namespace osu.Game.Rulesets.UMania
         public const string SHORT_NAME = "mania";
 
 
-        private static bool hasPatched;
         public UManiaRuleset()
         {
-            try
-            {
-
-                if (!hasPatched)
-                {
-                    // Patch the ManiaBeatmapConverter to use UManiaRuleset instead of ManiaRuleset
-                    //var harmony = new Harmony("umania.ruleset.patch");
-                    //harmony.PatchAll();
-                    hasPatched = true;
-                    Logger.Log("+++ Successfully applied Harmony patches for UManiaRuleset - " + nameof(OnlinePatch));
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.Log("!!! Failed to apply Harmony patches for UManiaRuleset: " + e);
-            }
+           
         }
 
         public override string Description => "unbeatable";
