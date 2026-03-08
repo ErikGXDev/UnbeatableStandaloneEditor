@@ -28,6 +28,8 @@ namespace osu.Game.Beatmaps.Formats
         private readonly ISkin? skin;
 
         private readonly int onlineRulesetID;
+        
+        private readonly bool wasUmaniaRuleset = false;
 
         /// <summary>
         /// Creates a new <see cref="LegacyBeatmapEncoder"/>.
@@ -41,8 +43,15 @@ namespace osu.Game.Beatmaps.Formats
 
             onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
 
-            if (onlineRulesetID < 0 || onlineRulesetID > 3)
-                throw new ArgumentException("Only beatmaps in the osu, taiko, catch, or mania rulesets can be encoded to the legacy beatmap format.", nameof(beatmap));
+            if (onlineRulesetID == 5)
+            {
+                wasUmaniaRuleset = true;
+                onlineRulesetID = 3; // FIX: Make UMania behave as a mania ruleset
+            }
+
+            // FIX: Would error on ID = 5
+            /*if (onlineRulesetID < 0 || onlineRulesetID > 3)
+                throw new ArgumentException("Only beatmaps in the osu, taiko, catch, or mania rulesets can be encoded to the legacy beatmap format.", nameof(beatmap));*/
         }
 
         public void Encode(TextWriter writer)
@@ -85,7 +94,14 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant(
                 $"SampleSet: {toLegacySampleBank(((beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePoints.FirstOrDefault() ?? SampleControlPoint.DEFAULT).SampleBank)}"));
             writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.StackLeniency}"));
-            writer.WriteLine(FormattableString.Invariant($"Mode: {onlineRulesetID}"));
+
+            // FIX: UMania keeps its mode as 5 to still make it different from
+            // mania, to stay compatible with the original ruleset.
+            writer.WriteLine(wasUmaniaRuleset
+                ? FormattableString.Invariant($"Mode: 5")
+                : FormattableString.Invariant($"Mode: {onlineRulesetID}"));
+
+
             writer.WriteLine(FormattableString.Invariant($"LetterboxInBreaks: {(beatmap.LetterboxInBreaks ? '1' : '0')}"));
             // if (beatmap.BeatmapInfo.UseSkinSprites)
             //     writer.WriteLine(@"UseSkinSprites: 1");

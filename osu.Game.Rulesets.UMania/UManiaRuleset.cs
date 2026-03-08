@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.UMania
         // Legacy support
 
         public ILegacyScoreSimulator CreateLegacyScoreSimulator() => new ManiaLegacyScoreSimulator();
-        public int LegacyID => 3;
+        public int LegacyID => 5;
 
 
         // Leave this line intact. It will bake the correct version into the ruleset on each build/release.
