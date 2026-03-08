@@ -72,8 +72,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private FormControlBackground background = null!;
 
         private FormFieldCaption caption = null!;
-        private OsuSpriteText placeholderText = null!;
-        private OsuSpriteText filenameText = null!;
+        // FIX: Make public for easier access for UbExportFolderSelector
+        public OsuSpriteText placeholderText = null!;
+        public OsuSpriteText filenameText = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;

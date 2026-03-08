@@ -1,15 +1,11 @@
 ﻿using System.IO;
-using HarmonyLib;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Screens.Edit.Setup;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Rulesets.UMania.Edit.Setup;
 
@@ -25,16 +21,16 @@ public partial class UbExportFolderSelector : FormBeatmapFileSelector
         {
             var path = dir.NewValue;
 
-            Traverse.Create(this).Field<OsuSpriteText>("filenameText").Value.Text = path;
 
-            var placeHolderTraverse = Traverse.Create(this).Field<OsuSpriteText>("placeholderText");
+            filenameText.Text = path;
+            
             if (path.Length > 0)
             {
-                placeHolderTraverse.Value.Alpha = 0;
+                placeholderText.Alpha = 0;
             }
             else
             {
-                placeHolderTraverse.Value.Alpha = 1;
+                placeholderText.Alpha = 1;
             }
         });
     }
