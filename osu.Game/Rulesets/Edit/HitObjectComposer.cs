@@ -180,8 +180,11 @@ namespace osu.Game.Rulesets.Edit
                                         Spacing = new Vector2(0, 5),
                                     },
                                 },
+                                // FIX: Remove the banks section from the editor as it is not needed
+                                // (Note presets will do this for us already)
                                 new EditorToolboxGroup("bank (Shift/Alt-Q~R)")
                                 {
+                                    Alpha = 0f,
                                     Child = new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
@@ -229,7 +232,7 @@ namespace osu.Game.Rulesets.Edit
                                             },
                                         }
                                     }
-                                },
+                                }
                             }
                         },
                     }
