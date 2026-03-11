@@ -66,7 +66,9 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 },
             });
 
-            text.AddText(@"osu!", t => t.Font = OsuFont.TorusAlternate);
+            // FIX: Remove potential trademark issues by not using "osu!" in the editor menu bar.
+            // Might as well change it to ubt!, which is an abbreviation commonly used in the custom ruleset code.
+            text.AddText(@"ubt!", t => t.Font = OsuFont.TorusAlternate);
             text.AddText(@"editor", t =>
             {
                 t.Font = OsuFont.TorusAlternate;
