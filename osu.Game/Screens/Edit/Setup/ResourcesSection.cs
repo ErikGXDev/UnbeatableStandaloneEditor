@@ -58,16 +58,17 @@ namespace osu.Game.Screens.Edit.Setup
 
             Children = new Drawable[]
             {
-                backgroundChooser = new FormBeatmapFileSelector(beatmapHasMultipleDifficulties, SupportedExtensions.IMAGE_EXTENSIONS)
-                {
-                    Caption = GameplaySettingsStrings.BackgroundHeader,
-                    PlaceholderText = EditorSetupStrings.ClickToSelectBackground,
-                },
                 audioTrackChooser = new FormBeatmapFileSelector(beatmapHasMultipleDifficulties, SupportedExtensions.AUDIO_EXTENSIONS)
                 {
                     Caption = EditorSetupStrings.AudioTrack,
                     PlaceholderText = EditorSetupStrings.ClickToSelectTrack,
                 },
+                backgroundChooser = new FormBeatmapFileSelector(beatmapHasMultipleDifficulties, SupportedExtensions.IMAGE_EXTENSIONS)
+                {
+                    Caption = GameplaySettingsStrings.BackgroundHeader,
+                    PlaceholderText = EditorSetupStrings.ClickToSelectBackground,
+                },
+               
                 // FIX: Hide sample set chooser because they're not needed
                 /*new FormSampleSetChooser
                 {
