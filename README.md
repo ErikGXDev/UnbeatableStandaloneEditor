@@ -28,7 +28,24 @@ Beatmaps / other data will be saved to an "unbeatable-beatmap-editor" folder. Fi
 - Cute icons
 - Everything else the osu!mania editor has to offer (composition, timing, great ui)
 
+## Getting started
+
+To start making your map, press the "New beatmap" button on the start screen. To edit an existing map, click on it in the list and press "Edit beatmap" at the bottom.
+
+Inside the editor, you will find a piano roll with 6 columns. They are as follows:
+
+| Column: |    1    |    2    |  3  |   4    |  5   |   6    |
+|:-------:|:-------:|:-------:|:---:|:------:|:----:|:------:|
+|  Type:  | Command | Command | Top | Bottom | Flip | Middle |
+
+The most interesting ones will be Top, Bottom, Flip and Extra. They should be self-explanatory, but to avoid confusion, any selected note preset will highlight its corresponding columns in the editor and prevent you from placing them in the wrong column.
+
+
+
 ## Screenshot
+
+![Starting Screen](images/screenshot0.png)
+_The beatmap selection screen. Create a new beatmap or edit an existing one._
 
 ![General Overview](images/screenshot.png)
 _The standard interface of the editor. Use the tools on the left to select and place notes. Placed notes will show their respective icons and modifiers._
