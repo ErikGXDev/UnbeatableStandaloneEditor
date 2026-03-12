@@ -42,7 +42,7 @@ The most interesting ones will be Top, Bottom, Flip and Extra. They should be se
 
 
 
-## Screenshot
+## Screenshots
 
 ![Starting Screen](images/screenshot0.png)
 _The beatmap selection screen. Create a new beatmap or edit an existing one._
