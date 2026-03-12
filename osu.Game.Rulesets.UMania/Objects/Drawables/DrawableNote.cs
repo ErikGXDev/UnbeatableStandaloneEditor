@@ -77,19 +77,12 @@ namespace osu.Game.Rulesets.UMania.Objects.Drawables
 
         private List<Drawable> modIcons = new List<Drawable>();
 
-        [Resolved(null, null, true)]
-        private UnbeatableHitObjectComposer composer { get; set; } = null!;
-
         private void addIcon()
         {
-            if (composer == null)
-            {
-                return;
-            }
 
             if (this is not DrawableHoldNoteTail && HitObject != null)
             {
-                var helper = new UbNoteBuilderHelper(composer, HitObject);
+                var helper = new UbNoteBuilder(HitObject);
 
                 var icon = helper.InferObjectTypeIcon();
 
