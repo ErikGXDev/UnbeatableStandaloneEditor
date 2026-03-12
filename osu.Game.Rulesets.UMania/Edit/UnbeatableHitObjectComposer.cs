@@ -23,6 +23,17 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     {
     }
 
+    protected override void LoadComplete()
+    {
+        base.LoadComplete();
+
+        // Add the order-toggle layer correctly so it can receive input
+        PlayfieldContentContainer.Add(new NoteOrderButtonLayer(Playfield.Stages[0])
+        {
+            RelativeSizeAxes = Axes.Both,
+        });
+    }
+
     protected override Drawable CreateHitObjectInspector() => new UManiaHitObjectInspector();
 
     protected override IReadOnlyList<CompositionTool> CompositionTools => new CompositionTool[]
