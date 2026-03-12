@@ -38,7 +38,8 @@ namespace osu.Game.Audio
         /// <summary>
         /// All valid bank constants.
         /// </summary>
-        public static readonly string[] ALL_BANKS = [BANK_NORMAL, BANK_SOFT, BANK_DRUM];
+        // Fix: Add BANK_STRONG as it is used in the UMania ruleset.
+        public static readonly string[] ALL_BANKS = [BANK_NORMAL, BANK_SOFT, BANK_DRUM, BANK_STRONG];
 
         /// <summary>
         /// The name of the sample to load.

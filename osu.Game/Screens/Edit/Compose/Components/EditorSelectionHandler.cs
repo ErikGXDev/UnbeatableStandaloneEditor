@@ -600,6 +600,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 State = { BindTarget = drum },
                 Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.R))
             };
+            
+            // FIX: Add strong as another sample type as it is used in the UMania ruleset.
+            var strong = SelectionBankStates[HitSampleInfo.BANK_STRONG];
+            yield return new TernaryStateToggleMenuItem(strong.Description)
+            {
+                State = { BindTarget = strong },
+                Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.T))
+            };
 
             yield return new OsuMenuItem("Addition bank")
             {
