@@ -4,6 +4,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.UMania.Edit.Blueprints;
 using osu.Game.Rulesets.UMania.Objects;
 using osu.Game.Rulesets.UMania.UI;
 using osu.Game.Screens.Edit;
@@ -81,7 +82,34 @@ namespace osu.Game.Rulesets.UMania.Edit
                 var col3Note = group.FirstOrDefault(h => h.Column == 3);
 
                 if (col2Note == null || col3Note == null) continue;
+                
+                var ubHelper2 = new UbNoteBuilder(col2Note);
+                var type2 = ubHelper2.InferObjectTypeIcon();
+                
+                var ubHelper3 = new UbNoteBuilder(col3Note);
+                var type3 = ubHelper3.InferObjectTypeIcon();
 
+                var invalidPairTypes = new[]
+                {
+                    UbIconType.Note,
+                    UbIconType.Hold,
+                };
+                
+                var isInvalidPair = false;
+                
+
+                foreach (var type in invalidPairTypes)
+                {
+                    if (type2 == type && type3 == type)
+                    {
+                        isInvalidPair = true;
+                        break;
+                    }
+                }
+                
+                if (isInvalidPair) continue;
+                
+                
                 // True = column 2 (top) appears first
                 bool isCol2First = editorBeatmap.FindIndex(col2Note) < editorBeatmap.FindIndex(col3Note);
 
