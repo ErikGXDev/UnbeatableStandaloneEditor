@@ -2,6 +2,7 @@
 
 A modified standalone osu!lazer editor that makes creating UNBEATABLE custom maps easier. Based on the osu!mania ruleset and editor.
 
+[Installation](#installation) | [Features](#features) | [Getting started](#getting-started) | [Screenshots](#screenshots) | [License / Credits](#license--credits)
 
 ## Installation
 
@@ -12,7 +13,7 @@ The editor consists of an executable file along with some dlls. Extract the file
 
 > That's all there is to it!
 
-Beatmaps / other data will be saved to an "unbeatable-beatmap-editor" folder. Find it in the following locations:
+Some data will be saved to an "unbeatable-beatmap-editor" folder. Find it in the following locations:
 
 - `%AppData%\unbeatable-beatmap-editor` on Windows
 - `~/.local/share/unbeatable-beatmap-editor` on Linux/macOS
@@ -23,10 +24,15 @@ Beatmaps / other data will be saved to an "unbeatable-beatmap-editor" folder. Fi
 - Note modifier menus: Easily customize notes
 - In-editor note preview: See the type and modifiers of any note
 - Column guides: Make sure you place notes where they belong
+- Placement order: More control over how your notes spawn in-game
 - Inspector: Easily check what side the notes are currently on.
 - Simple export options: Export as your map as .zip or playtest directly in UNBEATABLE
 - Cute icons
 - Everything else the osu!mania editor has to offer (composition, timing, great ui)
+
+> [!NOTE]
+> Playtesting a map in UNBEATABLE through the Editor requires installing [this mod](https://github.com/ErikGXDev/UnbeatableWebsocket) for the game.
+
 
 ## Getting started
 
@@ -56,10 +62,6 @@ _Select a single note to see its properties. You can also check what side it wil
 ![Export Options](images/screenshot3.png)
 _Export your map as a .zip file using the buttons at the bottom of the setup page. Choose a folder, and click export. You can also quickly test the map in-game here._
 
-
-
-> [!NOTE]
-> Playtesting a map in UNBEATABLE through the Editor requires installing [this mod](https://github.com/ErikGXDev/UnbeatableWebsocket) for the game.
 
 
 # License / Credits
