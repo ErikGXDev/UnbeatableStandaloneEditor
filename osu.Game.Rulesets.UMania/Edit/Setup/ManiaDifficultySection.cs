@@ -34,6 +34,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         [BackgroundDependencyLoader]
         private void load()
         {
+            // FIX: Hide the section as it is only needed to set the key count
+            Alpha = 0;
             Children = new Drawable[]
             {
                 keyCountSlider = new FormSliderBar<float>

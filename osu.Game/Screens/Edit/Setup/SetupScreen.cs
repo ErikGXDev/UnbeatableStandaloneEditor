@@ -58,8 +58,8 @@ namespace osu.Game.Screens.Edit.Setup
                         ChildrenEnumerable = ruleset.CreateEditorSetupSections().Select(section => section.With(s =>
                         {
                             s.Width = 450;
-                            s.Anchor = Anchor.TopCentre;
-                            s.Origin = Anchor.TopCentre;
+                            s.Anchor = Anchor.TopLeft;
+                            s.Origin = Anchor.TopLeft;
                         })),
                     }
                 }

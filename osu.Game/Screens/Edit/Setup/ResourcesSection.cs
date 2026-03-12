@@ -68,12 +68,15 @@ namespace osu.Game.Screens.Edit.Setup
                     Caption = EditorSetupStrings.AudioTrack,
                     PlaceholderText = EditorSetupStrings.ClickToSelectTrack,
                 },
-                new FormSampleSetChooser
+                // FIX: Hide sample set chooser because they're not needed
+                /*new FormSampleSetChooser
                 {
+                    Alpha = 0,
                     Current = { BindTarget = currentSampleSet },
                 },
                 new FormSampleSet
                 {
+                    Alpha = 0,
                     Current = { BindTarget = currentSampleSet },
                     SampleAddRequested = (file, targetName) =>
                     {
@@ -88,7 +91,7 @@ namespace osu.Game.Screens.Edit.Setup
                         if (file != null)
                             beatmaps.DeleteFile(working.Value.BeatmapSetInfo, file);
                     }
-                },
+                },*/
             };
 
             backgroundChooser.PreviewContainer.Add(headerBackground);

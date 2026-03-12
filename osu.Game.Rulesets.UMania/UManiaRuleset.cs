@@ -90,9 +90,9 @@ namespace osu.Game.Rulesets.UMania
         [
             new MetadataSection(),
             new ManiaDifficultySection(),
+            // Custom Unbeatable section for some custom features and ui
+            new UbExportSection(), 
             new ResourcesSection(),
-            new DesignSection(),
-            new UbExportSection() // Custom Unbeatable section for some custom features and ui
         ];
 
         public override HitObjectComposer CreateHitObjectComposer() => new UnbeatableHitObjectComposer(this);
