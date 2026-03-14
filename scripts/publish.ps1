@@ -70,7 +70,7 @@ foreach ($dir in $localeDirs) {
     Write-Host "    Removed locale dir: $($dir.Name)"
 }
 
-# Remove stbi.lib — static import library, not loaded at runtime
+# Remove stbi.lib - static import library, not loaded at runtime
 $stbiLib = Join-Path $outputDir "stbi.lib"
 if (Test-Path $stbiLib) {
     Remove-Item $stbiLib -Force
@@ -93,7 +93,7 @@ if (Test-Path $creditsSource) {
     Copy-Item $creditsSource $creditsDest -Force
     Write-Host "    Copied CREDITS"
 } else {
-    Write-Warning "CREDITS file not found at $creditsSource — skipping."
+    Write-Warning "CREDITS file not found at $creditsSource -- skipping."
 }
 
 # --- Summary ---
@@ -102,12 +102,14 @@ $totalSize = (Get-ChildItem $outputDir -Recurse -File | Measure-Object -Property
 Write-Host ""
 Write-Host "==> Published successfully to:" -ForegroundColor Green
 Write-Host "    $outputDir"
-Write-Host "    Total size: $([math]::Round($totalSize / (1024 * 1024), 1)) MB"
+$totalSizeMB = [math]::Round($totalSize / (1024 * 1024), 1)
+Write-Host "    Total size: $totalSizeMB MB"
 
 $exe = Get-ChildItem $outputDir -Filter "UnbeatableStandaloneEditor*" -File |
        Where-Object { $_.Extension -in @(".exe", "") -or $_.Name -notmatch "\." } |
        Select-Object -First 1
 
 if ($exe) {
-    Write-Host "    Executable: $($exe.Name)  ($([math]::Round($exe.Length / (1024 * 1024), 1)) MB)"
+    $exeSizeMB = [math]::Round($exe.Length / (1024 * 1024), 1)
+    Write-Host "    Executable: $($exe.Name)  ($exeSizeMB MB)"
 }
