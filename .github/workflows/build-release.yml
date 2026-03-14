@@ -1,0 +1,93 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+        include:
+          - os: ubuntu-latest
+            rid: linux-x64
+            platform: linux
+          - os: windows-latest
+            rid: win-x64
+            platform: windows
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          $tag = "${{ github.ref }}".Replace("refs/tags/", "")
+          $version = $tag.TrimStart('v', 'V')
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        shell: powershell
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore UnbeatableStandaloneEditor.sln
+
+      - name: Publish (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: powershell
+        run: |
+          .\scripts\publish.ps1 -Runtime ${{ matrix.rid }} -Configuration Release
+
+      - name: Publish (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        shell: pwsh
+        run: |
+          ./scripts/publish.ps1 -Runtime ${{ matrix.rid }} -Configuration Release
+
+      - name: Create release package (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          cd UnbeatableStandaloneEditor/publish
+          zip -r "../../unbeatable-editor-${{ matrix.platform }}-x64.zip" *
+
+      - name: Create release package (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: powershell
+        run: |
+          Compress-Archive -Path "UnbeatableStandaloneEditor/publish/*" -DestinationPath "unbeatable-editor-${{ matrix.platform }}-x64.zip"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: unbeatable-editor-${{ matrix.platform }}-x64
+          path: unbeatable-editor-${{ matrix.platform }}-x64.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
