@@ -23,13 +23,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract version from tag
-        id: version
+      - name: Extract version from tag (Windows)
+        id: version-windows
+        if: matrix.os == 'windows-latest'
+        shell: powershell
         run: |
           $tag = "${{ github.ref }}".Replace("refs/tags/", "")
           $version = $tag.TrimStart('v', 'V')
           echo "VERSION=$version" >> $env:GITHUB_OUTPUT
-        shell: powershell
+
+      - name: Extract version from tag (Linux)
+        id: version-linux
+        if: matrix.os == 'ubuntu-latest'
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref }}".Replace("refs/tags/", "")
+          $version = $tag.TrimStart('v', 'V')
+          "VERSION=$version" >> $env:GITHUB_OUTPUT
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
