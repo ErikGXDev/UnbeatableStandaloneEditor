@@ -1,4 +1,8 @@
-﻿# Unbeatable Standalone Editor
+﻿<p align="center">
+  <img src="images/icon.png" width="96" alt="Unbeatable Standalone Editor icon" />
+</p>
+
+# Unbeatable Standalone Editor
 
 A modified standalone osu!lazer editor that makes creating UNBEATABLE custom maps easier. Based on the osu!mania ruleset and editor.
 
@@ -75,4 +79,3 @@ This project includes [osu-resources](https://github.com/ppy/osu-resources) crea
 Due to the nature of a lot of code being copied from osu!, the osu trademark and license may appear in the code. However, this project **is not affiliated with ppy or osu! in any way**.
 
 This editor may be used to make custom maps for the game UNBEATABLE, but is not affiliated with D-CELL Games, Playstack or similar.
-
