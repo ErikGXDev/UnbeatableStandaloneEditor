@@ -9,7 +9,7 @@ class Program
         using var host = Host.GetSuitableDesktopHost("unbeatable-beatmap-editor", new HostOptions()
         {
             PortableInstallation = false,
-            FriendlyGameName = "unbeatable standalone beatmap editor"
+            FriendlyGameName = "UNBEATABLE Standalone Beatmap Editor"
         });
         host.Run(new MainGame());
     }
