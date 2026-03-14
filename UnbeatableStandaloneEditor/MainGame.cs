@@ -49,8 +49,6 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
             screenStack.Exit();
             return true;
         }
-
-
         return false;
     }
 
@@ -99,5 +97,13 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
 
         //screenStack.Push(new DirectEditorLoader());
         screenStack.Push(new BeatmapPickerScreen());
+    }
+
+    public override void SetHost(GameHost host)
+    {
+        base.SetHost(host);
+
+        host.Window.CursorState |= CursorState.Hidden;
+
     }
 }
