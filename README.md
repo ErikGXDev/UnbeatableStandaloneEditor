@@ -64,7 +64,7 @@ _The standard interface of the editor. Use the tools on the left to select and p
 _Select a single note to see its properties. You can also check what side it will spawn on, and if the camera is zoomed out (centered)._
 
 ![Export Options](images/screenshot3.png)
-_Export your map as a .zip file using the buttons at the bottom of the setup page. Choose a folder, and click export. You can also quickly test the map in-game here._
+_Export your map as a .zip file using the buttons at the setup page. Choose a folder, and click export. You can also quickly test the map in-game here._
 
 
 
