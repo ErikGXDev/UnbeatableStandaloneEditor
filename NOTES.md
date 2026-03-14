@@ -22,4 +22,18 @@ Create and push a tag:
 
 A release will be automatically created by the GitHub Actions workflow.
 
+## Deleting releases (locally and on GitHub)
+
+Delete a local tag:
+
+   ```powershell
+   git tag -d v1.0.0
+   ```
+
+Delete a remote tag:
+
+   ```powershell
+   git push --delete origin v1.0.0
+   ```
+
 (This document is mainly just for that I won't forget)
