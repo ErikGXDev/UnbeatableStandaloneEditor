@@ -102,12 +102,12 @@ $totalSize = (Get-ChildItem $outputDir -Recurse -File | Measure-Object -Property
 Write-Host ""
 Write-Host "==> Published successfully to:" -ForegroundColor Green
 Write-Host "    $outputDir"
-Write-Host "    Total size: $([math]::Round($totalSize / 1MB, 1)) MB"
+Write-Host "    Total size: $([math]::Round($totalSize / (1024 * 1024), 1)) MB"
 
 $exe = Get-ChildItem $outputDir -Filter "UnbeatableStandaloneEditor*" -File |
        Where-Object { $_.Extension -in @(".exe", "") -or $_.Name -notmatch "\." } |
        Select-Object -First 1
 
 if ($exe) {
-    Write-Host "    Executable: $($exe.Name)  ($([math]::Round($exe.Length / 1MB, 1)) MB)"
+    Write-Host "    Executable: $($exe.Name)  ($([math]::Round($exe.Length / (1024 * 1024), 1)) MB)"
 }
