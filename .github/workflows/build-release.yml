@@ -53,13 +53,13 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: powershell
         run: |
-          .\scripts\publish.ps1 -Runtime ${{ matrix.rid }} -Configuration Release
+          .\scripts\publish.ps1 -Runtime ${{ matrix.rid }} -Configuration Release -Version ${{ steps.version-windows.outputs.VERSION }}
 
       - name: Publish (Linux)
         if: matrix.os == 'ubuntu-latest'
         shell: pwsh
         run: |
-          ./scripts/publish.ps1 -Runtime ${{ matrix.rid }} -Configuration Release
+          ./scripts/publish.ps1 -Runtime ${{ matrix.rid }} -Configuration Release -Version ${{ steps.version-linux.outputs.VERSION }}
 
       - name: Create release package (Linux)
         if: matrix.os == 'ubuntu-latest'
@@ -101,3 +101,4 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
