@@ -157,8 +157,8 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     {
         ModButtonToolMap = new List<ModMapping>()
         {
-            makeMapping(ModFlyingButton, ["Note", "Hold", "Dodge", "Double", "Spam", "Freestyle"], () => !isCopModding() ),
-            makeMapping(ModInvisibleButton, ["Note", "Hold", "Double", "Spam", "Freestyle"], () => !isCopModding() ),
+            makeMapping(ModFlyingButton, ["Note", "Hold", "Dodge", "Double"], () => !isCopModding() ),
+            makeMapping(ModInvisibleButton, ["Note", "Hold"], () => !isCopModding() ),
             makeMapping(ModSwapImmediateButton, ["Flip"], () => !isCopModding() ),
             makeMapping(ModCopButton, ["Note", "Hold"] ),
             makeMapping(ModCop1Button, ["Note", "Hold"], isCopModding ),
