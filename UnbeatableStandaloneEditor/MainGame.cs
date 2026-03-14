@@ -5,6 +5,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game;
+using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Screens;
@@ -17,14 +18,14 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
     [Cached(typeof(IDialogOverlay))]
     private readonly DialogOverlay dialogOverlay = new DialogOverlay();
 
-    [Cached(typeof(INotificationOverlay))]
-    private readonly NotificationOverlay notificationOverlay = new NotificationOverlay();
-
     [Cached]
     private VolumeOverlay volumeOverlay = new VolumeOverlay();
 
     private OsuScreenStack screenStack = null!;
     private EditorConfigManager editorConfig = null!;
+
+    [Cached]
+    private OnScreenDisplay onScreenDisplay = new OnScreenDisplay();
 
     [BackgroundDependencyLoader]
     private void load(Storage storage)
@@ -34,8 +35,8 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
         Add(screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both });
 
         Add(dialogOverlay);
-        Add(notificationOverlay);
         Add(volumeOverlay);
+        Add(onScreenDisplay);
     }
 
     public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -83,6 +84,9 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
             Audio.VolumeTrack.Value = 0.7;
             editorConfig.SetValue(EditorSetting.FirstLaunch, false);
             editorConfig.Save();
+
+            LocalConfig.SetValue(OsuSetting.EditorAutoSeekOnPlacement, false);
+            LocalConfig.SetValue(OsuSetting.EditorShowSpeedChanges, true);
         }
 
         var maniaRuleset = UbRuleset.GetRulesetInfo();
@@ -92,7 +96,6 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
         // To open an existing one: Beatmap.Value = BeatmapManager.GetWorkingBeatmap(info);
          // leaves it as DummyWorkingBeatmap
         Beatmap.SetDefault();
-
 
         //screenStack.Push(new DirectEditorLoader());
         screenStack.Push(new BeatmapPickerScreen());
