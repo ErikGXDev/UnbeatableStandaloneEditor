@@ -28,7 +28,7 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
         base.LoadComplete();
 
         // Add the order-toggle layer correctly so it can receive input
-        PlayfieldContentContainer.Add(new NoteOrderButtonLayer(Playfield.Stages[0])
+        PlayfieldContentContainer.Add(new UbNoteOrderButtonLayer(Playfield.Stages[0])
         {
             RelativeSizeAxes = Axes.Both,
         });

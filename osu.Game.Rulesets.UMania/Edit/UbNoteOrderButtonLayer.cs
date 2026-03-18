@@ -13,7 +13,7 @@ using osuTK;
 namespace osu.Game.Rulesets.UMania.Edit
 {
     // Overlay for showing the swap order buttons
-    public partial class NoteOrderButtonLayer : CompositeDrawable
+    public partial class UbNoteOrderButtonLayer : CompositeDrawable
     {
         private readonly Stage stage;
 
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.UMania.Edit
         // Each entry tracks a same-time pair and its button
         private readonly List<(ManiaHitObject col2Note, ManiaHitObject col3Note, OrderToggleButton button)> pairs = new();
 
-        public NoteOrderButtonLayer(Stage stage)
+        public UbNoteOrderButtonLayer(Stage stage)
         {
             this.stage = stage;
             RelativeSizeAxes = Axes.Both;
