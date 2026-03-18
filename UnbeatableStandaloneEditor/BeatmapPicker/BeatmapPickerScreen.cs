@@ -1,9 +1,11 @@
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -32,6 +34,11 @@ public partial class BeatmapPickerScreen : OsuScreen
     private FillFlowContainer setsFlow = null!;
     private RoundedButton editButton = null!;
     private RoundedButton deleteButton = null!;
+    private RoundedButton? updateButton;
+
+    private OsuClickableContainer versionText = null!;
+    private Container? updateButtonContainer;
+
 
     [Cached] private OverlayColourProvider colours = new(OverlayColourScheme.Aquamarine);
 
@@ -137,6 +144,33 @@ public partial class BeatmapPickerScreen : OsuScreen
                         ],
                     }
                 ],
+            },
+            // Version and update button at bottom right
+            updateButtonContainer = new Container
+            {
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                Padding = new MarginPadding { Right = 16, Bottom = 16 },
+                Width = 80,
+                AutoSizeAxes = Axes.Y,
+                Children =
+                [
+                    versionText = new OsuClickableContainer
+                    {
+                        Anchor = Anchor.BottomRight,
+                        Origin = Anchor.BottomRight,
+                        Y = -8,
+                        AutoSizeAxes = Axes.Both,
+                        Action = openGitHubRepo,
+                        Child = new OsuSpriteText
+                        {
+                            Text = $"v{AppVersion.Current}",
+                            Font = OsuFont.GetFont(size: 16),
+                            Colour = colours.Highlight1,
+                            Alpha = 0.6f,
+                        }
+                    }
+                ]
             }
         ];
     }
@@ -145,7 +179,6 @@ public partial class BeatmapPickerScreen : OsuScreen
     {
         base.LoadComplete();
 
-        // Overlay a trash icon on the icon-only delete button
         deleteButton.Add(new SpriteIcon
         {
             Anchor = Anchor.Centre,
@@ -161,6 +194,32 @@ public partial class BeatmapPickerScreen : OsuScreen
             editButton.Enabled.Value = has;
             deleteButton.Enabled.Value = has;
         }, true);
+
+        // Check for updates asynchronously
+        Task.Run(async () =>
+        {
+            var update = await VersionCheckService.CheckForUpdateAsync();
+            if (update != null)
+            {
+                Schedule(() =>
+                {
+                    updateButton = new RoundedButton
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        Width = 180,
+                        Height = 28,
+                        Y = 30,
+                        Colour = colours.Colour1,
+                        BackgroundColour = colours.Background3,
+                        Text = "New version available!",
+                        Action = () => openUpdateRelease(update),
+                    };
+                    versionText.Y = -36;
+                    updateButtonContainer!.Add(updateButton);
+                });
+            }
+        });
 
         // Load all the beatmap sets
         realm.RegisterForNotifications(
@@ -219,6 +278,16 @@ public partial class BeatmapPickerScreen : OsuScreen
     {
         if (selectedSet.Value == null) return;
         dialogOverlay?.Push(new BeatmapDeleteDialog(selectedSet.Value));
+    }
+
+    private void openGitHubRepo()
+    {
+        BrowserUtil.OpenUrl("https://github.com/ErikGXDev/UnbeatableStandaloneEditor");
+    }
+
+    private void openUpdateRelease(VersionCheckService.ReleaseInfo update)
+    {
+        BrowserUtil.OpenUrl(update.ReleaseUrl);
     }
 
     // For when there are no beatmaps

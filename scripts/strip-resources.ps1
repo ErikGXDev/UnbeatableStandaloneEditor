@@ -43,14 +43,15 @@ if (!(Test-Path $sourceDll)) {
 }
 
 $originalSize = (Get-Item $sourceDll).Length
-Write-Host "==> Stripping osu.Game.Resources.dll  ($([math]::Round($originalSize/1MB,1)) MB)" -ForegroundColor Cyan
+$originalSizeMB = [math]::Round($originalSize/(1024 * 1024),1)
+Write-Host ("==> Stripping osu.Game.Resources.dll  ({0} MB)" -f $originalSizeMB) -ForegroundColor Cyan
 
 Copy-Item $sourceDll $backupDll -Force
 
 dotnet run --project $toolProject -c Release -- $sourceDll $outputDll
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "Strip tool failed — restoring original" -ForegroundColor Red
+    Write-Host "Strip tool failed - restoring original" -ForegroundColor Red
     Remove-Item $outputDll -ErrorAction SilentlyContinue
     exit $LASTEXITCODE
 }
@@ -59,8 +60,10 @@ Move-Item $outputDll $sourceDll -Force
 Remove-Item $backupDll -Force
 
 $newSize = (Get-Item $sourceDll).Length
-$saved   = ($originalSize - $newSize) / 1MB
+$newSizeMB = [math]::Round($newSize/(1024 * 1024),1)
+$saved   = ($originalSize - $newSize) / (1024 * 1024)
+$savedMB = [math]::Round($saved,1)
 
 Write-Host ""
 Write-Host "==> osu.Game.Resources.dll stripped" -ForegroundColor Green
-Write-Host "    $([math]::Round($originalSize/1MB,1)) MB  ->  $([math]::Round($newSize/1MB,1)) MB  (saved $([math]::Round($saved,1)) MB)"
+Write-Host ("    {0} MB  ->  {1} MB  (saved {2} MB)" -f $originalSizeMB, $newSizeMB, $savedMB)

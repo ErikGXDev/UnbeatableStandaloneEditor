@@ -8,6 +8,8 @@
         <!-- Only include English satellite assemblies; strips all non-en locale folders from publish output -->
         <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
         <RootNamespace>UnbeatableStandaloneEditor</RootNamespace>
+        <Version>1.0.0</Version>
+        <ApplicationIcon>icon.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>

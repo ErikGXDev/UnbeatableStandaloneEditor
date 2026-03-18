@@ -1287,12 +1287,14 @@ namespace osu.Game.Screens.Edit
                 Hotkey = new Hotkey(GlobalAction.EditorDiscardUnsavedChanges)
             };
 
-            if (RuntimeInfo.OS != RuntimeInfo.Platform.Android)
+            // FIX: Remove this export menu (User should use the one in setup page)
+            // TODO: Perhaps implement some quick-export options here
+            /*if (RuntimeInfo.OS != RuntimeInfo.Platform.Android)
             {
                 var export = createExportMenu();
                 saveRelatedMenuItems.AddRange(export.Items);
                 yield return export;
-            }
+            }*/
 
             if (RuntimeInfo.IsDesktop)
             {

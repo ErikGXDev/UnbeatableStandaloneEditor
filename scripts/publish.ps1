@@ -10,6 +10,10 @@
 .PARAMETER Configuration
     Build configuration. Defaults to Release.
 
+.PARAMETER Version
+    Override version number for the build (e.g., "0.1.2").
+    If not provided, uses version from .csproj.
+
 .PARAMETER StripResources
     After publishing, strip unused embedded resources from osu.Game.Resources.dll
     (background music, multiplayer/results/intro sounds & textures, retro skin).
@@ -19,11 +23,13 @@
     .\publish.ps1
     .\publish.ps1 -StripResources
     .\publish.ps1 -Runtime linux-x64
+    .\publish.ps1 -Version 0.1.2
     .\publish.ps1 -Runtime win-x64 -Configuration Debug
 #>
 param(
     [string]$Runtime = "win-x64",
-    [string]$Configuration = "Release"
+    [string]$Configuration = "Release",
+    [string]$Version = ""
 )
 
 $StripResources = $true
@@ -34,10 +40,17 @@ $repoRoot   = Split-Path $PSScriptRoot -Parent
 $project    = Join-Path $repoRoot "UnbeatableStandaloneEditor\UnbeatableStandaloneEditor.csproj"
 $outputDir  = Join-Path $repoRoot "UnbeatableStandaloneEditor\publish"
 
+# Default to version from .csproj if not provided
+if (-not $Version) {
+    [xml]$csproj = Get-Content $project
+    $Version = $csproj.Project.PropertyGroup.Version
+}
+
 Write-Host "==> Building UnbeatableStandaloneEditor" -ForegroundColor Cyan
 Write-Host "    Project      : $project"
 Write-Host "    Runtime      : $Runtime"
 Write-Host "    Configuration: $Configuration"
+Write-Host "    Version      : $Version"
 Write-Host "    StripResources: $StripResources"
 Write-Host ""
 
@@ -48,7 +61,8 @@ dotnet publish $project `
     --output $outputDir `
     -p:PublishSingleFile=true `
     -p:IncludeNativeLibrariesForSelfExtract=true `
-    -p:DebugType=embedded
+    -p:DebugType=embedded `
+    "-p:Version=$Version"
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""
@@ -70,7 +84,7 @@ foreach ($dir in $localeDirs) {
     Write-Host "    Removed locale dir: $($dir.Name)"
 }
 
-# Remove stbi.lib — static import library, not loaded at runtime
+# Remove stbi.lib - static import library, not loaded at runtime
 $stbiLib = Join-Path $outputDir "stbi.lib"
 if (Test-Path $stbiLib) {
     Remove-Item $stbiLib -Force
@@ -93,7 +107,7 @@ if (Test-Path $creditsSource) {
     Copy-Item $creditsSource $creditsDest -Force
     Write-Host "    Copied CREDITS"
 } else {
-    Write-Warning "CREDITS file not found at $creditsSource — skipping."
+    Write-Warning "CREDITS file not found at $creditsSource -- skipping."
 }
 
 # --- Summary ---
@@ -102,12 +116,14 @@ $totalSize = (Get-ChildItem $outputDir -Recurse -File | Measure-Object -Property
 Write-Host ""
 Write-Host "==> Published successfully to:" -ForegroundColor Green
 Write-Host "    $outputDir"
-Write-Host "    Total size: $([math]::Round($totalSize / 1MB, 1)) MB"
+$totalSizeMB = [math]::Round($totalSize / (1024 * 1024), 1)
+Write-Host "    Total size: $totalSizeMB MB"
 
 $exe = Get-ChildItem $outputDir -Filter "UnbeatableStandaloneEditor*" -File |
        Where-Object { $_.Extension -in @(".exe", "") -or $_.Name -notmatch "\." } |
        Select-Object -First 1
 
 if ($exe) {
-    Write-Host "    Executable: $($exe.Name)  ($([math]::Round($exe.Length / 1MB, 1)) MB)"
+    $exeSizeMB = [math]::Round($exe.Length / (1024 * 1024), 1)
+    Write-Host "    Executable: $($exe.Name)  ($exeSizeMB MB)"
 }

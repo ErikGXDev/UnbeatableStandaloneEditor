@@ -5,6 +5,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game;
+using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Screens;
@@ -31,17 +32,20 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
     protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
         dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-    [BackgroundDependencyLoader]
-    private void load()
-    {
-        dependencies.CacheAs(editorConfig);
+    [Cached]
+    private OnScreenDisplay onScreenDisplay = new OnScreenDisplay();
 
+    [BackgroundDependencyLoader]
+    private void load(Storage storage)
+    {
+        editorConfig = new EditorConfigManager(storage);
 
         Add(screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both });
 
         Add(dialogOverlay);
         Add(notificationOverlay);
         Add(volumeOverlay);
+        Add(onScreenDisplay);
     }
 
     public override void SetHost(GameHost host)
@@ -98,6 +102,9 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
             Audio.VolumeTrack.Value = 0.7;
             editorConfig.SetValue(EditorSetting.FirstLaunch, false);
             editorConfig.Save();
+
+            LocalConfig.SetValue(OsuSetting.EditorAutoSeekOnPlacement, false);
+            LocalConfig.SetValue(OsuSetting.EditorShowSpeedChanges, true);
         }
 
         var maniaRuleset = UbRuleset.GetRulesetInfo();
