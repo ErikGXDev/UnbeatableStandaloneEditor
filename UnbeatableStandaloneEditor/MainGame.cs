@@ -26,16 +26,31 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
     private OsuScreenStack screenStack = null!;
     private EditorConfigManager editorConfig = null!;
 
+    private DependencyContainer dependencies = null!;
+
+    protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+        dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
     [BackgroundDependencyLoader]
-    private void load(Storage storage)
+    private void load()
     {
-        editorConfig = new EditorConfigManager(storage);
+        dependencies.CacheAs(editorConfig);
+
 
         Add(screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both });
 
         Add(dialogOverlay);
         Add(notificationOverlay);
         Add(volumeOverlay);
+    }
+
+    public override void SetHost(GameHost host)
+    {
+        base.SetHost(host); // This has to go first, apparently.
+
+        editorConfig = new EditorConfigManager(Storage);
+
+
     }
 
     public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
