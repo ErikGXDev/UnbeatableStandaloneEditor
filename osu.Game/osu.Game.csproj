@@ -3,6 +3,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <OutputType>Library</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
+    <NoWarn>CS8981,OLOC003,OSUF001,AD0001</NoWarn>
   </PropertyGroup>
   <PropertyGroup Label="Nuget">
     <Title>osu!</Title>
