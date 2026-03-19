@@ -1,7 +1,9 @@
 ﻿using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.Handlers.Mouse;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game;
@@ -38,7 +40,9 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
     [BackgroundDependencyLoader]
     private void load(Storage storage)
     {
-        editorConfig = new EditorConfigManager(storage);
+
+        dependencies.CacheAs(editorConfig);
+
 
         Add(screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both });
 
@@ -54,6 +58,11 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
 
         editorConfig = new EditorConfigManager(Storage);
 
+
+        if (!editorConfig.Get<bool>(EditorSetting.ShowSystemCursor))
+        {
+            host.Window.CursorState |= CursorState.Hidden;
+        }
 
     }
 

@@ -12,10 +12,12 @@ public class EditorConfigManager : IniConfigManager<EditorSetting>
     protected override void InitialiseDefaults()
     {
         SetDefault(EditorSetting.FirstLaunch, true);
+        SetDefault(EditorSetting.ShowSystemCursor, true);
     }
 }
 
 public enum EditorSetting
 {
     FirstLaunch,
+    ShowSystemCursor
 }

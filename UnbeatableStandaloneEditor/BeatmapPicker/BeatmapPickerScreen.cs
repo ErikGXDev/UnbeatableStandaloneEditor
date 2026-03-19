@@ -19,6 +19,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Select;
 using osuTK;
 using osuTK.Graphics;
+using UnbeatableStandaloneEditor.Settings;
 
 namespace UnbeatableStandaloneEditor.BeatmapPicker;
 
@@ -144,6 +145,10 @@ public partial class BeatmapPickerScreen : OsuScreen
                         ],
                     }
                 ],
+            },
+            new MenuPopoverContainer()
+            {
+                new MenuSettingsButton()
             },
             // Version and update button at bottom right
             updateButtonContainer = new Container
