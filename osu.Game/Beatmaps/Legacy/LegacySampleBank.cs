@@ -3,7 +3,8 @@
 
 namespace osu.Game.Beatmaps.Legacy
 {
-    internal enum LegacySampleBank
+    // FIX: Make public
+    public enum LegacySampleBank
     {
         None = 0,
         Normal = 1,

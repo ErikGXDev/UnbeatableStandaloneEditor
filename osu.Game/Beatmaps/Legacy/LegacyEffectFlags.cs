@@ -5,8 +5,9 @@ using System;
 
 namespace osu.Game.Beatmaps.Legacy
 {
+    // FIX: Make public
     [Flags]
-    internal enum LegacyEffectFlags
+    public enum LegacyEffectFlags
     {
         None = 0,
         Kiai = 1,

@@ -3,7 +3,8 @@
 
 namespace osu.Game.Beatmaps.Legacy
 {
-    internal enum LegacyEventType
+    // FIX: Make public
+    public enum LegacyEventType
     {
         Background = 0,
         Video = 1,

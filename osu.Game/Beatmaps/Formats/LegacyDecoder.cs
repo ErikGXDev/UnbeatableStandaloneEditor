@@ -181,7 +181,8 @@ namespace osu.Game.Beatmaps.Formats
             Mania,
         }
 
-        internal class LegacySampleControlPoint : SampleControlPoint, IEquatable<LegacySampleControlPoint>
+        // FIX: Make public
+        public class LegacySampleControlPoint : SampleControlPoint, IEquatable<LegacySampleControlPoint>
         {
             public int CustomSampleBank;
 

@@ -5,8 +5,9 @@ using System;
 
 namespace osu.Game.Beatmaps.Legacy
 {
+    // FIX: Make public
     [Flags]
-    internal enum LegacyHitSoundType
+    public enum LegacyHitSoundType
     {
         None = 0,
         Normal = 1,
