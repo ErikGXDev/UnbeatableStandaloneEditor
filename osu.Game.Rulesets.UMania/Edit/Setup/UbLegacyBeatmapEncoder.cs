@@ -552,7 +552,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false)
         {
             LegacySampleBank normalBank = toLegacySampleBank(samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank);
-            LegacySampleBank addBank = toLegacySampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL && !s.EditorAutoBank)?.Bank);
+            LegacySampleBank addBank = toLegacySampleAddBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL && !s.EditorAutoBank)?.Bank);
 
             StringBuilder sb = new StringBuilder();
 
@@ -616,6 +616,28 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
                 case HitSampleInfo.BANK_SOFT:
                     return LegacySampleBank.Normal;
+
+                case HitSampleInfo.BANK_DRUM:
+                    return LegacySampleBank.Drum;
+                
+                case HitSampleInfo.BANK_STRONG:
+                    return LegacySampleBank.Drum;
+
+                default:
+                    return LegacySampleBank.None;
+            }
+        }
+        
+        // FIX: Add separate function for additional banks
+        private LegacySampleBank toLegacySampleAddBank(string? sampleBank)
+        {
+            switch (sampleBank?.ToLowerInvariant())
+            {
+                case HitSampleInfo.BANK_NORMAL:
+                    return LegacySampleBank.Normal;
+
+                case HitSampleInfo.BANK_SOFT:
+                    return LegacySampleBank.Soft;
 
                 case HitSampleInfo.BANK_DRUM:
                     return LegacySampleBank.Drum;
