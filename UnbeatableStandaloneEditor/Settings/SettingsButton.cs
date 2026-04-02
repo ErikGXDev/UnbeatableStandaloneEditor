@@ -15,9 +15,9 @@ using osuTK.Graphics;
 
 namespace UnbeatableStandaloneEditor.Settings;
 
-public partial class MenuSettingsButton : OsuButton, IHasPopover // Didnt want the triangles, so OsuButton only
+public partial class SettingsButton : OsuButton, IHasPopover // Didnt want the triangles, so OsuButton only
 {
-    public MenuSettingsButton() {}
+    public SettingsButton() {}
 
     [Resolved]
     private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -25,10 +25,9 @@ public partial class MenuSettingsButton : OsuButton, IHasPopover // Didnt want t
     [BackgroundDependencyLoader]
     private void load()
     {
-        Anchor = Anchor.TopRight;
         Origin = Anchor.TopRight;
+        Anchor = Anchor.TopRight;
         Size = new Vector2(32);
-        Margin = new MarginPadding(8);
 
         Colour = colourProvider.Colour1;
         BackgroundColour = colourProvider.Background3;
@@ -51,5 +50,5 @@ public partial class MenuSettingsButton : OsuButton, IHasPopover // Didnt want t
         };
     }
 
-    public Popover GetPopover() => new MenuPopover();
+    public Popover GetPopover() => new SettingsPopover();
 }

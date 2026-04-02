@@ -17,9 +17,9 @@ using osuTK.Graphics;
 
 namespace UnbeatableStandaloneEditor.Settings;
 
-public partial class MenuPopover : OsuPopover
+public partial class SettingsPopover : OsuPopover
 {
-    public MenuPopover() : base(false)
+    public SettingsPopover() : base(false)
     { }
 
     private OsuCheckbox mouseCheckbox;
