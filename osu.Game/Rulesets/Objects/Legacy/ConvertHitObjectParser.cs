@@ -210,12 +210,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
             string? stringAddBank = addBank.ToString().ToLowerInvariant();
 
             if (stringBank == @"none")
-                stringBank = null;
+                stringBank = "none"; // FIX: Allows 0-type banks to exist
 
             if (stringAddBank == @"none")
             {
                 bankInfo.EditorAutoBank = true;
-                stringAddBank = null;
+                stringAddBank = "none";
             }
             else
                 bankInfo.EditorAutoBank = false;
