@@ -110,6 +110,13 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
 
             return normalSample ?? new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "normal", string.Empty, 100);
         }
+        
+        public HitSampleInfo GetAdditionSample()
+        {
+            var normalSample = hitObject.Samples.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL);
+
+            return normalSample ?? new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "normal", string.Empty, 100);
+        }
 
         public bool HasSample(string sample)
         {
