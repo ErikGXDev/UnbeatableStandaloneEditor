@@ -70,14 +70,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 return;
             }
 
-
-            /*PassBeatmapConverter passConverter =
+            PassBeatmapConverter passConverter =
                 new PassBeatmapConverter(targetBeatmap, targetBeatmap.BeatmapInfo.Ruleset.CreateInstance());
 
             var playableBeatmap = passConverter.ConvertBeatmap(targetBeatmap, CancellationToken.None);
-            */
 
-            UbBeatmapEncoder encoder = new UbBeatmapEncoder(targetBeatmap, null);
+            UbBeatmapEncoder encoder = new UbBeatmapEncoder(playableBeatmap, null);
 
             var beatmapStream = new MemoryStream();
             using (var sw = new StreamWriter(beatmapStream, Encoding.UTF8, 1024, leaveOpen: true))
