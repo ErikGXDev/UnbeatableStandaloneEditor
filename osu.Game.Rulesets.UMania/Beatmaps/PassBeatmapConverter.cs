@@ -30,79 +30,70 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
     {
         var convertBeatmap = base.ConvertBeatmap(beatmap, token);
 
-        var hitObjects = new List<HitObject>(beatmap.HitObjects);
-
-        // serialize and deserialize all hitobjects
-        var serializedHitObjects = new List<HitObject>();
-        foreach (var hitObject in hitObjects)
+        // Clone hitobjects to avoid mutating the original beatmap
+        var clonedHitObjects = new List<HitObject>(convertBeatmap.HitObjects.Count);
+        
+        foreach (var hitObject in convertBeatmap.HitObjects)
         {
-            var samples = hitObject.Samples;
-            var serializedSamples = new List<HitSampleInfo>(samples.Count);
-
-            foreach (var sample in samples)
-            {
-                var serializedSample = sample.Serialize();
-                var deserializedSample = serializedSample.Deserialize<HitSampleInfo>();
-                serializedSamples.Add(deserializedSample);
-            }
-
-
-            var serialized = hitObject.Serialize();
-
+            HitObject cloned;
+            
+            // Clone based on concrete type
             if (hitObject is Note note)
             {
-                var deserialized = serialized.Deserialize<Note>();
-                deserialized.Samples = serializedSamples;
-                serializedHitObjects.Add(deserialized);
+                cloned = new Note
+                {
+                    StartTime = note.StartTime,
+                    Samples = cloneSamples(note.Samples),
+                    Column = note.Column
+                };
             }
             else if (hitObject is HoldNote holdNote)
             {
-                var deserialized = serialized.Deserialize<HoldNote>();
-                serializedHitObjects.Add(deserialized);
-
+                cloned = new HoldNote
+                {
+                    StartTime = holdNote.StartTime,
+                    Duration = holdNote.Duration,
+                    Column = holdNote.Column,
+                    Samples = cloneSamples(holdNote.Samples),
+                    NodeSamples = holdNote.NodeSamples
+                };
             }
-            else if (hitObject is IHasXPosition xPosition)
+            else if (hitObject is ManiaHitObject maniaHitObject)
             {
-
-                if (hitObject is IHasDuration duration)
+                cloned = new ManiaHitObject
                 {
-                    var deserialized1 = serialized.Deserialize<XHitObjectHold>();
-
-                    if (xPosition.X > 6)
-                    {
-                        deserialized1.X = GetColumn(xPosition.X);
-                    }
-
-                    deserialized1.Duration = duration.Duration;
-                    deserialized1.EndTime = duration.EndTime;
-
-                    serializedHitObjects.Add(deserialized1);
-                    continue;
-                }
-
-
-
-                var deserialized = serialized.Deserialize<XHitObject>();
-
-                if (xPosition.X > 6)
-                {
-                    deserialized.X = GetColumn(xPosition.X);
-                }
-
-                serializedHitObjects.Add(deserialized);
+                    StartTime = maniaHitObject.StartTime,
+                    Column = maniaHitObject.Column,
+                    Samples = cloneSamples(maniaHitObject.Samples)
+                };
             }
             else
             {
-                var deserialized = serialized.Deserialize<ManiaHitObject>();
-
-                serializedHitObjects.Add(deserialized);
+                // Fallback for unknown types - just use original
+                cloned = hitObject;
             }
+            
+            // Convert X position if needed
+            if (cloned is IHasXPosition xPosition && xPosition.X > 6)
+            {
+                xPosition.X = GetColumn(xPosition.X);
+            }
+            
+            clonedHitObjects.Add(cloned);
         }
 
-        convertBeatmap.HitObjects = serializedHitObjects;
-
-
+        convertBeatmap.HitObjects = clonedHitObjects;
         return convertBeatmap;
+    }
+
+    private List<HitSampleInfo> cloneSamples(IList<HitSampleInfo> samples)
+    {
+        var cloned = new List<HitSampleInfo>(samples.Count);
+        foreach (var sample in samples)
+        {
+            cloned.Add(new HitSampleInfo(sample.Name, sample.Bank, sample.Suffix, sample.Volume));
+        }
+        return cloned;
     }
 
     protected int GetColumn(float position)
@@ -110,29 +101,5 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
 
         float localXDivisor = 512f / 6;
         return Math.Clamp((int)MathF.Floor(position / localXDivisor), 0, 6 - 1);
-    }
-
-    class XHitObject : HitObject, IHasXPosition
-    {
-        public XHitObject()
-        {
-
-        }
-
-        public float X { get; set; }
-    }
-
-    class XHitObjectHold : HitObject, IHasXPosition, IHasDuration
-    {
-        public XHitObjectHold()
-        {
-
-        }
-
-        public float X { get; set; }
-
-        public double Duration { get; set; }
-
-        public double EndTime { get; set; }
     }
 }
