@@ -6,8 +6,6 @@ namespace UnbeatableStandaloneEditor;
 
 public partial class EditorLoader : osu.Game.Screens.Edit.EditorLoader
 {
-    
-    
     // Allow the framework to exit this screen normally
     public override bool AllowUserExit => true;
 
@@ -16,7 +14,9 @@ public partial class EditorLoader : osu.Game.Screens.Edit.EditorLoader
     public override void OnResuming(ScreenTransitionEvent e)
     {
         base.OnResuming(e);
-        this.Exit();
+
+        if (!ValidForResume)
+            this.Exit();
     }
 
     public override void OnEntering(ScreenTransitionEvent e)
@@ -24,9 +24,6 @@ public partial class EditorLoader : osu.Game.Screens.Edit.EditorLoader
         base.OnEntering(e);
         this.Push(CreateEditor());
     }
-    
-   
-    
+
     protected override Editor CreateEditor() => new Editor(this);
-    
 }
