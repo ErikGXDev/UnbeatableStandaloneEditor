@@ -23,6 +23,7 @@ public partial class EditorLoader : osu.Game.Screens.Edit.EditorLoader
     {
         base.OnEntering(e);
         this.Push(CreateEditor());
+        ValidForResume = false;
     }
 
     protected override Editor CreateEditor() => new Editor(this);
