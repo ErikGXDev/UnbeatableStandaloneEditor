@@ -70,6 +70,8 @@ _Export your map as a .zip file using the buttons at the setup page. Choose a fo
 
 # License / Credits
 
+If you're interested, you can join the UNBEATABLE Modding Community (https://discord.gg/4t8wrZ69Fx) for more mods and custom maps! 
+
 The UMania ruleset and UnbeatableStandaloneEditor code are licensed under the [MIT License](LICENSE)  and are available at the [GitHub repository](https://github.com/ErikGXDev/UnbeatableStandaloneEditor).
 
 The osu.Game code and large parts of the UMania ruleset are derived from [osu!](https://github.com/ppy/osu), which is also licensed as MIT.
