@@ -579,7 +579,8 @@ namespace osu.Game.Screens.Edit
         /// Saves the currently edited beatmap.
         /// </summary>
         /// <returns>Whether the save was successful.</returns>
-        internal bool Save()
+        // FIX: Make Save public
+        public bool Save()
         {
             if (!canSave)
             {
