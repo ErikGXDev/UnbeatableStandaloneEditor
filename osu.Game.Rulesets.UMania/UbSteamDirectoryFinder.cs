@@ -8,12 +8,6 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using Microsoft.Win32;
-
-using System;
-using System.IO;
-using System.Collections.Generic;
-using Microsoft.Win32;
-
 public static class UbSteamDirectoryFinder
 {
 
