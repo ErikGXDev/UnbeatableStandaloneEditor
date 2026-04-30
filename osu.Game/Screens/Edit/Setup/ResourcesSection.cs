@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Edit.Setup
                 },
                 backgroundChooser = new FormBeatmapFileSelector(beatmapHasMultipleDifficulties, SupportedExtensions.IMAGE_EXTENSIONS)
                 {
-                    Caption = GameplaySettingsStrings.BackgroundHeader,
+                    Caption = "Cover Art",
                     PlaceholderText = EditorSetupStrings.ClickToSelectBackground,
                 },
                 coverArtist = new FormTextBox()
