@@ -30,6 +30,7 @@ namespace osu.Game.Rulesets.UMania.Skinning.Argon
 
             // Without this, the width of the body will be slightly larger than the head/tail.
             Masking = true;
+            Alpha = 0.75f;
             CornerRadius = ArgonNotePiece.CORNER_RADIUS;
         }
 
