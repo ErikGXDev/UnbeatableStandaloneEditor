@@ -1,16 +1,25 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Localisation;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -24,13 +33,16 @@ namespace osu.Game.Screens.Edit.Setup
 
         private FormTextBox creatorTextBox = null!;
         private FormTextBox difficultyTextBox = null!;
-        private FormTextBox sourceTextBox = null!;
+        private FormEnumDropdown<DifficultySlot> sourceTextBox = null!;
         private FormTextBox tagsTextBox = null!;
         
-        // FIX: Add level, flavor text and attributes as inputs
+        // FIX: Add level, flavor text and songLength as inputs
         private FormTextBox levelTextBox = null!;
         private FormTextBox flavorTextTextBox = null!;
-        private FormTextBox attributesTextBox = null!;
+        private FormTextBox songLength = null!;
+
+        private OsuSpriteText warning = null!;
+        
 
         private bool reloading;
         private bool dirty;
@@ -39,11 +51,64 @@ namespace osu.Game.Screens.Edit.Setup
 
         [Resolved]
         private Editor? editor { get; set; }
+        
+        [Resolved]
+        private MusicController music { get; set; } = null!;
+
+
+        enum DifficultySlot
+        {
+            Beginner,
+            [Description("Normal")]
+            Easy,
+            [Description("Hard")]
+            Normal,
+            [Description("Expert")]
+            Hard,
+            [Description("UNBEATABLE")]
+            Unbeatable,
+            Star
+        }
+        
+        private string difficultySlotToString(DifficultySlot slot)
+        {
+            return slot.ToString();
+        }
+
+        private string difficultySlotToDisplayString(DifficultySlot slot)
+        {
+            var fieldInfo = typeof(DifficultySlot).GetField(slot.ToString());
+            var descriptionAttribute = fieldInfo?.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute;
+
+            var output = descriptionAttribute != null ? descriptionAttribute.Description : slot.ToString();
+            
+            Logger.Log("Parsed difficulty slot: " + slot);
+
+            return output;
+        }
+
+        private DifficultySlot difficultySlotFromString(string s)
+        {
+            foreach (DifficultySlot slot in Enum.GetValues(typeof(DifficultySlot)))
+            {
+                if (difficultySlotToString(slot).Equals(s, StringComparison.OrdinalIgnoreCase))
+                {
+                    Logger.Log("Parsed difficulty slot: " + slot);
+                    return slot;
+                }
+            }
+            
+            Logger.Log("Failed to parse difficulty slot from string: " + s + ". Defaulting to Beginner.");
+
+            // Default to Beginner if parsing fails
+            return DifficultySlot.Beginner;
+        }
+
 
         [BackgroundDependencyLoader]
         private void load(SetupScreen? setupScreen)
         {
-            Children = new[]
+            Children = new Drawable[]
             {
                 ArtistTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Artist),
                 
@@ -56,24 +121,40 @@ namespace osu.Game.Screens.Edit.Setup
                 RomanisedTitleTextBox = createTextBox<FormRomanisedTextBox>(EditorSetupStrings.RomanisedTitle),
                 
                 creatorTextBox = createTextBox<FormTextBox>(EditorSetupStrings.Creator),
-                difficultyTextBox = createTextBox<FormTextBox>(EditorSetupStrings.DifficultyName),
+                
+                sourceTextBox = new FormEnumDropdown<DifficultySlot>
+                {
+                    Caption = "Difficulty Slot",
+                    Current = new Bindable<DifficultySlot>(DifficultySlot.Beginner),
+                },
+                
+                difficultyTextBox = createTextBox<FormTextBox>("Star Name"),
                 
                 // These are disabled
-                sourceTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoSource),
                 tagsTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoMapperTags),
                 
                 levelTextBox = createTextBox<FormTextBox>("Level"),
                 flavorTextTextBox = createTextBox<FormTextBox>("Flavor Text"),
-                attributesTextBox = createTextBox<FormTextBox>("Attributes"),
+                songLength = createTextBox<FormTextBox>("Song Length"),
+                
+                warning = new OsuSpriteText()
+                {
+                    Margin = new MarginPadding() { Top = 10 },
+                    Text = "Everything is good!",
+                    Colour = Colours.Yellow,
+                    Alpha = 0f
+                }
                 
             };
+
+            difficultyTextBox.Alpha = 0;
             
             // FIX: Hide romanised input fields as they're not commonly used
             RomanisedArtistTextBox.Alpha = 0;
             RomanisedTitleTextBox.Alpha = 0;
             
             // FIX: Hide source as well
-            sourceTextBox.Alpha = 0;
+            //sourceTextBox.Alpha = 0;
             
             // FIX: Hide tags as the other level, flavor text etc. inputs set tags indirectly
             tagsTextBox.Alpha = 0;
@@ -96,6 +177,8 @@ namespace osu.Game.Screens.Edit.Setup
                 }
             });
             
+            
+            songLength.ReadOnly = true;
             
             if (setupScreen != null)
                 setupScreen.MetadataChanged += reloadMetadata;
@@ -132,11 +215,30 @@ namespace osu.Game.Screens.Edit.Setup
                         Beatmap.SaveState();
                 };
             }
+            
+            sourceTextBox.Current.BindValueChanged(ev =>
+            {
+
+                difficultyTextBox.Current.Value = difficultySlotToDisplayString(ev.NewValue);
+                
+                applyMetadata();
+                
+                Beatmap.SaveState();
+                
+                checkDuplicateSlots();
+                checkDifficultyNameVisibility();
+                
+                
+            });
 
             if (editor != null)
                 editor.Saved += () => dirty = false;
 
             updateReadOnlyState();
+            
+            checkDuplicateSlots();
+            checkDifficultyNameVisibility();
+
         }
 
         private void transferIfRomanised(string value, FormTextBox target)
@@ -168,18 +270,76 @@ namespace osu.Game.Screens.Edit.Setup
             RomanisedTitleTextBox.Current.Value = !string.IsNullOrEmpty(metadata.Title) ? metadata.Title : MetadataUtils.StripNonRomanisedCharacters(metadata.TitleUnicode);
             creatorTextBox.Current.Value = metadata.Author.Username;
             difficultyTextBox.Current.Value = Beatmap.BeatmapInfo.DifficultyName;
-            sourceTextBox.Current.Value = metadata.Source;
+            sourceTextBox.Current.Value = difficultySlotFromString(metadata.Source);
             tagsTextBox.Current.Value = metadata.Tags;
             
             // FIX: Convert tags data back to individual fields
             var tagsData = parseTags(metadata.Tags);
             levelTextBox.Current.Value = tagsData.Level?.ToString() ?? string.Empty;
             flavorTextTextBox.Current.Value = tagsData.FlavorText ?? string.Empty;
-            attributesTextBox.Current.Value = tagsData.Attributes ?? string.Empty;
+            songLength.Current.Value = (music.CurrentTrack.Length / 1000).ToString(CultureInfo.InvariantCulture);
+            
 
             updateReadOnlyState();
 
             reloading = false;
+        }
+
+        private void checkDifficultyNameVisibility()
+        {
+            if (difficultySlotFromString(Beatmap.Metadata.Source) == DifficultySlot.Star)
+            {
+                difficultyTextBox.Alpha = 1;
+            }
+            else
+            {
+                difficultyTextBox.Alpha = 0;
+            }
+        }
+        
+        private void checkDuplicateSlots()
+        {
+            var beatmapSet = Beatmap.BeatmapInfo.BeatmapSet;
+
+            var slots = new HashSet<DifficultySlot>();
+            
+            var hasDuplicates = false;
+            var duplicate = "";
+            
+            if (beatmapSet == null)
+            {
+                return;
+            }
+            
+            foreach (var beatmap in beatmapSet.Beatmaps)
+            {
+                var diff = beatmap.Metadata.Source;
+                if (string.IsNullOrEmpty(diff))
+                {
+                    continue;
+                }
+                
+                var slot = difficultySlotFromString(diff);
+                if (slots.Contains(slot))
+                {
+                    hasDuplicates = true;
+                    duplicate = difficultySlotToDisplayString(slot);
+                    break;
+                }
+                
+                slots.Add(slot);
+            }
+
+            if (hasDuplicates)
+            {
+                warning.Alpha = 1;
+                warning.Text = "Warning: Duplicate difficulty slots detected, pick a different one! (" + duplicate + ")";
+            }
+            else
+            {
+                warning.Alpha = 0;
+                warning.Text = "Everything is good!";
+            }
         }
 
         private void applyMetadata()
@@ -192,15 +352,32 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.Metadata.TitleUnicode = TitleTextBox.Current.Value;
             Beatmap.Metadata.Title = RomanisedTitleTextBox.Current.Value;
             Beatmap.Metadata.Author.Username = creatorTextBox.Current.Value;
+            Beatmap.Metadata.Source = difficultySlotToString(sourceTextBox.Current.Value);
             Beatmap.BeatmapInfo.DifficultyName = difficultyTextBox.Current.Value;
-            Beatmap.Metadata.Source = sourceTextBox.Current.Value;
+            
+            /*if (sourceTextBox.Current.Value == DifficultySlot.Star)
+            {
+                if (string.IsNullOrEmpty(difficultyTextBox.Current.Value))
+                {
+                    Beatmap.BeatmapInfo.DifficultyName = "Star";
+                }
+                else
+                {
+                    Beatmap.BeatmapInfo.DifficultyName = difficultyTextBox.Current.Value;
+                }
+                
+            }
+            else
+            {
+                Beatmap.BeatmapInfo.DifficultyName = Beatmap.Metadata.Source;
+            }*/
             
             // Serialize json data
             Beatmap.Metadata.Tags = serializeTags(new TagsData
             {
                 Level = int.TryParse(levelTextBox.Current.Value, out var levelVal) ? levelVal : null,
                 FlavorText = string.IsNullOrEmpty(flavorTextTextBox.Current.Value) ? null : flavorTextTextBox.Current.Value,
-                Attributes = string.IsNullOrEmpty(attributesTextBox.Current.Value) ? null : attributesTextBox.Current.Value,
+                SongLength = float.TryParse(songLength.Current.Value, out var songLengthVal) ? songLengthVal : 360.0f,
             });
             
 
@@ -216,7 +393,7 @@ namespace osu.Game.Screens.Edit.Setup
             public string? FlavorText { get; set; }
 
             [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-            public string? Attributes { get; set; }
+            public float? SongLength { get; set; }
         }
 
         private TagsData parseTags(string tags)
@@ -238,7 +415,7 @@ namespace osu.Game.Screens.Edit.Setup
         private string serializeTags(TagsData data)
         {
             // Returns empty string if all fields are null/empty
-            if (data.Level == null && string.IsNullOrEmpty(data.FlavorText) && string.IsNullOrEmpty(data.Attributes))
+            if (data.Level == null && string.IsNullOrEmpty(data.FlavorText) && data.SongLength == null)
                 return string.Empty;
 
             return JsonConvert.SerializeObject(data);
