@@ -52,20 +52,24 @@ namespace osu.Game.Screens.Edit
                         new Dimension(GridSizeMode.Absolute, 150),
                         new Dimension(),
                         new Dimension(GridSizeMode.Absolute, 220),
-                        new Dimension(GridSizeMode.Absolute, HitObjectComposer.TOOLBOX_CONTRACTED_SIZE_RIGHT),
+                        // FIX: Remove Test button
+                        new Dimension(GridSizeMode.Absolute, 0),
                     },
                     Content = new[]
                     {
                         new Drawable[]
                         {
-                            new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
+                            new TimeInfoContainer { RelativeSizeAxes = Axes.Both }, 
                             new SummaryTimeline { RelativeSizeAxes = Axes.Both },
                             new PlaybackControl { RelativeSizeAxes = Axes.Both },
                             TestGameplayButton = new TestGameplayButton
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Size = new Vector2(1),
-                                Action = editor.TestGameplay,
+                                Size = new Vector2(0),
+                                Alpha = 0f,
+                                
+                                // FIX: Simply remove it
+                                //Action = editor.TestGameplay,
                             }
                         },
                     }
