@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -76,6 +77,7 @@ public partial class UbExportFolderSelector : FormBeatmapFileSelector
         }
         
         private FormButton.Button userPackagesButton;
+        private FormButton.Button customSongsButton;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider provider)
@@ -133,6 +135,24 @@ public partial class UbExportFolderSelector : FormBeatmapFileSelector
 
                                 PopoverExtensions.HidePopover(this);
                             },
+                        },
+                        customSongsButton = new FormButton.Button()
+                        {
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                            Colour = provider.Colour2,
+                            BackgroundColour = provider.Background3,
+                            Width = 160f,
+                            Height = 32,
+                            Text = "CustomSongs folder",
+                            Action = () =>
+                            {
+                                var unbeatablePath = UbExportSection.GetCustomSongsDirectory();
+                                
+                                selectedDirectory.Value = unbeatablePath;
+                                
+                                PopoverExtensions.HidePopover(this);
+                            }
                         }
                     }
                 }
@@ -141,6 +161,11 @@ public partial class UbExportFolderSelector : FormBeatmapFileSelector
             var userPackagesPath = UbSteamDirectoryFinder.FindUnbeatableUserPackages();
             if (userPackagesPath == null)
                 userPackagesButton.Alpha = 0;
+
+            if (!UbExportSection.IsWindows() || !Directory.Exists(UbExportSection.GetCustomSongsDirectory()))
+            {
+                customSongsButton.Alpha = 0;
+            }
         }
 
         protected override void OnFileSelected(FileInfo file)
