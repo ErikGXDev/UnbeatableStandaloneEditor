@@ -433,10 +433,31 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         }
 
 
-        public bool IsWindows()
+        public static bool IsWindows()
         {
             return Environment.OSVersion.Platform == PlatformID.Win32NT;
         }
+
+        public static string GetDataDirectory()
+        {
+            var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            var localLowPath = Path.Combine(userProfile, "AppData", "LocalLow");
+
+            var unbeatablePath = Path.Combine(localLowPath, "D-CELL GAMES", "UNBEATABLE");
+            
+            return unbeatablePath;
+        }
+
+        public static string GetCustomSongsDirectory()
+        {
+            var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            var localLowPath = Path.Combine(userProfile, "AppData", "LocalLow");
+
+            var unbeatablePath = Path.Combine(localLowPath, "D-CELL GAMES", "UNBEATABLE", "CustomSongs");
+
+            return unbeatablePath;
+        }
+        
         public void OpenGameFolder()
         {
             // Open
@@ -451,10 +472,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             try
             {
                 // Resolve LocalLow from the user's profile (reliable on Windows)
-                var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var localLowPath = Path.Combine(userProfile, "AppData", "LocalLow");
-
-                var unbeatablePath = Path.Combine(localLowPath, "D-CELL GAMES", "UNBEATABLE");
+                var unbeatablePath = GetDataDirectory();
 
                 if (!Directory.Exists(unbeatablePath))
                 {
