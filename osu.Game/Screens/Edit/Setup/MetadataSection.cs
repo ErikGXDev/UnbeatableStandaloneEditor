@@ -41,8 +41,11 @@ namespace osu.Game.Screens.Edit.Setup
         private FormTextBox flavorTextTextBox = null!;
         private FormTextBox songLength = null!;
 
-        private OsuSpriteText warning = null!;
+        private FormTextBox coverArtist = null!;
         
+        public static Bindable<string> coverArtistBindable = new Bindable<string>("");
+
+        private OsuSpriteText warning = null!;
 
         private bool reloading;
         private bool dirty;
@@ -137,6 +140,9 @@ namespace osu.Game.Screens.Edit.Setup
                 flavorTextTextBox = createTextBox<FormTextBox>("Flavor Text"),
                 songLength = createTextBox<FormTextBox>("Song Length"),
                 
+                coverArtist = createTextBox<FormTextBox>("Cover Artist"),
+                
+                
                 warning = new OsuSpriteText()
                 {
                     Margin = new MarginPadding() { Top = 10 },
@@ -146,6 +152,9 @@ namespace osu.Game.Screens.Edit.Setup
                 }
                 
             };
+
+            coverArtist.Current = coverArtistBindable;
+            coverArtist.Alpha = 0;
 
             difficultyTextBox.Alpha = 0;
             
@@ -278,6 +287,7 @@ namespace osu.Game.Screens.Edit.Setup
             levelTextBox.Current.Value = tagsData.Level?.ToString() ?? string.Empty;
             flavorTextTextBox.Current.Value = tagsData.FlavorText ?? string.Empty;
             songLength.Current.Value = (music.CurrentTrack.Length / 1000).ToString(CultureInfo.InvariantCulture);
+            coverArtist.Current.Value = tagsData.CoverArt ?? string.Empty;
             
 
             updateReadOnlyState();
@@ -378,6 +388,7 @@ namespace osu.Game.Screens.Edit.Setup
                 Level = int.TryParse(levelTextBox.Current.Value, out var levelVal) ? levelVal : null,
                 FlavorText = string.IsNullOrEmpty(flavorTextTextBox.Current.Value) ? null : flavorTextTextBox.Current.Value,
                 SongLength = float.TryParse(songLength.Current.Value, out var songLengthVal) ? songLengthVal : 360.0f,
+                CoverArt = string.IsNullOrEmpty(coverArtist.Current.Value) ? null : coverArtist.Current.Value
             });
             
 
@@ -394,6 +405,9 @@ namespace osu.Game.Screens.Edit.Setup
 
             [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
             public float? SongLength { get; set; }
+            
+            [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+            public string? CoverArt { get; set; }
         }
 
         private TagsData parseTags(string tags)

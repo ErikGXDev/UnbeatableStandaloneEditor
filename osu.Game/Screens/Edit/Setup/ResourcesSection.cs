@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Models;
 using osu.Game.Overlays;
@@ -43,6 +44,8 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private SetupScreen setupScreen { get; set; } = null!;
 
+        private FormTextBox coverArtist = null!;
+
         private SetupScreenHeaderBackground headerBackground = null!;
 
         [BackgroundDependencyLoader]
@@ -67,6 +70,11 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Caption = GameplaySettingsStrings.BackgroundHeader,
                     PlaceholderText = EditorSetupStrings.ClickToSelectBackground,
+                },
+                coverArtist = new FormTextBox()
+                {
+                    Caption = "Cover Artist",
+                    Current = MetadataSection.coverArtistBindable,
                 },
                
                 // FIX: Hide sample set chooser because they're not needed
@@ -94,6 +102,8 @@ namespace osu.Game.Screens.Edit.Setup
                     }
                 },*/
             };
+            
+            
 
             backgroundChooser.PreviewContainer.Add(headerBackground);
 
