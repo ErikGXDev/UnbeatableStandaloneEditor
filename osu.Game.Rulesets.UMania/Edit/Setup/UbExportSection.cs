@@ -218,7 +218,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         private void exportToZip(string extension = ".osu")
         {
 
-            if (string.IsNullOrEmpty(exportFolderSelector.SelectedDirectory.Value))
+            if (string.IsNullOrEmpty(exportFolderSelector.SelectedDirectory.Value) || Beatmap.BeatmapInfo.BeatmapSet == null)
             {
                 showToast("Export failed", "No export folder selected.");
                 return;
@@ -237,7 +237,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             string artist = Beatmap.Metadata.Artist ?? "Unknown";
             string title = Beatmap.Metadata.Title ?? "Song";
             string author = Beatmap.Metadata.Author.Username ?? "Unknown";
-            string difficulty = Beatmap.BeatmapInfo.DifficultyName ?? "Easy";
+            string difficulty = Beatmap.Metadata.Source ?? "Easy";
 
             if (beatmapSet.Beatmaps.Count > 1)
             {
@@ -262,7 +262,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     {
                         var stream = getBeatmapStream(beatmap);
 
-                        var newDifficulty = beatmap.BeatmapInfo.DifficultyName ?? "Easy";
+                        var newDifficulty = beatmap.Metadata.Source ?? "Easy";
 
                         var beatmapName = $"{artist} - {title} ({author}) [{newDifficulty}]".GetValidFilename();
                         var beatmapEntry = archive.CreateEntry(beatmapName + extension, CompressionLevel.Optimal);
@@ -362,7 +362,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             {
                 var stream = getBeatmapStream(beatmap);
 
-                var newDifficulty = beatmap.BeatmapInfo.DifficultyName ?? "Easy";
+                var newDifficulty = beatmap.Metadata.Source ?? "Easy";
 
                 var beatmapName = $"{artist} - {title} ({author}) [{newDifficulty}]".GetValidFilename();
                 var beatmapPath = Path.Combine(directory, beatmapName + extension);
@@ -403,6 +403,14 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
         public void ExportMap()
         {
+
+            var good = editor.Save();
+
+            if (!good)
+            {
+                showToast("Export failed", "Failed to save beatmap. Please fix any errors and try again.");
+                return;
+            }
 
             showToast("Exporting...", "Please wait...");
 
