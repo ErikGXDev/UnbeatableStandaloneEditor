@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Edit.Setup
                     Current = new Bindable<DifficultySlot>(DifficultySlot.Beginner),
                 },
                 
-                difficultyTextBox = createTextBox<FormTextBox>("Star Name"),
+                difficultyTextBox = createTextBox<FormTextBox>("Difficulty Name"),
                 
                 // These are disabled
                 tagsTextBox = createTextBox<FormTextBox>(BeatmapsetsStrings.ShowInfoMapperTags),
@@ -156,7 +156,6 @@ namespace osu.Game.Screens.Edit.Setup
             coverArtist.Current = coverArtistBindable;
             coverArtist.Alpha = 0;
 
-            difficultyTextBox.Alpha = 0;
             
             // FIX: Hide romanised input fields as they're not commonly used
             RomanisedArtistTextBox.Alpha = 0;
@@ -235,7 +234,6 @@ namespace osu.Game.Screens.Edit.Setup
                 Beatmap.SaveState();
                 
                 checkDuplicateSlots();
-                checkDifficultyNameVisibility();
                 
                 
             });
@@ -246,7 +244,6 @@ namespace osu.Game.Screens.Edit.Setup
             updateReadOnlyState();
             
             checkDuplicateSlots();
-            checkDifficultyNameVisibility();
 
         }
 
@@ -295,17 +292,6 @@ namespace osu.Game.Screens.Edit.Setup
             reloading = false;
         }
 
-        private void checkDifficultyNameVisibility()
-        {
-            if (difficultySlotFromString(Beatmap.Metadata.Source) == DifficultySlot.Star)
-            {
-                difficultyTextBox.Alpha = 1;
-            }
-            else
-            {
-                difficultyTextBox.Alpha = 0;
-            }
-        }
         
         private void checkDuplicateSlots()
         {
