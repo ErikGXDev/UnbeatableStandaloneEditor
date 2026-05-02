@@ -231,6 +231,10 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             string audioFilename = Beatmap.Metadata.AudioFile;
 
             var audioFile = beatmapSet.GetFile(audioFilename);
+            
+            string coverFilename = Beatmap.Metadata.BackgroundFile;
+            
+            var coverFile = beatmapSet.GetFile(coverFilename);
 
             var baseFilename = "";
 
@@ -293,6 +297,23 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                             audioStream.Dispose();
                         }
                     }
+
+                    if (coverFile != null)
+                    {
+                        var coverStream = workingBeatmap.GetStream(coverFile.File.GetStoragePath());
+                        if (coverStream != null)
+                        {
+                            var coverEntry = archive.CreateEntry("cover.png", CompressionLevel.Optimal);
+
+                            using (var entryStream = coverEntry.Open())
+                            {
+                                coverStream.Seek(0, SeekOrigin.Begin);
+                                coverStream.CopyTo(entryStream);
+                            }
+
+                            coverStream.Dispose();
+                        }
+                    }
                 }
 
                 zipStream.Seek(0, SeekOrigin.Begin);
@@ -338,6 +359,10 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             string audioFilename = Beatmap.Metadata.AudioFile;
 
             var audioFile = beatmapSet.GetFile(audioFilename);
+
+            var coverFilename = Beatmap.Metadata.BackgroundFile;
+            
+            var coverFile = beatmapSet.GetFile(coverFilename);
 
 
             string artist = Beatmap.Metadata.Artist ?? "Unknown";
@@ -392,6 +417,23 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     }
 
                     audioStream.Dispose();
+                }
+            }
+
+            if (coverFile != null)
+            {
+                var coverStream = workingBeatmap.GetStream(coverFile.File.GetStoragePath());
+                if (coverStream != null)
+                {
+                    var coverPath = Path.Combine(directory, "cover.png");
+
+                    using (var fs = File.Create(coverPath))
+                    {
+                        coverStream.Seek(0, SeekOrigin.Begin);
+                        coverStream.CopyTo(fs);
+                    }
+
+                    coverStream.Dispose();
                 }
             }
 
