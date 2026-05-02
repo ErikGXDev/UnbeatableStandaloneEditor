@@ -188,6 +188,13 @@ namespace osu.Game.Screens.Edit.Setup
             
             songLength.ReadOnly = true;
             
+            songLength.Current.BindValueChanged(ev =>
+            {
+                
+                applyMetadata();
+               
+            });
+            
             if (setupScreen != null)
                 setupScreen.MetadataChanged += reloadMetadata;
 
@@ -368,12 +375,13 @@ namespace osu.Game.Screens.Edit.Setup
                 Beatmap.BeatmapInfo.DifficultyName = Beatmap.Metadata.Source;
             }*/
             
+            
             // Serialize json data
             Beatmap.Metadata.Tags = serializeTags(new TagsData
             {
                 Level = int.TryParse(levelTextBox.Current.Value, out var levelVal) ? levelVal : null,
                 FlavorText = string.IsNullOrEmpty(flavorTextTextBox.Current.Value) ? null : flavorTextTextBox.Current.Value,
-                SongLength = float.TryParse(songLength.Current.Value, out var songLengthVal) ? songLengthVal : 360.0f,
+                SongLength = float.TryParse(songLength.Current.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var songLengthVal) ? (float)Math.Round(songLengthVal, 5) : null,
                 CoverArt = string.IsNullOrEmpty(coverArtist.Current.Value) ? null : coverArtist.Current.Value
             });
             
