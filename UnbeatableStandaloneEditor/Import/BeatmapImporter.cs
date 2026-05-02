@@ -24,7 +24,27 @@ public static class BeatmapImporter
     public static Stream ModifyBeatmap(Stream stream)
     {
         Beatmap? beatmap;
-        using (var reader = new LineBufferedReader(stream))
+
+        // Copy the stream, but replace "Mode: 3" with "Mode: 5"
+        var tempStream = new MemoryStream();
+        using (var tempReader = new StreamReader(stream, leaveOpen: true))
+        using (var tempWriter = new StreamWriter(tempStream, leaveOpen: true))
+        {
+            string line;
+            while ((line = tempReader.ReadLine()) != null)
+            {
+                if (line.StartsWith("Mode:"))
+                {
+                    line = "Mode: 5";
+                }
+                tempWriter.WriteLine(line);
+            }
+            tempWriter.Flush();
+        }
+        tempStream.Position = 0;
+
+
+        using (var reader = new LineBufferedReader(tempStream))
         {
             var decoder = Decoder.GetDecoder<Beatmap>(reader);
             beatmap = decoder.Decode(reader);
@@ -33,7 +53,7 @@ public static class BeatmapImporter
         if (beatmap == null)
         {
             Logger.Log($"Failed to decode beatmap from stream");
-            return stream;
+            return tempStream;
         }
 
         beatmap.BeatmapInfo.Ruleset = UbRuleset.GetRulesetInfo();
