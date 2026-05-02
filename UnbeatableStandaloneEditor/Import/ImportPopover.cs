@@ -54,7 +54,7 @@ public partial class ImportPopover : OsuPopover
                 {
                     AllowMultiline = true,
                     RelativeSizeAxes = Axes.X,
-                    Text = "Select a .zip file and it will be imported automatically.",
+                    Text = "Select a .zip file and it will be imported automatically. (Highly experimental!)",
                     Font = OsuFont.Default.With(size: 14, weight: FontWeight.Regular),
                     Colour = colourProvider.Content1.Opacity(0.75f),
                     Margin = new MarginPadding { Left = 16, Bottom = 6 },
