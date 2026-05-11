@@ -66,6 +66,8 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
 
     public Bindable<TernaryState> SettingShowAllowedColumns = new Bindable<TernaryState>(TernaryState.True);
 
+    public Bindable<TernaryState> SettingShowPlacementOrder = new Bindable<TernaryState>(TernaryState.True);
+    
     /*private readonly Bindable<TernaryState> modFlyingNote = new Bindable<TernaryState>();
     private readonly Bindable<TernaryState> modInvisibleNote = new Bindable<TernaryState>();
     private readonly Bindable<TernaryState> modSwapImmediate = new Bindable<TernaryState>();
@@ -224,7 +226,13 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
                         Current = SettingShowAllowedColumns,
                         Description = "Use column hints",
                         CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Lightbulb },
-                    }
+                    },
+                    new DrawableTernaryButton
+                    {
+                        Current = SettingShowPlacementOrder,
+                        Description = "Placement order",
+                        CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Circle },
+                    },
                 ]
             },
         });

@@ -3,6 +3,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UMania.Edit.Blueprints;
 using osu.Game.Rulesets.UMania.Objects;
@@ -20,9 +21,22 @@ namespace osu.Game.Rulesets.UMania.Edit
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
+        [Resolved] private UnbeatableHitObjectComposer composer { get; set; } = null!;
+
+        // Column 2 = Top
+        // Column 3 = Bottom
+        // Column 5 = Middle
+        // (Count from 0)
+        
         // Each entry tracks a same-time pair and its button
         private readonly List<(ManiaHitObject col2Note, ManiaHitObject col3Note, OrderToggleButton button)> pairs = new();
-
+        
+        // Separate list for situations including all 3 columns
+        private readonly List<(ManiaHitObject col2Note, ManiaHitObject col3Note, ManiaHitObject col5Note, OrderToggleButton button)> triplePairs = new();
+        // (For 3 column situations it should basically always be so col5 is either in front of after both, col2 and col3 are basically one single entity here.)
+        // So a pair here can occur when a col5 and col3 note, a col5 and col2 note, or a col5, col3 and col2 note share the same time.
+        
+        
         public UbNoteOrderButtonLayer(Stage stage)
         {
             this.stage = stage;
@@ -31,12 +45,33 @@ namespace osu.Game.Rulesets.UMania.Edit
 
         protected override void LoadComplete()
         {
+
+            composer.SettingShowPlacementOrder.ValueChanged += (ev) =>
+            {
+                if (ev.NewValue == TernaryState.True)
+                {
+                    refreshPairs();
+                    Alpha = 1;
+                }
+                else
+                {
+                    Alpha = 0;
+                }
+            };
+            
+            
+            
             base.LoadComplete();
 
             editorBeatmap.HitObjectAdded += onHitObjectChanged;
             editorBeatmap.HitObjectRemoved += onHitObjectChanged;
+            
+            editorBeatmap.HitObjectUpdated += onHitObjectChanged;
 
             refreshPairs();
+            
+            Alpha = composer.SettingShowPlacementOrder.Value == TernaryState.True ? 1 : 0;
+            
         }
 
         protected override void Dispose(bool isDisposing)
@@ -45,6 +80,8 @@ namespace osu.Game.Rulesets.UMania.Edit
 
             editorBeatmap.HitObjectAdded -= onHitObjectChanged;
             editorBeatmap.HitObjectRemoved -= onHitObjectChanged;
+            
+            editorBeatmap.HitObjectUpdated -= onHitObjectChanged;
         }
 
         // Fix the buttons not firing normally
@@ -67,9 +104,11 @@ namespace osu.Game.Rulesets.UMania.Edit
         {
             ClearInternal();
             pairs.Clear();
+            triplePairs.Clear();
 
             if (stage.Columns.Length < 4) return;
 
+            // For pairs
             // Find all time positions where both column 2 and column 3 have at least one note
             var relevantObjects = editorBeatmap.HitObjects
                 .OfType<ManiaHitObject>()
@@ -118,6 +157,8 @@ namespace osu.Game.Rulesets.UMania.Edit
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                     IsTopFirst = isCol2First,
+                    MiddleMode = false,
+                    MiddleMixed = false,
                     Alpha = 0, // hidden until Update() positions it
                 };
 
@@ -127,6 +168,86 @@ namespace osu.Game.Rulesets.UMania.Edit
 
                 AddInternal(button);
                 pairs.Add((col2Note, col3Note, button));
+            }
+            
+            // For 3 column pairs
+            var relevantTripleObjects = editorBeatmap.HitObjects
+                .OfType<ManiaHitObject>()
+                .Where(h => h.Column == 2 || h.Column == 3 || h.Column == 5)
+                .GroupBy(h => h.StartTime);
+
+            foreach (var group in relevantTripleObjects)
+            {
+                var col2Note = group.FirstOrDefault(h => h.Column == 2);
+                var col3Note = group.FirstOrDefault(h => h.Column == 3);
+                var col5Note = group.FirstOrDefault(h => h.Column == 5);
+
+                if (col5Note == null || (col2Note == null && col3Note == null)) continue;
+
+                bool hasCol2 = col2Note != null;
+                bool hasCol3 = col3Note != null;
+
+                
+                
+                // check if the col5 note is inbetween the col2 and col3 note
+                int col5Index = editorBeatmap.FindIndex(col5Note);
+                int col2Index = hasCol2 ? editorBeatmap.FindIndex(col2Note!) : -1;
+                int col3Index = hasCol3 ? editorBeatmap.FindIndex(col3Note!) : -1;
+
+                
+                bool isMixed =
+                    hasCol2 && hasCol3 &&
+                    ((col5Index > col2Index && col5Index < col3Index) ||
+                     (col5Index > col3Index && col5Index < col2Index));
+                
+                // check if the col5 note is in front of both 
+                bool isCol5First =
+                    (!hasCol2 || col5Index < col2Index) &&
+                    (!hasCol3 || col5Index < col3Index);
+                
+
+
+                var button = new OrderToggleButton
+                {
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
+                    IsTopFirst = isCol5First, // Top refers to Col5 here
+                    MiddleMode = true,
+                    MiddleMixed = isMixed,
+                    Alpha = 0, // hidden until Update() positions it
+                };
+
+                // When swapping, we should ensure that the col5 note will definitely end up
+                // either in front or after both the col2 and col3 notes.
+                // The col5 note should never be inbetween the two.
+                button.OnToggle = () =>
+                {
+                    if (hasCol2 && hasCol3)
+                    {
+                        // Both col2 and col3 exist: toggle col5 between front and back of both
+                        if (button.IsTopFirst)
+                        {
+                            // Col5 is in front, move it to the back
+                            editorBeatmap.Remove(col5Note);
+                            Schedule(() => editorBeatmap.Add(col5Note));
+                        }
+                        else
+                        {
+                            // Col5 is in back (or mixed), move it to the front
+                            editorBeatmap.Remove(col5Note);
+                            Schedule(() => editorBeatmap.Insert(0, col5Note));
+                        }
+                    }
+                    else
+                    {
+                        // Only one of col2/col3 exists: just swap col5 with that note
+                        var otherNote = col2Note ?? col3Note!;
+                        swapOrder(col5Note, otherNote);
+                    }
+                };
+                
+                AddInternal(button);
+                triplePairs.Add((col2Note, col3Note, col5Note, button)!);
             }
         }
 
@@ -140,7 +261,10 @@ namespace osu.Game.Rulesets.UMania.Edit
 
             // Stage left edge in this layer's local coordinate space
             float stageLeftX = ToLocalSpace(stage.ScreenSpaceDrawQuad.TopLeft).X;
+            
+            float stageRightX = ToLocalSpace(stage.ScreenSpaceDrawQuad.TopRight).X;
 
+            // Pairs go on the left
             foreach (var (col2Note, _, button) in pairs)
             {
                 // Use the columns scrolling container to get screen-space Y at the note's time
@@ -149,6 +273,21 @@ namespace osu.Game.Rulesets.UMania.Edit
 
                 
                 button.X = stageLeftX - 4 - button.DrawWidth;
+                button.Y = y - button.DrawHeight / 1.3f;
+
+                // Only show the button when the note is within the visible scrolling area
+                button.Alpha = y >= 0 && y <= DrawHeight ? 1f : 0f;
+            }
+            
+            // Tripe pairs go to the right
+            foreach (var (col2Note, col3Note, col5Note, button) in triplePairs)
+            {
+                // Use whichever column note exists (prefer col2 if both exist)
+                var refNote = col2Note ?? col3Note!;
+                Vector2 screenPos = refColumn.HitObjectContainer.ScreenSpacePositionAtTime(refNote.StartTime);
+                float y = ToLocalSpace(screenPos).Y;
+
+                button.X = stageRightX + 4;
                 button.Y = y - button.DrawHeight / 1.3f;
 
                 // Only show the button when the note is within the visible scrolling area

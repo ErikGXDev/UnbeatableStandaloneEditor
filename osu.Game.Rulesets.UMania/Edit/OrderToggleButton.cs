@@ -18,8 +18,14 @@ namespace osu.Game.Rulesets.UMania.Edit
         private Sprite topFirstSprite = null!;
         private Sprite bottomFirstSprite = null!;
 
+        private Sprite middleFirstSprite = null!;
+        private Sprite middleSecondSprite = null!;
+        private Sprite middleMixedSprite = null!;
+
         private bool isTopFirst;
-        
+        private bool middleMode;
+        private bool middleMixed;
+
         public bool IsTopFirst
         {
             get => isTopFirst;
@@ -31,11 +37,34 @@ namespace osu.Game.Rulesets.UMania.Edit
                 if (IsLoaded) updateVisibility();
             }
         }
+        
+        public bool MiddleMode
+        {
+            get => middleMode;
+            set
+            {
+                if (middleMode == value) return;
+
+                middleMode = value;
+                if (IsLoaded) updateVisibility();
+            }
+        }
+        
+        public bool MiddleMixed
+        {
+            get => middleMixed;
+            set
+            {
+                if (middleMixed == value) return;
+
+                middleMixed = value;
+                if (IsLoaded) updateVisibility();
+            }
+        }
 
         public Action? OnToggle;
 
-        [Resolved]
-        private Editor editor { get; set; } = null!;
+        [Resolved] private Editor editor { get; set; } = null!;
 
         public OrderToggleButton()
         {
@@ -70,6 +99,36 @@ namespace osu.Game.Rulesets.UMania.Edit
                     Colour = Colour4.White,
                     Blending = BlendingParameters.Inherit,
                 },
+                middleFirstSprite = new Sprite
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Texture = textureStore.Get("Textures/order-1-2-middle-first"),
+                    FillMode = FillMode.Fit,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Colour = Colour4.White,
+                    Blending = BlendingParameters.Inherit,
+                },
+                middleSecondSprite = new Sprite
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Texture = textureStore.Get("Textures/order-1-2-middle-second"),
+                    FillMode = FillMode.Fit,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Colour = Colour4.White,
+                    Blending = BlendingParameters.Inherit,
+                },
+                middleMixedSprite = new Sprite
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Texture = textureStore.Get("Textures/order-1-2-middle-mixed"),
+                    FillMode = FillMode.Fit,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Colour = Colour4.White,
+                    Blending = BlendingParameters.Inherit,
+                },
             });
 
             Action = () => OnToggle?.Invoke();
@@ -83,8 +142,36 @@ namespace osu.Game.Rulesets.UMania.Edit
 
         private void updateVisibility()
         {
-            topFirstSprite.Alpha = isTopFirst ? 1f : 0f;
-            bottomFirstSprite.Alpha = isTopFirst ? 0f : 1f;
+            if (middleMode)
+            {
+                if (middleMixed)
+                {
+                    middleMixedSprite.Alpha = 1f;
+                    middleFirstSprite.Alpha = 0f;
+                    middleSecondSprite.Alpha = 0f;
+                }
+                else
+                {
+                    middleFirstSprite.Alpha = isTopFirst ? 1f : 0f;
+                    middleSecondSprite.Alpha = isTopFirst ? 0f : 1f;
+                    middleMixedSprite.Alpha = 0f;
+                }
+                
+                
+                topFirstSprite.Alpha = 0f;
+                bottomFirstSprite.Alpha = 0f;
+            }
+            else
+            {
+                topFirstSprite.Alpha = isTopFirst ? 1f : 0f;
+                bottomFirstSprite.Alpha = isTopFirst ? 0f : 1f;
+
+                middleFirstSprite.Alpha = 0f;
+                middleSecondSprite.Alpha = 0f;
+                middleMixedSprite.Alpha = 0f;
+            }
+
+
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -99,8 +186,37 @@ namespace osu.Game.Rulesets.UMania.Edit
             base.OnHoverLost(e);
         }
 
-        public LocalisableString TooltipText => isTopFirst
-            ? "Column 3 (green) is first - click to swap"
-            : "Column 4 (blue) is first - click to swap";
+        private string getToolTipText()
+        {
+            if (middleMode)
+            {
+                if (middleMixed)
+                {
+                    return "Pink note is in the middle - click to fix";
+                }
+                
+                if (isTopFirst)
+                {
+                    return "Pink note is first - click to swap";
+                }
+                else
+                {
+                    return "Normal notes are first - click to swap";
+                }
+            }
+            else
+            {
+                if (isTopFirst)
+                {
+                    return "Column 3 (green) is first - click to swap";
+                }
+                else
+                {
+                    return "Column 4 (blue) is first - click to swap";
+                }
+            }
+        }
+
+        public LocalisableString TooltipText => getToolTipText();
     }
 }
