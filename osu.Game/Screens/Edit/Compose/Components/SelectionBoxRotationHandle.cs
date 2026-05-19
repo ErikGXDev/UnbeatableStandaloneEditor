@@ -43,10 +43,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Icon = FontAwesome.Solid.Redo,
+                Alpha = 0f, // FIX: Remove handle temporarily
                 Scale = new Vector2
                 {
-                    X = Anchor.HasFlag(Anchor.x0) ? 1f : -1f,
-                    Y = Anchor.HasFlag(Anchor.y0) ? 1f : -1f
+                    X = 0,
+                    Y = 0
                 }
             });
         }
@@ -69,12 +70,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (rotationHandler.OperationInProgress.Value)
                 return false;
 
-            rotationHandler.Begin();
+            //rotationHandler.Begin();
             return true;
         }
 
         protected override void OnDrag(DragEvent e)
         {
+            return; // FIX: Make sure the thing doesnt work
             base.OnDrag(e);
 
             if (rotationHandler == null || !rotationHandler.OperationInProgress.Value) return;
