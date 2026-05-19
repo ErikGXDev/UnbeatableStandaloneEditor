@@ -36,6 +36,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void load()
         {
             Size = new Vector2(15f);
+            Scale = Vector2.Zero;
             AddInternal(icon = new SpriteIcon
             {
                 RelativeSizeAxes = Axes.Both,
@@ -54,14 +55,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void UpdateHoverState()
         {
-            base.UpdateHoverState();
-            icon.FadeColour(!IsHeld && IsHovered ? Color4.White : Color4.Black, TRANSFORM_DURATION, Easing.OutQuint);
+            //base.UpdateHoverState();
+            //icon.FadeColour(!IsHeld && IsHovered ? Color4.White : Color4.Black, TRANSFORM_DURATION, Easing.OutQuint);
         }
 
         private float rawCumulativeRotation;
 
         protected override bool OnDragStart(DragStartEvent e)
         {
+            return false;
             if (e.Button != MouseButton.Left)
                 return false;
 

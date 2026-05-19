@@ -12,15 +12,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
     {
         protected override bool OnDragStart(DragStartEvent e)
         {
-            TriggerOperationStarted();
+            //FIX: TriggerOperationStarted();
             return true;
         }
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            TriggerOperationEnded();
+            //TriggerOperationEnded();
 
-            UpdateHoverState();
+            //UpdateHoverState();
             base.OnDragEnd(e);
         }
 
