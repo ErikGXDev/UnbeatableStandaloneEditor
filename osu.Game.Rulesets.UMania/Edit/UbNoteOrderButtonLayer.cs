@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.UMania.Edit
     public partial class UbNoteOrderButtonLayer : CompositeDrawable
     {
         private readonly Stage stage;
+        private bool refreshScheduled;
 
         [Resolved]
         private EditorBeatmap editorBeatmap { get; set; } = null!;
@@ -50,7 +51,7 @@ namespace osu.Game.Rulesets.UMania.Edit
             {
                 if (ev.NewValue == TernaryState.True)
                 {
-                    refreshPairs();
+                    scheduleRefresh();
                     Alpha = 1;
                 }
                 else
@@ -63,12 +64,10 @@ namespace osu.Game.Rulesets.UMania.Edit
             
             base.LoadComplete();
 
-            editorBeatmap.HitObjectAdded += onHitObjectChanged;
-            editorBeatmap.HitObjectRemoved += onHitObjectChanged;
-            
-            editorBeatmap.HitObjectUpdated += onHitObjectChanged;
+            // Handles big changes better than single HitObjectAdded/Removed events
+            editorBeatmap.BeatmapReprocessed += onBeatmapReprocessed;
 
-            refreshPairs();
+            scheduleRefresh();
             
             Alpha = composer.SettingShowPlacementOrder.Value == TernaryState.True ? 1 : 0;
             
@@ -78,10 +77,7 @@ namespace osu.Game.Rulesets.UMania.Edit
         {
             base.Dispose(isDisposing);
 
-            editorBeatmap.HitObjectAdded -= onHitObjectChanged;
-            editorBeatmap.HitObjectRemoved -= onHitObjectChanged;
-            
-            editorBeatmap.HitObjectUpdated -= onHitObjectChanged;
+            editorBeatmap.BeatmapReprocessed -= onBeatmapReprocessed;
         }
 
         // Fix the buttons not firing normally
@@ -98,7 +94,20 @@ namespace osu.Game.Rulesets.UMania.Edit
             return false;
         }
 
-        private void onHitObjectChanged(HitObject _) => refreshPairs();
+        private void onBeatmapReprocessed() => scheduleRefresh();
+
+        private void scheduleRefresh()
+        {
+            if (refreshScheduled)
+                return;
+
+            refreshScheduled = true;
+            Schedule(() =>
+            {
+                refreshScheduled = false;
+                refreshPairs();
+            });
+        }
 
         private void refreshPairs()
         {
