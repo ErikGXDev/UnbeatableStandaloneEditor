@@ -8,7 +8,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -18,6 +21,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     internal partial class TimelineSelectionHandler : EditorSelectionHandler
     {
+        // FIX: Allow optional fine nudge by milliseconds via config.
+        private IBindable<bool> nudgeByMilliseconds = null!;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            nudgeByMilliseconds = config.GetBindable<bool>(OsuSetting.EditorNudgeByMilliseconds);
+        }
+
         // for now we always allow movement. snapping is provided by the Timeline's "distance" snap implementation
         public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent) => true;
 
@@ -49,8 +61,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (selected.Count == 0)
                 return;
 
-            var timingPoint = EditorBeatmap.ControlPointInfo.TimingPointAt(selected.First().StartTime);
-            double adjustment = timingPoint.BeatLength / EditorBeatmap.BeatDivisor * amount;
+            double adjustment;
+
+            if (nudgeByMilliseconds.Value)
+                adjustment = amount;
+            else
+            {
+                var timingPoint = EditorBeatmap.ControlPointInfo.TimingPointAt(selected.First().StartTime);
+                adjustment = timingPoint.BeatLength / EditorBeatmap.BeatDivisor * amount;
+            }
 
             EditorBeatmap.PerformOnSelection(h =>
             {

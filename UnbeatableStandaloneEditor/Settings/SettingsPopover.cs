@@ -4,10 +4,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -23,9 +26,10 @@ public partial class SettingsPopover : OsuPopover
     { }
 
     private OsuCheckbox mouseCheckbox;
+    private TooltipCheckbox nudgeCheckbox = null!;
 
     [BackgroundDependencyLoader]
-    private void load(OverlayColourProvider colourProvider, AudioManager audio, GameHost host, EditorConfigManager editorConfig)
+    private void load(OverlayColourProvider colourProvider, AudioManager audio, GameHost host, EditorConfigManager editorConfig, OsuConfigManager osuConfig)
     {
         Child = new FillFlowContainer
         {
@@ -48,6 +52,14 @@ public partial class SettingsPopover : OsuPopover
                     Current = new Bindable<bool>(true),
                     Margin = new MarginPadding { Bottom = 10, Top = 5 },
 
+                },
+                nudgeCheckbox = new TooltipCheckbox
+                {
+                    LabelText = "Nudge by 1ms (J/K)",
+                    TooltipText = "When on, pressing J/K nudges notes 1ms up/down instead of a full beat.\n(This feature may be useful for placement ordering.)",
+                    RelativeSizeAxes = Axes.X,
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.EditorNudgeByMilliseconds),
+                    Margin = new MarginPadding { Bottom = 10 },
                 },
                 new MenuLabel("Master Volume"),
                 new VolumeSlider(audio.Volume),
@@ -120,5 +132,10 @@ public partial class SettingsPopover : OsuPopover
             Current = volumeBindable;
             DisplayAsPercentage = true;
         }
+    }
+
+    private partial class TooltipCheckbox : OsuCheckbox, IHasTooltip
+    {
+        public LocalisableString TooltipText { get; set; }
     }
 }

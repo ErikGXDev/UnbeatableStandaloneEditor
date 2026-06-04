@@ -207,6 +207,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorScaleOrigin, EditorOrigin.GridCentre);
             SetDefault(OsuSetting.EditorRotationOrigin, EditorOrigin.GridCentre);
             SetDefault(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges, true);
+            SetDefault(OsuSetting.EditorNudgeByMilliseconds, true); // FIX: Add Config over here because it is used in osu code 
 
             SetDefault(OsuSetting.HideCountryFlags, false);
 
@@ -493,5 +494,8 @@ namespace osu.Game.Configuration
 
         DashboardSortMode,
         DashboardDisplayStyle,
+        
+        
+        EditorNudgeByMilliseconds, // FIX: New config, see above fix
     }
 }
