@@ -51,6 +51,7 @@ namespace osu.Game.Skinning
 
         private readonly IResourceStore<byte[]> resources;
 
+
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>();
 
         public readonly Bindable<Live<SkinInfo>> CurrentSkinInfo = new Bindable<Live<SkinInfo>>(ArgonSkin.CreateInfo().ToLiveUnmanaged());
@@ -61,6 +62,8 @@ namespace osu.Game.Skinning
 
         private readonly IResourceStore<byte[]> userFiles;
 
+        public readonly Storage storage;
+        
         private Skin argonSkin { get; }
 
         private Skin trianglesSkin { get; }
@@ -90,6 +93,7 @@ namespace osu.Game.Skinning
             this.scheduler = scheduler;
             this.host = host;
             this.resources = resources;
+            this.storage = storage;
 
             userFiles = new StorageBackedResourceStore(storage.GetStorageForDirectory("files"));
 
@@ -135,6 +139,12 @@ namespace osu.Game.Skinning
             {
                 PostNotification = obj => PostNotification?.Invoke(obj)
             };
+        }
+        
+        // FIX: Public function to change source
+        public void TriggerSourceChanged()
+        {
+            SourceChanged?.Invoke();
         }
 
         /// <summary>

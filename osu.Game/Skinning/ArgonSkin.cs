@@ -8,6 +8,9 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
@@ -16,6 +19,7 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Skinning.Components;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -39,6 +43,8 @@ namespace osu.Game.Skinning
         {
         }
 
+        private Storage? storage;
+
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public ArgonSkin(SkinInfo skin, IStorageResourceProvider resources)
             : base(
@@ -47,6 +53,13 @@ namespace osu.Game.Skinning
             )
         {
             Resources = resources;
+
+            if (resources is SkinManager skinManager)
+            {
+                storage = skinManager.storage.GetStorageForDirectory("custom");
+
+                Logger.Log("!!! Custom storage found.");
+            }
 
             Configuration.CustomComboColours = new List<Color4>
             {
@@ -75,6 +88,34 @@ namespace osu.Game.Skinning
 
         public override ISample? GetSample(ISampleInfo sampleInfo)
         {
+
+            foreach (var ext in SupportedExtensions.AUDIO_EXTENSIONS)
+            {
+                if (storage == null) break;
+                
+                if (storage.Exists("hitsound" + ext))
+                {
+                    
+                    var customStore = new StorageBackedResourceStore(storage);
+
+                    var customSampleStore = Resources.AudioManager?.GetSampleStore(customStore);
+                
+                    customSampleStore?.AddExtension(".mp3");
+
+                    var sample = customSampleStore?.Get("hitsound");
+                    
+                    Logger.Log("!!! Hitsound found!");
+                    
+                    if (sample != null)
+                    {
+                        Logger.Log("!!! Hitsound returned!");
+                        return sample;
+                    }
+                }
+            }
+            
+            Logger.Log("!!! No hitsound found, apparently.");
+            
             foreach (string lookup in sampleInfo.LookupNames)
             {
                 var sample = Samples?.Get(lookup)

@@ -7,16 +7,24 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Models;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit.Components;
+using osu.Game.Skinning;
 using osu.Game.Utils;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -24,6 +32,8 @@ namespace osu.Game.Screens.Edit.Setup
     {
         private FormBeatmapFileSelector audioTrackChooser = null!;
         private FormBeatmapFileSelector backgroundChooser = null!;
+        private FormBeatmapFileSelector hitsoundChooser = null!;
+        private HitsoundDeleteButton hitsoundDeleteButton = null!;
 
         private readonly Bindable<EditorBeatmapSkin.SampleSet?> currentSampleSet = new Bindable<EditorBeatmapSkin.SampleSet?>();
 
@@ -43,10 +53,17 @@ namespace osu.Game.Screens.Edit.Setup
 
         [Resolved]
         private SetupScreen setupScreen { get; set; } = null!;
+        
+        [Resolved]
+        private Storage storage { get; set; } = null!;
 
         private FormTextBox coverArtist = null!;
 
         private SetupScreenHeaderBackground headerBackground = null!;
+        
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
+        
 
         [BackgroundDependencyLoader]
         private void load()
@@ -76,6 +93,13 @@ namespace osu.Game.Screens.Edit.Setup
                     Caption = "Cover Artist",
                     Current = MetadataSection.coverArtistBindable,
                 },
+                hitsoundChooser = new FormBeatmapFileSelector(beatmapHasMultipleDifficulties, SupportedExtensions.AUDIO_EXTENSIONS)
+                {
+                    Caption = "Custom Hitsound (global)",
+                    PlaceholderText = "Click to add a hitsound",
+                    Margin = new MarginPadding { Top = 8 }
+                },
+                hitsoundDeleteButton = new HitsoundDeleteButton()
                
                 // FIX: Hide sample set chooser because they're not needed
                 /*new FormSampleSetChooser
@@ -112,10 +136,21 @@ namespace osu.Game.Screens.Edit.Setup
 
             if (!string.IsNullOrEmpty(working.Value.Metadata.AudioFile))
                 audioTrackChooser.Current.Value = new FileInfo(working.Value.Metadata.AudioFile);
+            
+            Schedule(hitsoundDisplayUpdate);
 
             backgroundChooser.Current.BindValueChanged(backgroundChanged);
             audioTrackChooser.Current.BindValueChanged(audioTrackChanged);
+            hitsoundChooser.Current.BindValueChanged(hitsoundChanged);
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Schedule(hitsoundDisplayUpdate);
+        }
+
 
         public bool ChangeBackgroundImage(FileInfo source, bool applyToAllDifficulties)
         {
@@ -275,6 +310,121 @@ namespace osu.Game.Screens.Edit.Setup
                 rollingBackAudioChange = true;
                 audioTrackChooser.Current.Value = file.OldValue;
                 rollingBackAudioChange = false;
+            }
+        }
+
+        [Resolved] private SkinManager skinManager { get; set; } = null!;
+
+        private void hitsoundChanged(ValueChangedEvent<FileInfo?> file)
+        {
+            if (file.NewValue == null)
+                return;
+            
+            // Delete previous files
+            foreach (var exts in SupportedExtensions.AUDIO_EXTENSIONS)
+            {
+                if (storage.Exists("custom/hitsound" + exts))
+                {
+                    storage.Delete("custom/hitsound" + exts);
+                }
+            }
+
+            var stream = storage.CreateFileSafely("custom/hitsound" + file.NewValue.Extension);
+
+            using (var sourceStream = file.NewValue.OpenRead())
+            {
+                sourceStream.CopyTo(stream);
+            }
+            
+            stream.Close();
+
+            Schedule(() =>
+            {
+                skinManager.TriggerSourceChanged();
+                Logger.Log("Requested new skin.");
+                hitsoundDisplayUpdate();
+
+            });
+        }
+
+        private void hitsoundDisplayUpdate()
+        {
+            skinManager.TriggerSourceChanged();
+
+            // Enable/Disable hitsound delete button based on whether a custom hitsound exists or not
+            // (as well as update hitsoundChooser.filenameText.Text)
+            var exists = false;
+            foreach (var ext in SupportedExtensions.AUDIO_EXTENSIONS)
+            {
+                if (storage.Exists("custom/hitsound" + ext))
+                {
+                    exists = true;
+                }
+            }
+
+            if (exists)
+            {
+                hitsoundDeleteButton.Enabled.Value = true;
+                hitsoundDeleteButton.Action = () =>
+                {
+                    foreach (var ext in SupportedExtensions.AUDIO_EXTENSIONS)
+                    {
+                        if (storage.Exists("custom/hitsound" + ext))
+                        {
+                            storage.Delete("custom/hitsound" + ext);
+                        }
+                    }
+
+                    Schedule(() =>
+                    {
+                        skinManager.TriggerSourceChanged();
+                        Logger.Log("Deleted custom hitsound and requested new skin.");
+                        hitsoundDisplayUpdate();
+                    });
+
+                };
+
+                Schedule(() => { 
+                    hitsoundChooser.filenameText.Text = "custom/hitsound.mp3";
+                    hitsoundChooser.filenameText.Colour = Color4.White;
+                    hitsoundChooser.placeholderText.Text = "";
+                    hitsoundChooser.placeholderText.Alpha = 0;
+                });
+            }
+            else
+            {
+                Schedule(() =>
+                {
+
+                    hitsoundDeleteButton.Enabled.Value = false;
+                    hitsoundDeleteButton.Action = null;
+                    hitsoundChooser.filenameText.Text = "";
+                    hitsoundChooser.filenameText.Colour = colourProvider.Foreground1;
+                    hitsoundChooser.placeholderText.Text = "Click to add a hitsound";
+                    hitsoundChooser.placeholderText.Alpha = 1;
+                });
+            }
+        }
+
+        private partial class HitsoundDeleteButton : OsuButton
+        {
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider, OsuColour  colours)
+            {
+                
+                Origin = Anchor.TopRight;
+                Anchor = Anchor.TopRight;
+                Size = new Vector2(118, 30);
+
+
+                Colour = colourProvider.Colour1;
+                BackgroundColour = colours.Red4;
+                
+                SpriteText.Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold);
+
+                Content.CornerRadius = 8;
+                
+                Text = "Remove hitsound";
             }
         }
     }
