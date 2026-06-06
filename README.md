@@ -48,9 +48,15 @@ Inside the editor, you will find a piano roll with 6 columns. They are as follow
 |:-------:|:-------:|:-------:|:---:|:------:|:----:|:------:|
 |  Type:  | Command | Command | Top | Bottom | Flip | Middle |
 
-The most interesting ones will be Top, Bottom, Flip and Extra. They should be self-explanatory, but to avoid confusion, any selected note preset will highlight its corresponding columns in the editor and prevent you from placing them in the wrong column.
+The most interesting ones will be Top, Bottom, Flip and Middle. They should be self-explanatory, but to avoid confusion, any selected note preset will highlight its corresponding columns in the editor and prevent you from placing them in the wrong column.
 
+First, you should visit the "setup" tab at the top right and add an audio file, as well as add a title and other metadata. This is also the tab where you can export your map to share it with others.
 
+Next, head to the "timing" tab to configure the bpm and timing of your song. You can tap or enter the bpm there, and also use the visible audio spectrum to line up your beats perfectly! You can also have multiple timing points if needed.
+
+The "compose" tab is the screen where you will place your notes. You will also see it in the screenshots below.
+
+Have fun!
 
 ## Screenshots
 
@@ -70,7 +76,7 @@ _Export your map as a .zip file using the buttons at the setup page. Choose a fo
 
 # License / Credits
 
-If you're interested, you can join the UNBEATABLE Modding Community for more mods and custom maps! If you have any questions you can either ask over there or message me directly ("erik_x", or simply "Erik")
+If you're interested, you can join the [UNBEATABLE Modding Community](https://discord.gg/4t8wrZ69Fx) for more mods! If you have any questions you can either ask over there or message me directly ("erik_x", or simply "Erik")
 
 The UMania ruleset and UnbeatableStandaloneEditor code are licensed under the [MIT License](LICENSE)  and are available at the [GitHub repository](https://github.com/ErikGXDev/UnbeatableStandaloneEditor).
 
