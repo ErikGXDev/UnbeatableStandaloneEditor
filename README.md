@@ -85,7 +85,7 @@ _Export your map as a .zip file using the buttons at the setup page. Choose a fo
 
 # License / Credits
 
-If you're interested, you can join the [UNBEATABLE Modding Community](https://discord.gg/4t8wrZ69Fx) for more mods! If you have any questions you can either ask over there or message me directly ("erik_x", or simply "Erik")
+If you're interested, you can join the UNBEATABLE Modding Community for more mods! If you have any questions you can either ask over there or message me directly ("erik_x", or simply "Erik")
 
 The UMania ruleset and UnbeatableStandaloneEditor code are licensed under the [MIT License](LICENSE)  and are available at the [GitHub repository](https://github.com/ErikGXDev/UnbeatableStandaloneEditor).
 
