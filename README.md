@@ -49,7 +49,7 @@ Some data will be saved to an "unbeatable-beatmap-editor" folder. Find it in the
 
 ## Getting started
 
-To start making your map, press the "New beatmap" button on the start screen. To edit an existing map, click on it in the list and press "Edit beatmap" at the bottom.
+To start making your map, press the "New Beatmap" button on the start screen. To edit an existing map, click on it in the list and press "Edit beatmap" at the bottom.
 
 Inside the editor, you will find a piano roll with 6 columns. They are as follows:
 
