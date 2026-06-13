@@ -11,7 +11,14 @@ A modified standalone osu!lazer editor that makes creating UNBEATABLE custom map
 ## Installation
 
 > [!TIP]
-> You can download the latest version of the editor from the [releases page](https://github.com/ErikGXDev/UnbeatableStandaloneEditor/releases).
+> 
+> Download the latest version here:
+> 
+> | Windows | [Download](https://github.com/ErikGXDev/UnbeatableStandaloneEditor/releases/latest/download/unbeatable-editor-windows-x64.zip) |
+> |---------|--------------------------------------------------------------------------------------------------------------------------------|
+> | Linux   | [Download](https://github.com/ErikGXDev/UnbeatableStandaloneEditor/releases/latest/download/unbeatable-editor-linux-x64.zip)   |
+> 
+> You can also find specific versions on the [releases page](https://github.com/ErikGXDev/UnbeatableStandaloneEditor/releases).
 
 The editor consists of an executable file along with some dlls. Extract the files to a folder of your choice and run the executable to start the editor.
 
