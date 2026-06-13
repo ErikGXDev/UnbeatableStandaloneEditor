@@ -1,4 +1,6 @@
-﻿<p align="center" id="readme-start">
+<p id="readme-start"></p>
+ 
+ <p align="center">
   <img src="images/icon.png" width="96" alt="Unbeatable Standalone Editor icon" />
 </p>
 
