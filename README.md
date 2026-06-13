@@ -1,4 +1,4 @@
-﻿<p align="center">
+﻿<p align="center" id="icon">
   <img src="images/icon.png" width="96" alt="Unbeatable Standalone Editor icon" />
 </p>
 
