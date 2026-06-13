@@ -448,25 +448,26 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         {
             LegacyHitObjectType type = 0;
 
-            if (hitObject is IHasCombo combo)
+            // FIX: New combos will make beatmaps impossible to open in the official level editor
+            /*if (hitObject is IHasCombo combo)
             {
                 type = (LegacyHitObjectType)(combo.ComboOffset << 4);
 
-                if (combo.NewCombo)
-                    type |= LegacyHitObjectType.NewCombo;
-            }
+                /*if (combo.NewCombo)
+                    type |= LegacyHitObjectType.NewCombo;#1#
+            }*/
 
             switch (hitObject)
             {
-                case IHasPath:
+                /*case IHasPath:
                     type |= LegacyHitObjectType.Slider;
-                    break;
+                    break;*/
 
                 case IHasDuration:
                     if (onlineRulesetID == 3)
                         type |= LegacyHitObjectType.Hold;
                     else
-                        type |= LegacyHitObjectType.Spinner;
+                        type |= LegacyHitObjectType.Hold;
                     break;
 
                 default:
