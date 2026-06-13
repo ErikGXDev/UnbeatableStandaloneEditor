@@ -482,12 +482,16 @@ namespace osu.Game.Screens.Edit
 
         protected override BackgroundScreen CreateBackground() => new EditorBackgroundScreen(editorBeatmap);
 
+
+        // FIX: Make new songs open to the setup menu.
+        public bool IsActuallyNewBeatmap = false;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
             setUpClipboardActionAvailability();
 
-            Mode.Value = isNewBeatmap ? EditorScreenMode.SongSetup : EditorScreenMode.Compose;
+            Mode.Value = IsActuallyNewBeatmap ? EditorScreenMode.SongSetup : EditorScreenMode.Compose;
             Mode.BindValueChanged(onModeChanged, true);
 
             MutationTracker.InProgress.BindValueChanged(_ =>

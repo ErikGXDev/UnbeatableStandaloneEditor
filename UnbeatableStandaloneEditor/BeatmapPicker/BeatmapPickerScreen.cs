@@ -278,9 +278,10 @@ public partial class BeatmapPickerScreen : OsuScreen
     {
         var ruleset = UbRuleset.GetRulesetInfo();
         var working = beatmapManager.CreateNew(ruleset, api.LocalUser.Value);
+
         Beatmap.Value = working;
         Ruleset.Value = ruleset;
-        this.Push(new EditorLoader());
+        this.Push(new EditorLoader(true));
     }
 
     private void openEditor()
@@ -290,7 +291,7 @@ public partial class BeatmapPickerScreen : OsuScreen
         var working = beatmapManager.GetWorkingBeatmap(beatmap);
         Beatmap.Value = working;
         Ruleset.Value = UbRuleset.GetRulesetInfo();
-        this.Push(new EditorLoader());
+        this.Push(new EditorLoader(false));
     }
 
     private void promptDelete()

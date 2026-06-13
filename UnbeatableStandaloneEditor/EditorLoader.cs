@@ -6,6 +6,14 @@ namespace UnbeatableStandaloneEditor;
 
 public partial class EditorLoader : osu.Game.Screens.Edit.EditorLoader
 {
+
+    public bool IsNewBeatmap;
+
+    public EditorLoader(bool isNewBeatmap)
+    {
+        IsNewBeatmap = isNewBeatmap;
+     }
+
     // Allow the framework to exit this screen normally
     public override bool AllowUserExit => true;
 
@@ -22,7 +30,19 @@ public partial class EditorLoader : osu.Game.Screens.Edit.EditorLoader
     public override void OnEntering(ScreenTransitionEvent e)
     {
         base.OnEntering(e);
-        this.Push(CreateEditor());
+        var editor = CreateEditor();
+        editor.IsActuallyNewBeatmap = IsNewBeatmap;
+        this.Push(editor);
+
+        if (IsNewBeatmap)
+        {
+            editor.Mode.Value = EditorScreenMode.SongSetup;
+        }
+        else
+        {
+            editor.Mode.Value = EditorScreenMode.Compose;
+        }
+
         ValidForResume = false;
     }
 
