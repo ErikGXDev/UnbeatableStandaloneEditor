@@ -34,7 +34,8 @@ namespace osu.Game.Screens.Edit.Compose
         [Resolved]
         private IBeatSnapProvider beatSnapProvider { get; set; }
 
-        private Bindable<string> clipboard { get; set; }
+        // FIX: Make clipboard static to share clipboard between maps
+        private static Bindable<string> clipboard { get; set; }
 
         private HitObjectComposer composer;
 
@@ -102,9 +103,15 @@ namespace osu.Game.Screens.Edit.Compose
         }
 
         [BackgroundDependencyLoader]
-        private void load(EditorClipboard clipboard)
+        private void load(EditorClipboard _clipboard)
         {
-            this.clipboard = clipboard.Content.GetBoundCopy();
+            // FIX: clipboard is static and perchance undefined in the beginning
+            if (clipboard == null)
+            {
+                clipboard = new Bindable<string>();
+            }
+            
+            //clipboard = _clipboard.Content.GetBoundCopy();
         }
 
         protected override void LoadComplete()
