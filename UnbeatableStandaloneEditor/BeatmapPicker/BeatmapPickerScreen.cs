@@ -88,7 +88,7 @@ public partial class BeatmapPickerScreen : OsuScreen
                                 Height = 32,
                                 Text = "Sort by: ...",
                                 Colour = colours.Colour1,
-                                BackgroundColour = colours.Background3,
+                                BackgroundColour = colours.Background4,
                                 Action = switchSortMode
                             },
                             new RoundedButton
