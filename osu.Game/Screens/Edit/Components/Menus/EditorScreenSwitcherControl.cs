@@ -24,10 +24,16 @@ namespace osu.Game.Screens.Edit.Components.Menus
             TabContainer.AutoSizeAxes = Axes.X;
             TabContainer.Spacing = Vector2.Zero;
         }
+        protected override bool AddEnumEntriesAutomatically => false;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
+            
+            AddItem(EditorScreenMode.SongSetup);
+            AddItem(EditorScreenMode.Compose);
+            AddItem(EditorScreenMode.Timing);
+            AddItem(EditorScreenMode.Verify);
             AccentColour = colourProvider.Light3;
 
             AddInternal(new Box
