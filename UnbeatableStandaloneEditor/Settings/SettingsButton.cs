@@ -12,10 +12,11 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
+using UnbeatableStandaloneEditor.Components;
 
 namespace UnbeatableStandaloneEditor.Settings;
 
-public partial class SettingsButton : OsuButton, IHasPopover // Didnt want the triangles, so OsuButton only
+public partial class SettingsButton : BlankButton, IHasPopover // Didnt want the triangles, so OsuButton only
 {
     public SettingsButton() {}
 
@@ -29,10 +30,6 @@ public partial class SettingsButton : OsuButton, IHasPopover // Didnt want the t
         Anchor = Anchor.TopRight;
         Size = new Vector2(32);
 
-        Colour = colourProvider.Colour1;
-        BackgroundColour = colourProvider.Background3;
-
-        Content.CornerRadius = 8;
 
         // Note to self: Do not use Child = ... because it removes the background of the button for some reason.
         Add(new SpriteIcon

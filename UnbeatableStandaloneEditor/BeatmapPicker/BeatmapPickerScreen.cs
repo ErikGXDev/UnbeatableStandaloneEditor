@@ -40,7 +40,7 @@ public partial class BeatmapPickerScreen : OsuScreen
     private RoundedButton editButton = null!;
     private RoundedButton deleteButton = null!;
     private RoundedButton? updateButton;
-    private RoundedButton sortByButton = null!;
+    private SortButton sortByButton = null!;
 
     private OsuClickableContainer versionText = null!;
     private Container? updateButtonContainer;
@@ -79,18 +79,7 @@ public partial class BeatmapPickerScreen : OsuScreen
                                 Text = "Your Beatmaps",
                                 Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                             },
-                            sortByButton = new RoundedButton()
-                            {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                X = -158,
-                                Width = 148,
-                                Height = 32,
-                                Text = "Sort by: ...",
-                                Colour = colours.Colour1,
-                                BackgroundColour = colours.Background4,
-                                Action = switchSortMode
-                            },
+                            sortByButton = new SortButton(),
                             new RoundedButton
                             {
                                 Anchor = Anchor.CentreRight,
@@ -265,64 +254,11 @@ public partial class BeatmapPickerScreen : OsuScreen
             }
         );
 
-        updateSortButtonText();
-
-    }
-
-
-    // TODO: Potentially refactor into entirely own Drawable
-    private Bindable<SortMode> currentSortMode = new Bindable<SortMode>(SortMode.Artist);
-
-    enum SortMode
-    {
-        Artist,
-        Title,
-        [Description("Last Edited")]
-        LastEdited
-    }
-
-    private void updateSortButtonText()
-    {
-        sortByButton.Text = "Sort by: " + currentSortMode.Value.Humanize();
-    }
-
-    // Cycle between modes
-    private void switchSortMode()
-    {
-        if (currentSortMode.Value == SortMode.Artist)
+        sortByButton.CurrentSortMode.BindValueChanged(v =>
         {
-            currentSortMode.Value = SortMode.Title;
-        } else if (currentSortMode.Value == SortMode.Title)
-        {
-            currentSortMode.Value = SortMode.LastEdited;
-        } else if (currentSortMode.Value == SortMode.LastEdited)
-        {
-            currentSortMode.Value = SortMode.Artist;
-        }
+            rebuildBeatmapList();
+        });
 
-        updateSortButtonText();
-
-        rebuildBeatmapList();
-    }
-
-    private object getSortObject(BeatmapSetInfo set)
-    {
-        if (currentSortMode.Value == SortMode.Artist)
-        {
-            return set.Metadata.Artist;
-        }
-
-        if (currentSortMode.Value == SortMode.Title)
-        {
-            return set.Metadata.Title;
-        }
-
-        if (currentSortMode.Value == SortMode.LastEdited)
-        {
-            return -set.DateAdded.UtcTicks;
-        }
-
-        return set.Metadata.Artist;
     }
 
     private void rebuildBeatmapList()
@@ -350,7 +286,7 @@ public partial class BeatmapPickerScreen : OsuScreen
         BeatmapSetInfo? newSelection = null;
         BeatmapSetInfo? firstSet = null;
 
-        foreach (var set in sets.OrderBy(getSortObject).ThenBy(s => s.Metadata.Title))
+        foreach (var set in sets.OrderBy(sortByButton.GetSortObject).ThenBy(s => s.Metadata.Title))
         {
             var detached = set.Detach();
             firstSet ??= detached;

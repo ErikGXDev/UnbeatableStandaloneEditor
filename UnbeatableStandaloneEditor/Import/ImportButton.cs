@@ -2,15 +2,14 @@
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
+using UnbeatableStandaloneEditor.Components;
 
 namespace UnbeatableStandaloneEditor.Import;
 
-public partial class ImportButton : OsuButton, IHasPopover
+public partial class ImportButton : BlankButton, IHasPopover
 {
     [Resolved]
     private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -22,11 +21,6 @@ public partial class ImportButton : OsuButton, IHasPopover
         Anchor = Anchor.TopRight;
         Size = new Vector2(70, 32);
 
-
-        Colour = colourProvider.Colour1;
-        BackgroundColour = colourProvider.Background3;
-
-        Content.CornerRadius = 8;
 
         Text = "Import";
 
