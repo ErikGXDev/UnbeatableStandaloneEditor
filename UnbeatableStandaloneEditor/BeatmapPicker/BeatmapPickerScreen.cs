@@ -278,10 +278,13 @@ public partial class BeatmapPickerScreen : OsuScreen
 
         if (!sets.Any())
         {
+            sortByButton.Alpha = 0;
             setsFlow.Add(new EmptyState());
             selectedSet.Value = null;
             return;
         }
+
+        sortByButton.Alpha = 1;
 
         BeatmapSetInfo? newSelection = null;
         BeatmapSetInfo? firstSet = null;
