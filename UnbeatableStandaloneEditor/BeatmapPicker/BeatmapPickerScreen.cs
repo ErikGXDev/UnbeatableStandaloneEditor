@@ -1,4 +1,6 @@
+using System.ComponentModel;
 using System.Threading.Tasks;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -21,6 +23,7 @@ using osuTK;
 using osuTK.Graphics;
 using UnbeatableStandaloneEditor.Import;
 using UnbeatableStandaloneEditor.Settings;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace UnbeatableStandaloneEditor.BeatmapPicker;
 
@@ -37,6 +40,7 @@ public partial class BeatmapPickerScreen : OsuScreen
     private RoundedButton editButton = null!;
     private RoundedButton deleteButton = null!;
     private RoundedButton? updateButton;
+    private RoundedButton sortByButton = null!;
 
     private OsuClickableContainer versionText = null!;
     private Container? updateButtonContainer;
@@ -74,6 +78,18 @@ public partial class BeatmapPickerScreen : OsuScreen
                                 Origin = Anchor.CentreLeft,
                                 Text = "Your Beatmaps",
                                 Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                            },
+                            sortByButton = new RoundedButton()
+                            {
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                X = -158,
+                                Width = 148,
+                                Height = 32,
+                                Text = "Sort by: ...",
+                                Colour = colours.Colour1,
+                                BackgroundColour = colours.Background3,
+                                Action = switchSortMode
                             },
                             new RoundedButton
                             {
@@ -245,33 +261,107 @@ public partial class BeatmapPickerScreen : OsuScreen
             r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending),
             (sets, _) =>
             {
-                var prevId = selectedSet.Value?.ID;
-                setsFlow.Clear();
-
-                if (sets.Count == 0)
-                {
-                    setsFlow.Add(new EmptyState());
-                    selectedSet.Value = null;
-                    return;
-                }
-
-                BeatmapSetInfo? newSelection = null;
-                BeatmapSetInfo? firstSet = null;
-
-                foreach (var set in sets.OrderBy(s => s.Metadata.Artist).ThenBy(s => s.Metadata.Title))
-                {
-                    var detached = set.Detach();
-                    firstSet ??= detached;
-                    if (prevId.HasValue && detached.ID == prevId.Value)
-                        newSelection = detached;
-                    setsFlow.Add(new BeatmapSetRow(detached, selectedSet));
-                }
-
-                // If nothing was previously selected (e.g. first beatmap just created),
-                // fall back to the first set so the buttons activate automatically.
-                selectedSet.Value = newSelection ?? firstSet;
+                buildFlowFromSets(sets.ToList());
             }
         );
+
+        updateSortButtonText();
+
+    }
+
+
+    // TODO: Potentially refactor into entirely own Drawable
+    private Bindable<SortMode> currentSortMode = new Bindable<SortMode>(SortMode.Artist);
+
+    enum SortMode
+    {
+        Artist,
+        Title,
+        [Description("Last Edited")]
+        LastEdited
+    }
+
+    private void updateSortButtonText()
+    {
+        sortByButton.Text = "Sort by: " + currentSortMode.Value.Humanize();
+    }
+
+    // Cycle between modes
+    private void switchSortMode()
+    {
+        if (currentSortMode.Value == SortMode.Artist)
+        {
+            currentSortMode.Value = SortMode.Title;
+        } else if (currentSortMode.Value == SortMode.Title)
+        {
+            currentSortMode.Value = SortMode.LastEdited;
+        } else if (currentSortMode.Value == SortMode.LastEdited)
+        {
+            currentSortMode.Value = SortMode.Artist;
+        }
+
+        updateSortButtonText();
+
+        rebuildBeatmapList();
+    }
+
+    private object getSortObject(BeatmapSetInfo set)
+    {
+        if (currentSortMode.Value == SortMode.Artist)
+        {
+            return set.Metadata.Artist;
+        }
+
+        if (currentSortMode.Value == SortMode.Title)
+        {
+            return set.Metadata.Title;
+        }
+
+        if (currentSortMode.Value == SortMode.LastEdited)
+        {
+            return -set.DateAdded.UtcTicks;
+        }
+
+        return set.Metadata.Artist;
+    }
+
+    private void rebuildBeatmapList()
+    {
+        realm.Run(r =>
+        {
+            var sets = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending);
+            buildFlowFromSets(sets.ToList());
+        });
+    }
+
+    private void buildFlowFromSets(List<BeatmapSetInfo> sets)
+    {
+
+        var prevId = selectedSet.Value?.ID;
+        setsFlow.Clear();
+
+        if (!sets.Any())
+        {
+            setsFlow.Add(new EmptyState());
+            selectedSet.Value = null;
+            return;
+        }
+
+        BeatmapSetInfo? newSelection = null;
+        BeatmapSetInfo? firstSet = null;
+
+        foreach (var set in sets.OrderBy(getSortObject).ThenBy(s => s.Metadata.Title))
+        {
+            var detached = set.Detach();
+            firstSet ??= detached;
+            if (prevId.HasValue && detached.ID == prevId.Value)
+                newSelection = detached;
+            setsFlow.Add(new BeatmapSetRow(detached, selectedSet));
+        }
+
+        // If nothing was previously selected (e.g. first beatmap just created),
+        // fall back to the first set so the buttons activate automatically.
+        selectedSet.Value = newSelection ?? firstSet;
     }
 
     private void createNewBeatmap()
@@ -287,6 +377,20 @@ public partial class BeatmapPickerScreen : OsuScreen
     private void openEditor()
     {
         if (selectedSet.Value == null) return;
+
+        // Update selectedSet.Value.DateAdded
+        realm.Write(r =>
+        {
+            var realmSet = r.Find<BeatmapSetInfo>(selectedSet.Value.ID);
+
+            if (realmSet != null)
+            {
+                realmSet.DateAdded = DateTime.Now;
+            }
+        });
+        selectedSet.Value.DateAdded = DateTime.Now;
+
+
         var beatmap = selectedSet.Value.Beatmaps.OrderBy(b => b.StarRating).First();
         var working = beatmapManager.GetWorkingBeatmap(beatmap);
         Beatmap.Value = working;

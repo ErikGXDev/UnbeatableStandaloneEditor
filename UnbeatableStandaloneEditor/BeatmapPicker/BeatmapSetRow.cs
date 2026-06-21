@@ -1,3 +1,4 @@
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -88,7 +89,7 @@ public partial class BeatmapSetRow : OsuClickableContainer
                         },
                         new OsuSpriteText
                         {
-                            Text = $"by {set.Metadata.Author.Username}  \u2022  {diffLabel}",
+                            Text = $"by {set.Metadata.Author.Username}  \u2022  {diffLabel}  \u2022  {set.DateAdded.Humanize()}",
                             Font = OsuFont.GetFont(size: 14),
                             Alpha = 0.55f,
                         }
