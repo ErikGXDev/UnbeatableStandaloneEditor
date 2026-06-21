@@ -813,9 +813,11 @@ namespace osu.Game.Screens.Edit
                     screenSwitcher.SelectItem(EditorScreenMode.Compose);
                     return true;
 
-                case GlobalAction.EditorDesignMode:
+                // Remove design mode
+                /*case GlobalAction.EditorDesignMode:
                     screenSwitcher.SelectItem(EditorScreenMode.Design);
                     return true;
+                    */
 
                 case GlobalAction.EditorTimingMode:
                     screenSwitcher.SelectItem(EditorScreenMode.Timing);
@@ -829,9 +831,9 @@ namespace osu.Game.Screens.Edit
                     screenSwitcher.SelectItem(EditorScreenMode.Verify);
                     return true;
 
-                case GlobalAction.EditorTestGameplay:
+                /*case GlobalAction.EditorTestGameplay:
                     bottomBar.TestGameplayButton.TriggerClick();
-                    return true;
+                    return true;*/
 
                 case GlobalAction.EditorDiscardUnsavedChanges:
                     DiscardUnsavedChanges();
@@ -1101,9 +1103,9 @@ namespace osu.Game.Screens.Edit
                         currentScreen = new ComposeScreen();
                         break;
 
-                    case EditorScreenMode.Design:
+                    /*case EditorScreenMode.Design:
                         currentScreen = new DesignScreen();
-                        break;
+                        break;*/
 
                     case EditorScreenMode.Timing:
                         currentScreen = new TimingScreen();
