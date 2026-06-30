@@ -18,7 +18,7 @@ public partial class UManiaHitObjectInspector : HitObjectInspector
         {
             var maniaObject = (ManiaHitObject)objects[0];
 
-            findFlipAndZoom(maniaObject.StartTime, out bool flippedRight, out bool zoomedIn);
+            findFlipAndZoom(maniaObject, out bool flippedRight, out bool zoomedIn);
 
 
             if (maniaObject.Column == 4)
@@ -55,7 +55,7 @@ public partial class UManiaHitObjectInspector : HitObjectInspector
         }
     }
 
-    private void findFlipAndZoom(double time, out bool flippedRight, out bool zoomedIn)
+    private void findFlipAndZoom(ManiaHitObject maniaNote, out bool flippedRight, out bool zoomedIn)
     {
         flippedRight = true;
         zoomedIn = true;
@@ -63,9 +63,39 @@ public partial class UManiaHitObjectInspector : HitObjectInspector
         // for every flip note, invert the direction
 
         var notes = (List<ManiaHitObject>)EditorBeatmap.HitObjects;
+        
+        var indexOfNote = notes.IndexOf(maniaNote);
+        var time = maniaNote.StartTime;
+        
+        
 
-        foreach (var note in notes)
+        /*foreach (var note in notes)
         {
+            if (note.StartTime > time) break;
+
+            if (note.Column == 4)
+            {
+                if (isZoomNote(note))
+                {
+                    zoomedIn = !zoomedIn;
+                }
+                else
+                {
+                    flippedRight = !flippedRight;
+                }
+            }
+        }*/
+        
+        // Rewrite loop above into for-loop with index
+        // Not only do we have to check that only flips are included that are under the notes time,
+        // the index should also be checked, as it may happen that a zoom that is after the target note is calculated in,
+        // which it obviously should not
+        for (var i = 0; i < notes.Count; i++)
+        {
+            var note = notes[i];
+            
+            if (i > indexOfNote) break;
+            
             if (note.StartTime > time) break;
 
             if (note.Column == 4)
