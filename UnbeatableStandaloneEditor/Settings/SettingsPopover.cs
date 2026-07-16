@@ -6,8 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
@@ -15,7 +13,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
+using osuTK;
 using osuTK.Graphics;
 
 namespace UnbeatableStandaloneEditor.Settings;
@@ -27,13 +27,15 @@ public partial class SettingsPopover : OsuPopover
 
     private OsuCheckbox mouseCheckbox;
     private TooltipCheckbox nudgeCheckbox = null!;
+    private OsuScrollContainer keybindingsContainer = null!;
+    private RoundedButton editKeybindingsButton = null!;
 
     [BackgroundDependencyLoader]
     private void load(OverlayColourProvider colourProvider, AudioManager audio, GameHost host, EditorConfigManager editorConfig, OsuConfigManager osuConfig)
     {
         Child = new FillFlowContainer
         {
-            Width = 250,
+            Width = 340,
             AutoSizeAxes = Axes.Y,
             Padding = new MarginPadding(16),
             Direction = FillDirection.Vertical,
@@ -45,28 +47,71 @@ public partial class SettingsPopover : OsuPopover
                     Font = OsuFont.Default.With(size: 18, weight: FontWeight.Bold),
                     Margin = new MarginPadding { Bottom = 10 },
                 },
-                mouseCheckbox = new OsuCheckbox()
+                new SettingsGroup
                 {
-                    LabelText =  "Show system cursor",
-                    RelativeSizeAxes = Axes.X,
-                    Current = new Bindable<bool>(true),
-                    Margin = new MarginPadding { Bottom = 10, Top = 5 },
+                    Label = "General",
+                    Controls = new Drawable[]
+                    {
+                        mouseCheckbox = new OsuCheckbox()
+                        {
+                            LabelText =  "Show system cursor",
+                            RelativeSizeAxes = Axes.X,
+                            Current = new Bindable<bool>(true),
+                            Margin = new MarginPadding { Bottom = 10, Top = 5 },
 
+                        },
+                        nudgeCheckbox = new TooltipCheckbox
+                        {
+                            LabelText = "Nudge by 1ms (J/K)",
+                            TooltipText = "When on, pressing J/K nudges notes 1ms up/down instead of a full beat.\n(This feature may be useful for placement ordering.)",
+                            RelativeSizeAxes = Axes.X,
+                            Current = osuConfig.GetBindable<bool>(OsuSetting.EditorNudgeByMilliseconds),
+                            Margin = new MarginPadding { Bottom = 10 },
+                        },
+                    },
                 },
-                nudgeCheckbox = new TooltipCheckbox
+                new SettingsGroup
                 {
-                    LabelText = "Nudge by 1ms (J/K)",
-                    TooltipText = "When on, pressing J/K nudges notes 1ms up/down instead of a full beat.\n(This feature may be useful for placement ordering.)",
-                    RelativeSizeAxes = Axes.X,
-                    Current = osuConfig.GetBindable<bool>(OsuSetting.EditorNudgeByMilliseconds),
-                    Margin = new MarginPadding { Bottom = 10 },
+                    Label = "Volume",
+                    Controls = new Drawable[]
+                    {
+                        new MenuLabel("Master Volume"),
+                        new VolumeSlider(audio.Volume),
+                        new MenuLabel("Music"),
+                        new VolumeSlider(audio.VolumeTrack),
+                        new MenuLabel("Effects"),
+                        new VolumeSlider(audio.VolumeSample),
+                    },
                 },
-                new MenuLabel("Master Volume"),
-                new VolumeSlider(audio.Volume),
-                new MenuLabel("Music"),
-                new VolumeSlider(audio.VolumeTrack),
-                new MenuLabel("Effects"),
-                new VolumeSlider(audio.VolumeSample),
+
+                new OsuSpriteText
+                {
+                    Text = "Key Bindings",
+                    Font = OsuFont.Default.With(size: 16, weight: FontWeight.Bold),
+                    Margin = new MarginPadding { Top = 15, Bottom = 5 },
+                },
+                keybindingsContainer = new OsuScrollContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 280,
+                    Masking = true,
+                    AlwaysPresent = false,
+                    Child = new EditorKeyBindingsSubsection(),
+                },
+                editKeybindingsButton = new RoundedButton
+                {
+                    Width = 150,
+                    Height = 30,
+                    Text = "Click to show...",
+                    Colour = colourProvider.Colour1,
+                    BackgroundColour = colourProvider.Background2,
+                    Scale = new Vector2(0.9f),
+                    Action = () =>
+                    {
+                        keybindingsContainer.Show();
+                        editKeybindingsButton.Hide();
+                    },
+                },
 
                 new OsuSpriteText()
                 {
@@ -80,6 +125,8 @@ public partial class SettingsPopover : OsuPopover
 
             }
         };
+
+        keybindingsContainer.Hide();
 
         mouseCheckbox.Current.Value = editorConfig.Get<bool>(EditorSetting.ShowSystemCursor);
         mouseCheckbox.Current.ValueChanged += e =>
@@ -131,6 +178,37 @@ public partial class SettingsPopover : OsuPopover
             RelativeSizeAxes = Axes.X;
             Current = volumeBindable;
             DisplayAsPercentage = true;
+        }
+    }
+
+    public partial class SettingsGroup : FillFlowContainer
+    {
+        public LocalisableString Label { get; init; }
+
+        public Drawable[]? Controls { get; init; }
+
+        public SettingsGroup()
+        {
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+            Direction = FillDirection.Vertical;
+            Spacing = new Vector2(0, 2);
+            Margin = new MarginPadding { Bottom = 10 };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Add(new OsuSpriteText
+            {
+                Text = Label,
+                Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold),
+                Margin = new MarginPadding { Bottom = 4 },
+            });
+
+            if (Controls != null)
+                AddRange(Controls);
         }
     }
 

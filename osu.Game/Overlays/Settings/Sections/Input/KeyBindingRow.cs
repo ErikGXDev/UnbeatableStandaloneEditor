@@ -21,6 +21,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -103,8 +104,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private Sample?[]? keypressSamples;
 
         private const float transition_time = 150;
-        private const float height = 20;
-        private const float padding = 5;
+        // FIX: Reduced height/padding
+        private const float height = 18;
+        private const float padding = 3;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             content.ReceivePositionalInputAt(screenSpacePos);
@@ -128,7 +130,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Padding = new MarginPadding { Right = SettingsPanel.CONTENT_PADDING.Right };
+            // FIX: Removed horizontal margin
+            Padding = new MarginPadding();
 
             InternalChildren = new Drawable[]
             {
@@ -143,7 +146,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = SettingsPanel.CONTENT_PADDING.Left },
+                    // FIX: Removed horizontal margin
+                    Padding = new MarginPadding(),
                     Children = new Drawable[]
                     {
                         content = new Container
@@ -168,7 +172,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 },
                                 text = new OsuSpriteText
                                 {
+                                    // FIX: Smaller font to fit the compact options popover.
                                     Text = Action.GetLocalisableDescription(),
+                                    Font = OsuFont.Default.With(size: 14),
                                     Margin = new MarginPadding(1.5f * padding),
                                 },
                                 buttons = new FillFlowContainer<KeyButton>

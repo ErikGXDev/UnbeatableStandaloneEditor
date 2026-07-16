@@ -69,7 +69,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     new Container
                     {
                         AlwaysPresent = true,
-                        Width = 80,
+                        // FIX: Reduced width
+                        Width = 70,
                         Height = height,
                     },
                     box = new Box
@@ -78,8 +79,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     },
                     Text = new OsuSpriteText
                     {
-                        Font = OsuFont.Numeric.With(size: 10),
-                        Margin = new MarginPadding(5),
+                        // FIX: regular osu font
+                        Font = OsuFont.Default.With(size: 12),
+                        Margin = new MarginPadding(3),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
