@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.UMania.Edit
     {
         private readonly UbIconType iconType;
 
+        public bool ForShow = false;
+
         public UbIcon(UbIconType iconType)
         {
             this.iconType = iconType;
@@ -40,6 +42,8 @@ namespace osu.Game.Rulesets.UMania.Edit
 
         public override bool UpdateSubTree()
         {
+            if (ForShow) return base.UpdateSubTree();
+            
             Colour = Colour4.White;
             Size = new Vector2(25);
             Blending = BlendingParameters.Inherit;

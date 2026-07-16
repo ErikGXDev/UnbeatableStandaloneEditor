@@ -32,7 +32,19 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
         {
             RelativeSizeAxes = Axes.Both,
         });
+
+        previewArea = new UManiaPreviewArea
+        {
+            Anchor = Anchor.BottomRight,
+            Origin = Anchor.BottomRight,
+            Margin = new MarginPadding { Right = 10, Bottom = 10 },
+            RightToolbox = RightToolbox,
+        };
+        
+        PlayfieldContentContainer.Add(previewArea);
     }
+    
+    private UManiaPreviewArea previewArea;
 
     protected override Drawable CreateHitObjectInspector() => new UManiaHitObjectInspector();
 
@@ -67,6 +79,8 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     public Bindable<TernaryState> SettingShowAllowedColumns = new Bindable<TernaryState>(TernaryState.True);
 
     public Bindable<TernaryState> SettingShowPlacementOrder = new Bindable<TernaryState>(TernaryState.True);
+    
+    public Bindable<TernaryState> SettingShowPreview = new Bindable<TernaryState>(TernaryState.True);
     
     /*private readonly Bindable<TernaryState> modFlyingNote = new Bindable<TernaryState>();
     private readonly Bindable<TernaryState> modInvisibleNote = new Bindable<TernaryState>();
@@ -233,6 +247,12 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
                         Description = "Placement order",
                         CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Circle },
                     },
+                    new DrawableTernaryButton
+                    {
+                        Current = SettingShowPreview,
+                        Description = "Show preview",
+                        CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Tv },
+                    }
                 ]
             },
         });

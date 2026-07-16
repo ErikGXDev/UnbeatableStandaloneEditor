@@ -1,0 +1,45 @@
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osuTK;
+using osuTK.Graphics;
+using System;
+
+namespace osu.Game.Rulesets.UMania.Edit
+{
+    public partial class PreviewHold : CompositeDrawable
+    {
+        private Box line = null!;
+
+        public PreviewHold()
+        {
+            RelativePositionAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
+            Origin = Anchor.CentreLeft;
+            Size = new Vector2(0, 4);
+            Depth = 12;
+        }
+
+        public Vector2 EndPosition
+        {
+            set
+            {
+                float width = value.X - X;
+                Y = value.Y;
+                
+                Width = width;
+            }
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            InternalChild = line = new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+                Colour = Color4.LightBlue,
+            };
+        }
+    }
+}
