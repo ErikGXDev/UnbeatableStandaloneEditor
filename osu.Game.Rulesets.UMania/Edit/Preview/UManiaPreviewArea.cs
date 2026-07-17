@@ -360,11 +360,11 @@ namespace osu.Game.Rulesets.UMania.Edit
                         if (centerForUpcomingFlip)
                         {
                             // Upcoming flip stage: nudge slightly inward from the current side instead of centering.
-                            float inwardPull = olFlippedRight ? 0.08f : -0.08f;
+                            float inwardPull = olFlippedRight ? 0.04f : -0.04f;
 
                             cameraBorder.MoveTo(new Vector2(cam_middle_receptor + inwardPull, cam_middle_receptor), 700,
                                 Easing.OutCubic);
-                            cameraBorder.ResizeTo(new Vector2(preview_width * 0.50f, preview_height * 0.79f), 700,
+                            cameraBorder.ResizeTo(new Vector2(preview_width * 0.52f, preview_height * 0.79f), 700,
                                 Easing.OutCubic);
                         }
                         else if (olFlippedRight)

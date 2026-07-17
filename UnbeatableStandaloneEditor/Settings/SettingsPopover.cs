@@ -25,7 +25,7 @@ public partial class SettingsPopover : OsuPopover
     public SettingsPopover() : base(false)
     { }
 
-    private OsuCheckbox mouseCheckbox;
+    private OsuCheckbox mouseCheckbox = null!;
     private TooltipCheckbox nudgeCheckbox = null!;
     private OsuScrollContainer keybindingsContainer = null!;
     private RoundedButton editKeybindingsButton = null!;
