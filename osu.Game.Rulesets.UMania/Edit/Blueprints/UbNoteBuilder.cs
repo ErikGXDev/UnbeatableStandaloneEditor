@@ -48,7 +48,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
 
             foreach (string sample in samples)
             {
-                HitSampleInfo sampleInfo = hitObject.CreateHitSampleInfo(sample);
+                // EditorAutoBank must be false so the encoder preserves the explicit bank
+                HitSampleInfo sampleInfo = hitObject.CreateHitSampleInfo(sample).With(newEditorAutoBank: false);
                 hitSamples.Add(sampleInfo);
             }
 
@@ -59,7 +60,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
         {
             if (isModActive(modButton))
             {
-                HitSampleInfo sampleInfo = hitObject.CreateHitSampleInfo(sample).With(newVolume: 100);
+                HitSampleInfo sampleInfo = hitObject.CreateHitSampleInfo(sample).With(newVolume: 100, newEditorAutoBank: false);
                 hitObject.Samples.Add(sampleInfo);
             }
         }
@@ -88,7 +89,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
 
             bool hasAdditionSample = hitObject.Samples.Any(s => s.Name != HitSampleInfo.HIT_NORMAL);
             if (!hasAdditionSample)
-                hitObject.Samples.Add(hitObject.CreateHitSampleInfo(HitSampleInfo.HIT_FLOURISH).With(newVolume: 100));
+                hitObject.Samples.Add(hitObject.CreateHitSampleInfo(HitSampleInfo.HIT_FLOURISH).With(newVolume: 100, newEditorAutoBank: false));
 
             ApplyAdditionBank(HitSampleInfo.BANK_NORMAL);
         }
