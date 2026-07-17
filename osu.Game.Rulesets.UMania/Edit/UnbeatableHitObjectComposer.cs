@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -108,10 +109,11 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
 
         PlayfieldContentContainer.Add(timingPopup);
 
-        EditorBeatmap.HasTiming.BindValueChanged(hasTiming =>
+        hasTimingHandler = hasTiming =>
         {
             timingPopup.FadeTo(hasTiming.NewValue ? 0 : 1, 300, Easing.OutQuint);
-        });
+        };
+        EditorBeatmap.HasTiming.ValueChanged += hasTimingHandler;
     }
     
     private UManiaPreviewArea previewArea;
@@ -176,6 +178,9 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
 
     // True when the current selection contains at least one cop note
     private bool selectionContainsCop;
+
+    private NotifyCollectionChangedEventHandler? selectionChangedHandler;
+    private Action<ValueChangedEvent<bool>>? hasTimingHandler;
 
     // Returns the modifier buttons that are valid for the current selection
     public IEnumerable<DrawableTernaryButton> GetApplicableModifierButtons()
@@ -411,7 +416,8 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
         foreach (var button in modButtons)
             button.Current.BindValueChanged(_ => applyModifiersToSelection());
 
-        EditorBeatmap.SelectedHitObjects.CollectionChanged += (_, _) => Scheduler.AddOnce(updateButtonStatesFromSelection);
+        selectionChangedHandler = (_, _) => Scheduler.AddOnce(updateButtonStatesFromSelection);
+        EditorBeatmap.SelectedHitObjects.CollectionChanged += selectionChangedHandler;
     }
 
     private void applyModifiersToSelection()
@@ -559,5 +565,16 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
                 }
             }
         }
+    }
+
+    protected override void Dispose(bool isDisposing)
+    {
+        base.Dispose(isDisposing);
+
+        if (hasTimingHandler != null)
+            EditorBeatmap.HasTiming.ValueChanged -= hasTimingHandler;
+
+        if (selectionChangedHandler != null)
+            EditorBeatmap.SelectedHitObjects.CollectionChanged -= selectionChangedHandler;
     }
 }
