@@ -7,6 +7,7 @@
 - Added a keybind section for general editor shortcuts (this does not include notes and modifiers, which are still bound to 1-9 and q-p)
 - Added a help button at the top of the editor, to let users know of the general workflow when creating a map.
 - Improved export support for Linux, and added a general tip for getting charts into the game.
+- Fixed a bug where all notes had the same sample, even with different modifiers (this does not apply if you have a custom hitsound set)
 - Removed the Websocket mod feature, there are better ways to test maps quickly now.
 
 **Happy mapping!**
