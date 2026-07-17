@@ -16,6 +16,19 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
     public class UbNoteBuilder
     {
         private HitObject hitObject;
+        
+        public static readonly Dictionary<UbIconType, List<string>> BaseSamples = new Dictionary<UbIconType, List<string>>
+        {
+            { UbIconType.Note, new List<string>() },
+            { UbIconType.Hold, new List<string>() },
+            { UbIconType.Dodge, new List<string> { HitSampleInfo.HIT_WHISTLE } },
+            { UbIconType.Double, new List<string> { HitSampleInfo.HIT_WHISTLE } },
+            { UbIconType.Freestyle, new List<string>() },
+            { UbIconType.Spam, new List<string> { HitSampleInfo.HIT_FINISH } },
+            { UbIconType.Flip, new List<string>() },
+            { UbIconType.Zoom, new List<string> { HitSampleInfo.HIT_WHISTLE } },
+            { UbIconType.Brawl, new List<string>() },
+        };
 
         public UbNoteBuilder(HitObject hitObject)
         {
@@ -67,6 +80,19 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
             }
         }
 
+        // Add another hit sample here, otherwise heavy brawl cant be added on cop 1
+        public void ApplyHeavyBrawl(DrawableTernaryButton modButton)
+        {
+            if (!isModActive(modButton))
+                return;
+
+            bool hasAdditionSample = hitObject.Samples.Any(s => s.Name != HitSampleInfo.HIT_NORMAL);
+            if (!hasAdditionSample)
+                hitObject.Samples.Add(hitObject.CreateHitSampleInfo(HitSampleInfo.HIT_FLOURISH).With(newVolume: 100));
+
+            ApplyAdditionBank(HitSampleInfo.BANK_NORMAL);
+        }
+
         public void ApplyMainBank(string bank)
         {
             var normalSample = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
@@ -103,6 +129,13 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
 
 
         }
+        
+        public void Recompute(List<string> baseSamples, string baseBank)
+        {
+            hitObject.Samples.Clear();
+            ApplySamples(baseSamples);
+            ApplyMainBank(baseBank);
+        }
 
         public HitSampleInfo GetMainSample()
         {
@@ -137,8 +170,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
         {
             if (hitObject is ManiaHitObject maniaHitObject)
             {
-                Logger.Log("Inferring icon type " + hitObject.GetType());
-
                 int column = maniaHitObject.Column;
 
                 if (HasMainBank(HitSampleInfo.BANK_DRUM))
@@ -203,7 +234,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
             {
                 int column = maniaHitObject.Column;
 
-                Logger.Log(HasMainBank(HitSampleInfo.BANK_STRONG) + " " + HasMainBank(HitSampleInfo.BANK_SOFT) + " " + HasSample(HitSampleInfo.HIT_CLAP) + " " + HasSample(HitSampleInfo.HIT_WHISTLE) + " " + HasAdditionBank(HitSampleInfo.BANK_NORMAL));
                 if (HasMainBank(HitSampleInfo.BANK_DRUM))
                 {
                     // Cop

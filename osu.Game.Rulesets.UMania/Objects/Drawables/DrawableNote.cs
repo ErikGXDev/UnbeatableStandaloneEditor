@@ -3,7 +3,9 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -16,6 +18,8 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.UMania.Configuration;
 using osu.Game.Rulesets.UMania.Edit;
@@ -69,8 +73,27 @@ namespace osu.Game.Rulesets.UMania.Objects.Drawables
                     AutoSizeAxes = Axes.Y
                 });
 
-            HitObjectApplied += _ => addIcon();
+            HitObjectApplied += onHitObjectApplied;
         }
+
+        // FIX: Re-draw the icon when the note's samples change
+        private NotifyCollectionChangedEventHandler? samplesChangedHandler;
+
+        private void onHitObjectApplied(DrawableHitObject _)
+        {
+            if (samplesChangedHandler != null && InferenceSource != null)
+                InferenceSource.SamplesBindable.BindCollectionChanged(samplesChangedHandler, false);
+
+            addIcon();
+
+            if (InferenceSource != null)
+            {
+                samplesChangedHandler = (_, _) => addIcon();
+                InferenceSource.SamplesBindable.BindCollectionChanged(samplesChangedHandler, false);
+            }
+        }
+        
+        protected virtual HitObject InferenceSource => HitObject;
 
         [CanBeNull]
         private Drawable noteSprite;
@@ -80,9 +103,9 @@ namespace osu.Game.Rulesets.UMania.Objects.Drawables
         private void addIcon()
         {
 
-            if (this is not DrawableHoldNoteTail && HitObject != null)
+            if (this is not DrawableHoldNoteTail && InferenceSource != null)
             {
-                var helper = new UbNoteBuilder(HitObject);
+                var helper = new UbNoteBuilder(InferenceSource);
 
                 var icon = helper.InferObjectTypeIcon();
 
@@ -140,6 +163,14 @@ namespace osu.Game.Rulesets.UMania.Objects.Drawables
 
             configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
             StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
+        }
+
+        protected override void OnFree()
+        {
+            if (samplesChangedHandler != null && InferenceSource != null)
+                InferenceSource.SamplesBindable.BindCollectionChanged(samplesChangedHandler, false);
+            samplesChangedHandler = null;
+            base.OnFree();
         }
 
         protected override void OnApply()

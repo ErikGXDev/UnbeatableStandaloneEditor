@@ -5,8 +5,11 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.UMania.Edit;
 using osu.Game.Rulesets.UMania.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
 
@@ -16,6 +19,20 @@ namespace osu.Game.Rulesets.UMania.Edit
     {
         [Resolved]
         private HitObjectComposer composer { get; set; } = null!;
+
+        // FIX: Expose UMania note modifiers in the editor right-click menu
+        protected override System.Collections.Generic.IEnumerable<MenuItem> GetModifierMenuItems()
+        {
+            var ubComposer = (UnbeatableHitObjectComposer)composer;
+
+            ubComposer.SyncModifierButtonsFromSelection();
+
+            return ubComposer.GetApplicableModifierButtons().Select(button =>
+                new TernaryStateToggleMenuItem(button.Description.ToString())
+                {
+                    State = { BindTarget = button.Current },
+                });
+        }
 
         protected override void OnSelectionChanged()
         {

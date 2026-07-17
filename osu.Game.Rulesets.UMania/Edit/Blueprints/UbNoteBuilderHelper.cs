@@ -33,20 +33,32 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
         {
             ApplySamples(hitSampleInfos);
             ApplyMainBank(mainBank);
+            ApplyModifierLayer();
+        }
+        
+        public void RecomputeFromCurrentState()
+        {
+            var icon = InferObjectTypeIcon();
+            if (!BaseSamples.TryGetValue(icon, out var baseSamples))
+                baseSamples = new List<string>();
 
+            Recompute(baseSamples, HitSampleInfo.BANK_NORMAL);
+            ApplyModifierLayer();
+        }
+
+        private void ApplyModifierLayer()
+        {
             if (isModActive(composer.ModCopButton))
             {
                 ApplyModifierMainBank(composer.ModCopButton, HitSampleInfo.BANK_DRUM);
 
                 ApplyModifierSample(composer.ModCopFinishButton, HitSampleInfo.HIT_FINISH);
-                //ApplyModifierSample(composer.ModCop1Button, HitSampleInfo.HIT_FLOURISH);
                 ApplyModifierSample(composer.ModCop2Button, HitSampleInfo.HIT_WHISTLE);
                 ApplyModifierSample(composer.ModCop3Button, HitSampleInfo.HIT_CLAP);
-                // Cop 4 has both whistle and clap
                 ApplyModifierSample(composer.ModCop4Button, HitSampleInfo.HIT_WHISTLE);
                 ApplyModifierSample(composer.ModCop4Button, HitSampleInfo.HIT_CLAP);
 
-                ApplyModifierAdditionBank(composer.ModCopHeavyButton, HitSampleInfo.BANK_NORMAL);
+                ApplyHeavyBrawl(composer.ModCopHeavyButton);
             }
             else
             {
@@ -55,13 +67,10 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
                 ApplyModifierSample(composer.ModSwapImmediateButton, HitSampleInfo.HIT_CLAP);
             }
 
-
             foreach (var nest in hitObject.NestedHitObjects)
             {
                 nest.Samples = hitObject.Samples;
             }
-
-            Logger.Log("Applied everything on " + hitObject.GetType());
         }
 
     }

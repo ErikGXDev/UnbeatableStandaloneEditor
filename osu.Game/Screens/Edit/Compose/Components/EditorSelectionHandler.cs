@@ -543,9 +543,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 };
             }
 
+            // FIX: Allow custom note modifiers
+            var modifierItems = GetModifierMenuItems().ToArray();
+            if (modifierItems.Length > 0)
+                yield return new OsuMenuItem("Modifiers") { Items = modifierItems };
+
             yield return new OsuMenuItem("Sample") { Items = getSampleSubmenuItems().ToArray(), };
             yield return new OsuMenuItem("Bank") { Items = getBankSubmenuItems().ToArray(), };
         }
+        
+        // FIX: Virtual hook for custom note modifiers
+        protected virtual IEnumerable<MenuItem> GetModifierMenuItems() => Array.Empty<MenuItem>();
 
         private IEnumerable<MenuItem> getSampleSubmenuItems()
         {

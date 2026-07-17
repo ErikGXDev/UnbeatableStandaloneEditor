@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,7 +10,9 @@ using osu.Game.Audio;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Rulesets.UMania.Edit.Blueprints;
 using osu.Game.Rulesets.UMania.Edit.Composition;
+using osu.Game.Rulesets.UMania.Objects;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osuTK;
 
@@ -82,24 +85,8 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     
     public Bindable<TernaryState> SettingShowPreview = new Bindable<TernaryState>(TernaryState.True);
     
-    /*private readonly Bindable<TernaryState> modFlyingNote = new Bindable<TernaryState>();
-    private readonly Bindable<TernaryState> modInvisibleNote = new Bindable<TernaryState>();
-    private readonly Bindable<TernaryState> modSwapImmediate = new Bindable<TernaryState>();
-
-    private readonly Bindable<TernaryState> modCopNote = new Bindable<TernaryState>();
-    private readonly Bindable<TernaryState> modCopFinish = new Bindable<TernaryState>();
-    private readonly Bindable<TernaryState> modCop1 = new Bindable<TernaryState>();
-    private readonly Bindable<TernaryState> modCop2 = new Bindable<TernaryState>();
-    private readonly Bindable<TernaryState> modCop3 = new Bindable<TernaryState>();
-    private readonly Bindable<TernaryState> modCop4 = new Bindable<TernaryState>();
-    private readonly Bindable<TernaryState> modCopHeavy = new Bindable<TernaryState>();
-    private readonly Bindable<TernaryState> modCopImpossible = new Bindable<TernaryState>();*/
-
-
     public DrawableTernaryButton ModFlyingButton = null!;
     public DrawableTernaryButton ModInvisibleButton = null!;
-
-    //public
 
     public DrawableTernaryButton ModCopButton = null!;
     public DrawableTernaryButton ModCopFinishButton = null!;
@@ -108,7 +95,6 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     public DrawableTernaryButton ModCop3Button = null!;
     public DrawableTernaryButton ModCop4Button = null!;
     public DrawableTernaryButton ModCopHeavyButton = null!;
-    //public DrawableTernaryButton ModCopImpossibleButton = null!;
 
 
     public DrawableTernaryButton ModSwapImmediateButton = null!;
@@ -117,6 +103,46 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
 
     // Create a dictionary that maps each button to a list of tool names that should have it enabled
     public List<ModMapping> ModButtonToolMap;
+
+    // Suppresses re-applying modifiers
+    private bool suppressSelectionFeedback;
+
+    // True when the current selection contains at least one cop note
+    private bool selectionContainsCop;
+
+    // Returns the modifier buttons that are valid for the current selection
+    public IEnumerable<DrawableTernaryButton> GetApplicableModifierButtons()
+    {
+        if (!EditorBeatmap.SelectedHitObjects.OfType<ManiaHitObject>().Any())
+            yield break;
+
+        var selection = classifySelection();
+
+        var copSubButtons = new HashSet<DrawableTernaryButton>
+        {
+            ModCop1Button, ModCop2Button, ModCop3Button, ModCop4Button, ModCopFinishButton, ModCopHeavyButton,
+        };
+
+        foreach (var mapping in ModButtonToolMap)
+        {
+            bool appliesToSelection = selection.ToolNames.All(mapping.ApplicableTools.Contains);
+
+            bool visible = mapping.Button switch
+            {
+                // Cop master: valid whenever all notes can be cop notes.
+                _ when mapping.Button == ModCopButton => selection.AllCopCapable && appliesToSelection,
+                // Cop sub-modifiers: only for (pure) cop selections, never for mixed or non-cop selections.
+                _ when copSubButtons.Contains(mapping.Button) => selection.AllCopCapable && selection.HasCop && !selection.MixedCop && appliesToSelection,
+                // Non-cop modifiers: invalid whenever a cop note is present in the selection.
+                _ => !selection.HasCop && appliesToSelection,
+            };
+
+            if (visible)
+                yield return mapping.Button;
+        }
+    }
+
+    public void SyncModifierButtonsFromSelection() => updateButtonStatesFromSelection();
 
     protected override IEnumerable<Drawable> CreateTernaryButtons()
     {
@@ -132,11 +158,7 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
             ModCop4Button = makeButton("Cop 4", FontAwesome.Solid.UserShield),
             ModCopFinishButton = makeButton("Knock-out", FontAwesome.Solid.UserShield),
             ModCopHeavyButton = makeButton("Heavy Brawl", FontAwesome.Solid.UserShield),
-            //ModCopImpossibleButton = makeButton(modCopImpossible, "Impossible Cop", FontAwesome.Solid.UserShield),
-
         };
-
-        //return base.CreateTernaryButtons();
     }
 
     private DrawableTernaryButton makeButton(string description, IconUsage icon)
@@ -166,6 +188,67 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     {
         return ModCopButton.Current.Value == TernaryState.True && ModCopButton.Enabled.Value;
     }
+    
+    private static string? iconToToolName(UbIconType icon) => icon switch
+    {
+        UbIconType.Note => "Note",
+        UbIconType.Hold => "Hold",
+        UbIconType.Dodge => "Dodge",
+        UbIconType.Double => "Double",
+        UbIconType.Freestyle => "Freestyle",
+        UbIconType.Spam => "Spam",
+        UbIconType.Flip => "Flip",
+        UbIconType.Zoom => "Zoom",
+        _ => null,
+    };
+
+    // Classify selection for available modifiers
+    private class SelectionModifierClassification
+    {
+        public HashSet<string> ToolNames { get; } = new HashSet<string>();
+        public bool HasCop { get; set; }
+        public bool HasCopCapableNonCop { get; set; }
+        public bool HasOther { get; set; }
+
+        public bool AllCopCapable => !HasOther;
+        public bool MixedCop => AllCopCapable && HasCop && HasCopCapableNonCop;
+    }
+
+    private static bool isCopIcon(UbIconType icon) =>
+        icon is UbIconType.ModCop1 or UbIconType.ModCop2 or UbIconType.ModCop3 or UbIconType.ModCop4 or UbIconType.ModCopFinish or UbIconType.ModCopHeavy;
+
+    private SelectionModifierClassification classifySelection()
+    {
+        var result = new SelectionModifierClassification();
+
+        foreach (var h in EditorBeatmap.SelectedHitObjects.OfType<ManiaHitObject>())
+        {
+            var helper = new UbNoteBuilderHelper(this, h);
+
+            if (helper.InferObjectModifierIcons().Any(isCopIcon))
+            {
+                // Cop notes only ever originate from the Note/Hold tools, so treat them as such
+                // for applicability. Without this, a pure cop selection yields an empty tool set
+                result.ToolNames.Add("Note");
+                result.ToolNames.Add("Hold");
+                result.HasCop = true;
+            }
+            else
+            {
+                var toolName = iconToToolName(helper.InferObjectTypeIcon());
+                if (toolName != null)
+                    result.ToolNames.Add(toolName);
+
+                // Only Note/Hold types can be converted to cop notes
+                if (toolName == "Note" || toolName == "Hold")
+                    result.HasCopCapableNonCop = true;
+                else
+                    result.HasOther = true;
+            }
+        }
+
+        return result;
+    }
 
 
     [BackgroundDependencyLoader]
@@ -173,18 +256,16 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     {
         ModButtonToolMap = new List<ModMapping>()
         {
-            makeMapping(ModFlyingButton, ["Note", "Hold", "Dodge", "Double"], () => !isCopModding() ),
-            makeMapping(ModInvisibleButton, ["Note", "Hold"], () => !isCopModding() ),
-            makeMapping(ModSwapImmediateButton, ["Flip"], () => !isCopModding() ),
+            makeMapping(ModFlyingButton, ["Note", "Hold", "Dodge", "Double"], () => !(isCopModding() || selectionContainsCop) ),
+            makeMapping(ModInvisibleButton, ["Note", "Hold"], () => !(isCopModding() || selectionContainsCop) ),
+            makeMapping(ModSwapImmediateButton, ["Flip"], () => !(isCopModding() || selectionContainsCop) ),
             makeMapping(ModCopButton, ["Note", "Hold"] ),
-            makeMapping(ModCop1Button, ["Note", "Hold"], isCopModding ),
-            makeMapping(ModCop2Button, ["Note", "Hold"], isCopModding ),
-            makeMapping(ModCop3Button, ["Note", "Hold"], isCopModding ),
-            makeMapping(ModCop4Button, ["Note", "Hold"], isCopModding ),
-            makeMapping(ModCopFinishButton, ["Note", "Hold"], isCopModding ),
-            makeMapping(ModCopHeavyButton, ["Note", "Hold"], isCopModding ),
-            //{ ModCopImpossibleButton, new List<string> { "Note", "Hold" } },
-
+            makeMapping(ModCop1Button, ["Note", "Hold"], () => isCopModding() || selectionContainsCop),
+            makeMapping(ModCop2Button, ["Note", "Hold"], () => isCopModding() || selectionContainsCop),
+            makeMapping(ModCop3Button, ["Note", "Hold"], () => isCopModding() || selectionContainsCop),
+            makeMapping(ModCop4Button, ["Note", "Hold"], () => isCopModding() || selectionContainsCop),
+            makeMapping(ModCopFinishButton, ["Note", "Hold"], () => isCopModding() || selectionContainsCop),
+            makeMapping(ModCopHeavyButton, ["Note", "Hold"], () => isCopModding() || selectionContainsCop),
         };
 
         ModCop1Button.Current.Value = TernaryState.True; // Default to cop 1
@@ -256,6 +337,71 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
                 ]
             },
         });
+
+        // Wire modifier toggles to apply to selected notes
+        var modButtons = new[] { ModFlyingButton, ModInvisibleButton, ModSwapImmediateButton, ModCopButton, ModCop1Button, ModCop2Button, ModCop3Button, ModCop4Button, ModCopFinishButton, ModCopHeavyButton };
+
+        foreach (var button in modButtons)
+            button.Current.BindValueChanged(_ => applyModifiersToSelection());
+
+        EditorBeatmap.SelectedHitObjects.CollectionChanged += (_, _) => Scheduler.AddOnce(updateButtonStatesFromSelection);
+    }
+
+    private void applyModifiersToSelection()
+    {
+        if (suppressSelectionFeedback) return;
+
+        var selected = EditorBeatmap.SelectedHitObjects.OfType<ManiaHitObject>().ToList();
+        if (selected.Count == 0) return;
+
+        EditorBeatmap.PerformOnSelection(h =>
+        {
+            if (h is not ManiaHitObject maniaObj) return;
+            var builder = new UbNoteBuilderHelper(this, maniaObj);
+            builder.RecomputeFromCurrentState();
+        });
+    }
+
+    private void updateButtonStatesFromSelection()
+    {
+        var selected = EditorBeatmap.SelectedHitObjects.OfType<ManiaHitObject>().ToList();
+
+        suppressSelectionFeedback = true;
+        try
+        {
+            if (selected.Count == 0)
+                return;
+
+            // Cache inferred icons
+            var iconsPerNote = selected.Select(h => new UbNoteBuilderHelper(this, h).InferObjectModifierIcons().ToHashSet()).ToList();
+
+            updateButton(ModFlyingButton, UbIconType.ModFlying, iconsPerNote);
+            updateButton(ModInvisibleButton, UbIconType.ModInvisible, iconsPerNote);
+            updateButton(ModSwapImmediateButton, UbIconType.ModSwapImmediate, iconsPerNote);
+
+            // Cop master button: true if any note has any cop sub-modifier
+            bool allCop = iconsPerNote.All(set => set.Contains(UbIconType.ModCop1) || set.Contains(UbIconType.ModCop2) || set.Contains(UbIconType.ModCop3) || set.Contains(UbIconType.ModCop4));
+            bool anyCop = iconsPerNote.Any(set => set.Contains(UbIconType.ModCop1) || set.Contains(UbIconType.ModCop2) || set.Contains(UbIconType.ModCop3) || set.Contains(UbIconType.ModCop4));
+            ModCopButton.Current.Value = allCop ? TernaryState.True : (anyCop ? TernaryState.Indeterminate : TernaryState.False);
+
+            updateButton(ModCop1Button, UbIconType.ModCop1, iconsPerNote);
+            updateButton(ModCop2Button, UbIconType.ModCop2, iconsPerNote);
+            updateButton(ModCop3Button, UbIconType.ModCop3, iconsPerNote);
+            updateButton(ModCop4Button, UbIconType.ModCop4, iconsPerNote);
+            updateButton(ModCopFinishButton, UbIconType.ModCopFinish, iconsPerNote);
+            updateButton(ModCopHeavyButton, UbIconType.ModCopHeavy, iconsPerNote);
+        }
+        finally
+        {
+            suppressSelectionFeedback = false;
+        }
+    }
+
+    private static void updateButton(DrawableTernaryButton button, UbIconType icon, List<HashSet<UbIconType>> iconsPerNote)
+    {
+        bool all = iconsPerNote.All(set => set.Contains(icon));
+        bool any = iconsPerNote.Any(set => set.Contains(icon));
+        button.Current.Value = all ? TernaryState.True : (any ? TernaryState.Indeterminate : TernaryState.False);
     }
 
     protected override void Update()
@@ -269,6 +415,12 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
 
             string currentToolName = tool.Name;
 
+            // When a note is selected, also reveal the modifier buttons that
+            // apply to the selected note's tool so they can be edited.
+            var selection = classifySelection();
+            var selectedToolNames = selection.ToolNames;
+            selectionContainsCop = selection.HasCop;
+
             foreach (var mapping in ModButtonToolMap)
             {
                 var button = mapping.Button;
@@ -277,7 +429,21 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
 
                 bool predicateResult = predicate?.Invoke() ?? true;
 
-                bool shouldEnable = tools.Contains(currentToolName) && predicateResult;
+                // With a selection, a button is only revealed if it applies to EVERY selected notes tool
+                // Without a selection, fall back to the current placement tool.
+                bool appliesToSelection = selectedToolNames.Count > 0 && selectedToolNames.All(tools.Contains);
+                bool appliesToTool = selectedToolNames.Count == 0 && tools.Contains(currentToolName);
+                bool shouldEnable = (appliesToSelection || appliesToTool) && predicateResult;
+
+                // Cop conversion is only valid when every selected note can be a cop note.
+                if (!selection.AllCopCapable && button == ModCopButton)
+                    shouldEnable = false;
+
+                // Mixed cop/non-cop (Note/Hold) selection: only the cop master toggle is meaningful,
+                // since non-cop modifiers are invalid on cop notes and cop sub-modifiers shouldn't yet
+                // apply to the regular notes. Toggling the master converts the whole selection to/from cop.
+                if (selection.MixedCop)
+                    shouldEnable = button == ModCopButton;
 
                 if (button.Enabled.Value != shouldEnable)
                 {
@@ -310,12 +476,10 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
                 {
                     if (!toolColumns.Contains(col.Index))
                     {
-                        //col.Colour = Colour4.Gray;
                         col.FlashColour(Colour4.Gray.Lighten(0.35f), 200);
                     }
                     else
                     {
-                        //col.Colour = Colour4.White;
                         col.FlashColour(Colour4.White, 200);
                     }
                 }

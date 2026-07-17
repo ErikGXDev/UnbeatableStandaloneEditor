@@ -5,6 +5,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UMania.Skinning;
 
@@ -30,6 +31,10 @@ namespace osu.Game.Rulesets.UMania.Objects.Drawables
         }
 
         public bool UpdateResult() => base.UpdateResult(true);
+
+        // FIX: Infer the icon from the parent HoldNote (the object edited by the modifier toggles),
+        // so a Brawl/cop modifier applied to a hold updates the head icon correctly.
+        protected override HitObject InferenceSource => ParentHitObject is DrawableHoldNote hold ? hold.HitObject : HitObject;
 
         protected override void UpdateHitStateTransforms(ArmedState state)
         {
