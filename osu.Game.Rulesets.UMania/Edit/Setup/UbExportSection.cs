@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             var audioFile = beatmapSet.GetFile(audioFilename);
             if (audioFile == null)
             {
-                showToast("Export failed", "Audio file not found in beatmap set.");
+                showToast("Export failed: No audio found", "Audio file not found in beatmap set.");
                 return;
             }
 
@@ -230,7 +230,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             if (string.IsNullOrEmpty(exportFolderSelector.SelectedDirectory.Value) || Beatmap.BeatmapInfo.BeatmapSet == null)
             {
-                showToast("Export failed", "No export folder selected.");
+                showToast("Export failed: Set an export folder", "No export folder selected.");
                 return;
             }
 
@@ -358,7 +358,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         {
             if (string.IsNullOrEmpty(exportFolderSelector.SelectedDirectory.Value))
             {
-                showToast("Export failed", "No export folder selected.");
+                showToast("Export failed: Set an export folder", "No export folder selected.");
                 return;
             }
 
@@ -460,7 +460,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             if (!good)
             {
-                showToast("Export failed", "Failed to save beatmap. Please fix any errors and try again.");
+                showToast("Export failed: Failed to save", "Failed to save beatmap. Please fix any errors and try again.");
                 return;
             }
 
@@ -589,6 +589,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     Caption = "Test your map in Unbeatable (Through Websocket)",
                     ButtonText = "Test Beatmap",
                     Action = ExportToUnbeatable,
+                    Alpha = 0f,
                 },
                 new FormButton
                 {

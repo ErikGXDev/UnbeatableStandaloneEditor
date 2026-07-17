@@ -42,9 +42,6 @@ Some data will be saved to an "unbeatable-beatmap-editor" folder. Find it in the
 - Cute icons
 - Everything else the osu!mania editor has to offer (composition, timing, great ui)
 
-> [!NOTE]
-> Playtesting a map in UNBEATABLE through the Editor requires installing [this mod](https://github.com/ErikGXDev/UnbeatableWebsocket) for the game.
-
 
 ## Getting started
 
