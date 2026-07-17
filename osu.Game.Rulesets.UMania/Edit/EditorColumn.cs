@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.UMania.Edit
 
             if (label != null)
             {
-                AddInternal(new SpriteText
+                TopLevelContainer.Add(new SpriteText
                 {
                     Text = label,
                     Anchor = Anchor.BottomCentre,
