@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.UMania.Edit.Blueprints;
 using osu.Game.Rulesets.UMania.Edit.Composition;
 using osu.Game.Rulesets.UMania.Objects;
+using osu.Game.Rulesets.UMania.Objects.Drawables;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osuTK;
 
@@ -433,6 +434,25 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
             var builder = new UbNoteBuilderHelper(this, maniaObj);
             builder.RecomputeFromCurrentState();
         });
+        
+        refreshNoteIcons(selected);
+    }
+
+    private void refreshNoteIcons(IEnumerable<ManiaHitObject> hitObjects)
+    {
+        var targets = new HashSet<ManiaHitObject>(hitObjects);
+
+        foreach (var stage in Playfield.Stages)
+        {
+            foreach (var column in stage.Columns)
+            {
+                foreach (var drawable in column.HitObjectContainer.AliveObjects)
+                {
+                    if (drawable.HitObject is ManiaHitObject mho && targets.Contains(mho) && drawable is DrawableNote note)
+                        note.RefreshIcon();
+                }
+            }
+        }
     }
 
     private void updateButtonStatesFromSelection()

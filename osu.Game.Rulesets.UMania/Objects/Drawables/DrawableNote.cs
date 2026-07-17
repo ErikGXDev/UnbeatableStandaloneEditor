@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -73,68 +74,56 @@ namespace osu.Game.Rulesets.UMania.Objects.Drawables
                     AutoSizeAxes = Axes.Y
                 });
 
+            AddInternal(iconContainer = new Container());
+
             HitObjectApplied += onHitObjectApplied;
         }
 
-        // FIX: Re-draw the icon when the note's samples change
-        private NotifyCollectionChangedEventHandler? samplesChangedHandler;
-
         private void onHitObjectApplied(DrawableHitObject _)
         {
-            if (samplesChangedHandler != null && InferenceSource != null)
-                InferenceSource.SamplesBindable.BindCollectionChanged(samplesChangedHandler, false);
-
             addIcon();
-
-            if (InferenceSource != null)
-            {
-                samplesChangedHandler = (_, _) => addIcon();
-                InferenceSource.SamplesBindable.BindCollectionChanged(samplesChangedHandler, false);
-            }
         }
+
+       
+        public void RefreshIcon() => addIcon();
         
         protected virtual HitObject InferenceSource => HitObject;
 
-        [CanBeNull]
-        private Drawable noteSprite;
+        private Container iconContainer = null!;
 
-        private List<Drawable> modIcons = new List<Drawable>();
+        private UbIconType? lastIconType;
+        private List<UbIconType> lastModIcons = new List<UbIconType>();
 
         private void addIcon()
         {
-
             if (this is not DrawableHoldNoteTail && InferenceSource != null)
             {
                 var helper = new UbNoteBuilder(InferenceSource);
 
                 var icon = helper.InferObjectTypeIcon();
-
-                if (noteSprite != null)
-                    noteSprite.Expire();
-
-                Logger.Log("Drawing a " + icon + " icon on note");
-                AddInternal(new Container
-                {
-                    Child = noteSprite = new UbIcon(icon)
-                    {
-                        Scale = new Vector2(2f),
-                    }
-                });
-
-                if (modIcons.Count > 0)
-                {
-                    foreach (var modIcon in modIcons)
-                        modIcon.Expire();
-                }
-
                 var infIcons = helper.InferObjectModifierIcons();
+
+                // No change since last draw: don't allocate new drawables.
+                if (icon == lastIconType && infIcons.SequenceEqual(lastModIcons))
+                    return;
+
+                lastIconType = icon;
+                lastModIcons = infIcons.ToList();
+
+                // Dispose any previously drawn icons immediately (Clear(true) disposes children).
+                iconContainer.Clear(true);
+
+                iconContainer.Add(new UbIcon(icon)
+                {
+                    Scale = new Vector2(2f),
+                });
 
                 if (infIcons.Count > 0)
                 {
                     var scale = infIcons.Count > 2 ? 0.85f : 1f;
                     var xOffset = infIcons.Count > 2 ? -5 : 0;
 
-                    Drawable dr = new Container
+                    iconContainer.Add(new Container
                     {
                         X = xOffset,
                         Children = new Drawable[]
@@ -150,9 +139,7 @@ namespace osu.Game.Rulesets.UMania.Objects.Drawables
                                 })
                             }
                         }
-                    };
-                    AddInternal(dr);
-                    modIcons.Add(dr);
+                    });
                 }
             }
         }
@@ -167,9 +154,11 @@ namespace osu.Game.Rulesets.UMania.Objects.Drawables
 
         protected override void OnFree()
         {
-            if (samplesChangedHandler != null && InferenceSource != null)
-                InferenceSource.SamplesBindable.BindCollectionChanged(samplesChangedHandler, false);
-            samplesChangedHandler = null;
+            // Dispose any drawn icons so a recycled drawable doesn't retain UbIcon drawables.
+            iconContainer.Clear(true);
+            lastIconType = null;
+            lastModIcons.Clear();
+
             base.OnFree();
         }
 
