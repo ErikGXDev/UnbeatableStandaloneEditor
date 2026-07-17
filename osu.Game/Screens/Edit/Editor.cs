@@ -1781,6 +1781,7 @@ namespace osu.Game.Screens.Edit
             {
                 this.popupContent = popupContent;
                 RelativeSizeAxes = Axes.Both;
+                popupContent.Scale = new Vector2(0.7f);
                 Children = new Drawable[] { popupContent };
             }
 

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -46,31 +47,29 @@ namespace osu.Game.Rulesets.UMania.Edit
 
         protected override void LoadComplete()
         {
+            composer.SettingShowPlacementOrder.ValueChanged += onPlacementOrderChanged;
 
-            composer.SettingShowPlacementOrder.ValueChanged += (ev) =>
-            {
-                if (ev.NewValue == TernaryState.True)
-                {
-                    scheduleRefresh();
-                    Alpha = 1;
-                }
-                else
-                {
-                    Alpha = 0;
-                }
-            };
-            
-            
-            
             base.LoadComplete();
 
             // Handles big changes better than single HitObjectAdded/Removed events
             editorBeatmap.BeatmapReprocessed += onBeatmapReprocessed;
 
             scheduleRefresh();
-            
+
             Alpha = composer.SettingShowPlacementOrder.Value == TernaryState.True ? 1 : 0;
-            
+        }
+
+        private void onPlacementOrderChanged(ValueChangedEvent<TernaryState> ev)
+        {
+            if (ev.NewValue == TernaryState.True)
+            {
+                scheduleRefresh();
+                Alpha = 1;
+            }
+            else
+            {
+                Alpha = 0;
+            }
         }
 
         protected override void Dispose(bool isDisposing)
@@ -78,6 +77,7 @@ namespace osu.Game.Rulesets.UMania.Edit
             base.Dispose(isDisposing);
 
             editorBeatmap.BeatmapReprocessed -= onBeatmapReprocessed;
+            composer.SettingShowPlacementOrder.ValueChanged -= onPlacementOrderChanged;
         }
 
         // Fix the buttons not firing normally
