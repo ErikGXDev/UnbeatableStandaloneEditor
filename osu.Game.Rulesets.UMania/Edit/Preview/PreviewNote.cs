@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.UMania.Edit
 {
     public partial class PreviewNote : CompositeDrawable
     {
-        private Drawable shape = null!;
+        private Drawable? shape;
 
         public PreviewNote()
         {
@@ -22,43 +22,46 @@ namespace osu.Game.Rulesets.UMania.Edit
 
         public UbIconType IconType
         {
-            set
-            {
-                iconType = value;
-                if (shape != null)
-                    shape.Colour = colourFor(value);
-               
-            }
+            set => SetIconType(value);
             get => iconType;
         }
 
         private UbIconType iconType;
 
+        public void SetIconType(UbIconType type)
+        {
+            bool needsTriangle = type == UbIconType.Dodge;
+            bool hasTriangle = shape is Triangle;
+
+            if (shape == null || needsTriangle != hasTriangle)
+            {
+                ClearInternal(true);
+                shape = needsTriangle
+                    ? new Triangle { RelativeSizeAxes = Axes.Both }
+                    : new Circle { RelativeSizeAxes = Axes.Both };
+                AddInternal(shape);
+            }
+
+            shape.Colour = colourFor(type);
+            shape.Scale = type == UbIconType.Spam ? new Vector2(1, 1.5f) : Vector2.One;
+            shape.Y = type == UbIconType.Spam ? -5 : 0;
+            iconType = type;
+        }
+
+        public void Reset()
+        {
+            Scale = Vector2.One;
+            Position = Vector2.Zero;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = shape = new Circle
+            AddInternal(shape = new Circle
             {
                 RelativeSizeAxes = Axes.Both,
-                
-                Colour = colourFor(iconType),
-            };
-            
-            if (iconType == UbIconType.Dodge)
-            {
-                InternalChild = shape = new Triangle()
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourFor(iconType),
-                };
-            }
-
-            if (iconType == UbIconType.Spam)
-            {
-                shape.Scale = new Vector2(1, 1.5f);
-                shape.Y = -5;
-            }
-            
+                Colour = Color4.White,
+            });
         }
 
         private static Color4 colourFor(UbIconType type) => type switch

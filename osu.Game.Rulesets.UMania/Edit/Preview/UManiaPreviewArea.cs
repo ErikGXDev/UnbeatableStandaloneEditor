@@ -53,6 +53,11 @@ namespace osu.Game.Rulesets.UMania.Edit
 
         private List<Circle> hitCircles = new List<Circle>();
 
+        private List<PreviewNote> notePool = new List<PreviewNote>();
+        private List<PreviewHold> holdPool = new List<PreviewHold>();
+        private int activeNoteCount;
+        private int activeHoldCount;
+
         private const double flash_duration = 150;
         private const double hit_window = 50;
 
@@ -217,10 +222,16 @@ namespace osu.Game.Rulesets.UMania.Edit
 
         protected override void Update()
         {
-            notesLayer.Clear();
             base.Update();
 
             if (Alpha == 0) return; // Don't update if preview is hidden
+
+            foreach (var note in notePool)
+                note.Hide();
+            foreach (var hold in holdPool)
+                hold.Hide();
+            activeNoteCount = 0;
+            activeHoldCount = 0;
 
             double time = clock.CurrentTime;
             bool centerForUpcomingFlip = shouldCenterForUpcomingFlip(time);
@@ -288,8 +299,6 @@ namespace osu.Game.Rulesets.UMania.Edit
 
                 if (isHold && endTime > time && startTime < time + view_field + view_field_tolerance)
                 {
-                    var previewHold = new PreviewHold();
-
                     var pos = GetPreviewNotePosition(column, startTime, time, flippedRight);
 
                     var ubhelper = new UbNoteBuilder(note);
@@ -325,16 +334,17 @@ namespace osu.Game.Rulesets.UMania.Edit
                             float lineStartY = tailPos.Y - slope * (tailPos.X - clampedX);
                             var lineStart = new Vector2(clampedX, lineStartY);
 
+                            var previewHold = getPooledHold();
                             if (notesLayer.DrawSize != Vector2.Zero)
                                 previewHold.SetDiagonal(lineStart, tailPos, notesLayer.DrawSize);
-
-                            notesLayer.Add(previewHold);
+                            previewHold.Show();
 
                             if (time >= startTime)
                             {
-                                var previewNote2 = makeNote(note);
+                                var previewNote2 = getPooledNote();
+                                previewNote2.SetIconType(iconType);
                                 previewNote2.Position = lineStart;
-                                notesLayer.Add(previewNote2);
+                                previewNote2.Show();
                             }
                         }
                     }
@@ -349,30 +359,32 @@ namespace osu.Game.Rulesets.UMania.Edit
                         var holdVisualStart = flippedRight ? pos : tailPos;
                         var holdVisualEnd = flippedRight ? tailPos : pos;
 
+                        var previewHold = getPooledHold();
                         previewHold.Position = holdVisualStart;
                         previewHold.EndPosition = holdVisualEnd;
 
                         if (!flippedRight)
                             previewHold.Width = Math.Min(previewHold.Width, left_receptor - previewHold.X);
 
-                        notesLayer.Add(previewHold);
+                        previewHold.Show();
 
                         if (Math.Abs(pos.X - (flippedRight ? right_receptor : left_receptor)) < 0.01f)
                         {
-                            var previewNote2 = makeNote(note);
+                            var previewNote2 = getPooledNote();
+                            previewNote2.SetIconType(iconType);
                             previewNote2.Position = pos;
-                            notesLayer.Add(previewNote2);
+                            previewNote2.Show();
                         }
                     }
 
-                    var endNote = new PreviewNote()
-                    {
-                        Depth = 11,
-                        Scale = new Vector2(0.5f),
-                        IconType = iconType
-                    };
-                    endNote.Position = tailPos;
+                    var endNote = getPooledNote();
+                    endNote.SetIconType(iconType);
+                    notesLayer.Remove(endNote, false);
+                    endNote.Depth = 11;
                     notesLayer.Add(endNote);
+                    endNote.Scale = new Vector2(0.5f);
+                    endNote.Position = tailPos;
+                    endNote.Show();
 
                     // Flash the receptor on the opposite lane when a Double hold ends
                     if (iconType == UbIconType.Double && Math.Abs(time - endTime) < hit_window)
@@ -448,7 +460,7 @@ namespace osu.Game.Rulesets.UMania.Edit
                     }
                 }
 
-                notesLayer.Add(previewNote);
+                previewNote.Show();
             }
         }
 
@@ -520,14 +532,44 @@ namespace osu.Game.Rulesets.UMania.Edit
             return -1;
         }
 
+        private PreviewNote getPooledNote()
+        {
+            if (activeNoteCount < notePool.Count)
+            {
+                var note = notePool[activeNoteCount++];
+                note.Reset();
+                return note;
+            }
+
+            var newNote = new PreviewNote();
+            notePool.Add(newNote);
+            notesLayer.Add(newNote);
+            activeNoteCount++;
+            return newNote;
+        }
+
+        private PreviewHold getPooledHold()
+        {
+            if (activeHoldCount < holdPool.Count)
+            {
+                var hold = holdPool[activeHoldCount++];
+                hold.Reset();
+                return hold;
+            }
+
+            var newHold = new PreviewHold();
+            holdPool.Add(newHold);
+            notesLayer.Add(newHold);
+            activeHoldCount++;
+            return newHold;
+        }
+
         private PreviewNote makeNote(ManiaHitObject hitObject)
         {
+            var note = getPooledNote();
             var ubiconHelper = new UbNoteBuilder(hitObject);
-
-            return new PreviewNote
-            {
-                IconType = ubiconHelper.InferObjectTypeIcon(),
-            };
+            note.SetIconType(ubiconHelper.InferObjectTypeIcon());
+            return note;
         }
 
         private Vector2 GetPreviewNotePosition(int column, double hitTime, double currentTime, bool flippedRight)

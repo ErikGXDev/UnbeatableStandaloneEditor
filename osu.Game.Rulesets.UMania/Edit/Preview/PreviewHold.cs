@@ -51,6 +51,16 @@ namespace osu.Game.Rulesets.UMania.Edit
             Rotation = angle;
         }
 
+        public void Reset()
+        {
+            RelativePositionAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
+            Origin = Anchor.CentreLeft;
+            Size = new Vector2(0, 4);
+            Rotation = 0;
+            Position = Vector2.Zero;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
