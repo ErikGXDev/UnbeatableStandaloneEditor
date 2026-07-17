@@ -16,8 +16,11 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -33,6 +36,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Extensions;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
@@ -58,6 +62,7 @@ using osu.Game.Screens.Edit.Timing;
 using osu.Game.Screens.Edit.Verify;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Users;
+using osuTK;
 using osuTK.Input;
 using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
 
@@ -244,7 +249,7 @@ namespace osu.Game.Screens.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, OverlayColourProvider colourProvider)
         {
             var loadableBeatmap = Beatmap.Value;
 
@@ -352,6 +357,120 @@ namespace osu.Game.Screens.Edit
                     editorAutoSeekOnPlacement.Value = false;
             });
 
+            // FIX: Add help popup
+            var helpPopupContent = new Container
+            {
+                Name = "Help popup",
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                Y = 45,
+                X = -10,
+                AutoSizeAxes = Axes.Both,
+                CornerRadius = 10,
+                Masking = true,
+                EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Shadow,
+                    Offset = new Vector2(0, 2),
+                    Radius = 5,
+                    Colour = Colour4.Black.Opacity(0.3f),
+                },
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colourProvider.Background4,
+                    },
+                    new OsuScrollContainer
+                    {
+                        Width = 440,
+                        Height = 420,
+                        Padding = new MarginPadding(20),
+                        Child = new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, 10),
+                            Children = new Drawable[]
+                            {
+                                new SpriteText
+                                {
+                                    Text = "Getting Started",
+                                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                                },
+                                new OsuTextFlowContainer(t => t.Font = OsuFont.GetFont(size: 13))
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Text = "Hi! Thank you for using my editor.\nIf you've used the osu!lazer editor before, you'll probably be very familiar with this one as well. The following text will guide you a bit to help you create your charts.\nIf you have any problems with the editor, feel free to ping me on discord. (\"erik_x\")\n In the main menu, press \"New Beatmap\" on the start screen to begin, or select an existing map and press \"Edit beatmap\".",
+                                },
+                                new SpriteText
+                                {
+                                    Text = "Setup",
+                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
+                                    Margin = new MarginPadding { Top = 6 },
+                                },
+                                new OsuTextFlowContainer(t => t.Font = OsuFont.GetFont(size: 13))
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Text = "The setup tab should open by default. It allows you to set a title, author and your audio. You will also export your map here. This can be done by either exporting as a zip file for easy sharing, or as a folder.",
+                                },
+                                new SpriteText
+                                {
+                                    Text = "Compose",
+                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
+                                    Margin = new MarginPadding { Top = 6 },
+                                },
+                                new OsuTextFlowContainer(t => t.Font = OsuFont.GetFont(size: 13))
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Text = "Before you start adding notes, go to the timing tab and add a timing point. Then you can head to the Compose tab to start placing notes. To begin, select a note on the left (and optionally some modifiers) and place your note in the designated columns.\nThese are the columns you will place notes in to make your chart:\n1 & 2 = Used for in-game tutorial\n3 = Top Lane\n4 = Bottom Lane\n5 = Camera (Flip / Zoom)\n6 = Middle\n\nThe columns in the compose tab will also have their respective label at the bottom.\nYou can double-check your work by looking at the gameplay preview at the bottom right.\nAnd also, don't forget to regularly save so you don't lose your work! (CTRL+S or File > Save)",
+                                },
+                                new SpriteText
+                                {
+                                    Text = "Workflow",
+                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
+                                    Margin = new MarginPadding { Top = 6 },
+                                },
+                                new OsuTextFlowContainer(t => t.Font = OsuFont.GetFont(size: 13))
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Text = "Here is once again a general overview:\nThe tabs on the top right of the editor serve different purposes.\n1. Setup: add audio, title, and metadata. Export your finished map here.\n2. Timing: set BPM and timing points. Use the audio spectrum to line up beats perfectly.\n3. Compose: place notes with the tools on the left. Use modifiers to customize them.",
+                                },
+                                new SpriteText
+                                {
+                                    Text = "Tips",
+                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
+                                    Margin = new MarginPadding { Top = 6 },
+                                },
+                                new OsuTextFlowContainer(t => t.Font = OsuFont.GetFont(size: 13))
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Text = "- The preview area at the bottom-right shows how notes will look in-game.\n- The selected note preset in the Compose tab highlights its valid columns automatically.\n- Use the modifier buttons or right-click placed notes to change modifiers or configure cop notes and more.\n- Test your map in UNBEATABLE by exporting it in the Setup tab. (You can, for example, directly export your map as a folder into the \"CustomSongs\" directory.)",
+                                },
+                                new SpriteText
+                                {
+                                    Text = "Happy mapping!",
+                                    Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold),
+                                    Margin = new MarginPadding { Top = 12 },
+                                },
+                            },
+                        },
+                    },
+                },
+            };
+
+            helpOverlay = new HelpOverlayContainer(helpPopupContent)
+            {
+                Alpha = 0,
+            };
+
             AddInternal(new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -454,7 +573,8 @@ namespace osu.Game.Screens.Edit
                                             new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime),
                                             bookmarkController.Menu,
                                         }
-                                    }
+                                    },
+                                    new EditorMenuItem("Help", MenuItemType.Standard, toggleHelpOverlay),
                                 }
                             },
                             screenSwitcher = new EditorScreenSwitcherControl
@@ -468,6 +588,7 @@ namespace osu.Game.Screens.Edit
                     },
                     bottomBar = new BottomBar(),
                     MutationTracker,
+                    helpOverlay,
                 }
             });
 
@@ -1155,6 +1276,15 @@ namespace osu.Game.Screens.Edit
         private ScheduledDelegate playbackDisabledDebounce;
 
         private EditorScreenSwitcherControl screenSwitcher;
+        private HelpOverlayContainer helpOverlay;
+
+        private void toggleHelpOverlay()
+        {
+            if (helpOverlay.Alpha > 0)
+                helpOverlay.HidePopup();
+            else
+                helpOverlay.ShowPopup();
+        }
 
         private void updateSampleDisabledState()
         {
@@ -1641,6 +1771,41 @@ namespace osu.Game.Screens.Edit
             public new Task LoadComponentAsync<TLoadable>([NotNull] TLoadable component, Action<TLoadable> onLoaded = null, CancellationToken cancellation = default, Scheduler scheduler = null)
                 where TLoadable : Drawable
                 => base.LoadComponentAsync(component, onLoaded, cancellation, scheduler);
+        }
+
+        private partial class HelpOverlayContainer : Container
+        {
+            private readonly Container popupContent;
+
+            public HelpOverlayContainer(Container popupContent)
+            {
+                this.popupContent = popupContent;
+                RelativeSizeAxes = Axes.Both;
+                Children = new Drawable[] { popupContent };
+            }
+
+            public void ShowPopup()
+            {
+                this.FadeIn(250, Easing.OutQuint);
+                popupContent.ScaleTo(1, 500, Easing.OutElasticHalf);
+            }
+
+            public void HidePopup()
+            {
+                this.FadeOut(250, Easing.OutQuint);
+                popupContent.ScaleTo(0.7f, 500, Easing.OutQuint);
+            }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                if (!popupContent.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
+                {
+                    HidePopup();
+                    return true;
+                }
+
+                return false;
+            }
         }
     }
 }
