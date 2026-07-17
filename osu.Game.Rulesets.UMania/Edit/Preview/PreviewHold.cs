@@ -32,6 +32,25 @@ namespace osu.Game.Rulesets.UMania.Edit
             }
         }
 
+        
+        public void SetDiagonal(Vector2 startRelative, Vector2 endRelative, Vector2 parentDrawSize)
+        {
+            RelativePositionAxes = Axes.None;
+            RelativeSizeAxes = Axes.None;
+            Origin = Anchor.CentreLeft;
+
+            Vector2 startAbs = new Vector2(startRelative.X * parentDrawSize.X, startRelative.Y * parentDrawSize.Y);
+            Vector2 endAbs = new Vector2(endRelative.X * parentDrawSize.X, endRelative.Y * parentDrawSize.Y);
+
+            Vector2 delta = endAbs - startAbs;
+            float distance = delta.Length;
+            float angle = MathHelper.RadiansToDegrees(MathF.Atan2(delta.Y, delta.X));
+
+            Position = startAbs;
+            Size = new Vector2(distance, 4);
+            Rotation = angle;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {

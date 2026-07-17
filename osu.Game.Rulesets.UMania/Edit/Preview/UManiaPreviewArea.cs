@@ -292,39 +292,78 @@ namespace osu.Game.Rulesets.UMania.Edit
 
                     var pos = GetPreviewNotePosition(column, startTime, time, flippedRight);
 
-                    // clamp hold to corresponding receptor
-                    if (flippedRight)
-                    {
-                        pos.X = Math.Max(pos.X, right_receptor);
+                    var ubhelper = new UbNoteBuilder(note);
+                    var iconType = ubhelper.InferObjectTypeIcon();
 
-                        if (Math.Abs(pos.X - right_receptor) < 0.01f)
+                    int endColumn = column;
+                    if (iconType == UbIconType.Double)
+                        endColumn = column == 2 ? 3 : 2;
+
+                    var tailPos = GetPreviewNotePosition(endColumn, endTime, time, flippedRight);
+
+                    // diagonal for double holds
+
+                    if (iconType == UbIconType.Double)
+                    {
+                        float startY = pos.Y;
+                        float endY = tailPos.Y;
+
+                        double holdDuration = endTime - startTime;
+                        float speedX = flippedRight
+                            ? (float)((1.0 - right_receptor) / view_field)
+                            : -(float)(left_receptor / view_field);
+                        float D = (float)holdDuration * speedX;
+
+                        if (Math.Abs(D) > 0.0001f)
                         {
-                            var previewNote2 = makeNote(note);
-                            previewNote2.Position = pos;
-                            notesLayer.Add(previewNote2);
+                            float deltaY = endY - startY;
+                            float slope = deltaY / D;
+
+                            float clampedX = flippedRight
+                                ? Math.Max(pos.X, right_receptor)
+                                : Math.Min(pos.X, left_receptor);
+                            float lineStartY = tailPos.Y - slope * (tailPos.X - clampedX);
+                            var lineStart = new Vector2(clampedX, lineStartY);
+
+                            if (notesLayer.DrawSize != Vector2.Zero)
+                                previewHold.SetDiagonal(lineStart, tailPos, notesLayer.DrawSize);
+
+                            notesLayer.Add(previewHold);
+
+                            if (time >= startTime)
+                            {
+                                var previewNote2 = makeNote(note);
+                                previewNote2.Position = lineStart;
+                                notesLayer.Add(previewNote2);
+                            }
                         }
                     }
                     else
                     {
-                        pos.X = Math.Min(pos.X, left_receptor);
+                        // clamp hold start to corresponding receptor
+                        if (flippedRight)
+                            pos.X = Math.Max(pos.X, right_receptor);
+                        else
+                            pos.X = Math.Min(pos.X, left_receptor);
 
-                        if (Math.Abs(pos.X - left_receptor) < 0.01f)
+                        var holdVisualStart = flippedRight ? pos : tailPos;
+                        var holdVisualEnd = flippedRight ? tailPos : pos;
+
+                        previewHold.Position = holdVisualStart;
+                        previewHold.EndPosition = holdVisualEnd;
+
+                        if (!flippedRight)
+                            previewHold.Width = Math.Min(previewHold.Width, left_receptor - previewHold.X);
+
+                        notesLayer.Add(previewHold);
+
+                        if (Math.Abs(pos.X - (flippedRight ? right_receptor : left_receptor)) < 0.01f)
                         {
                             var previewNote2 = makeNote(note);
                             previewNote2.Position = pos;
                             notesLayer.Add(previewNote2);
                         }
                     }
-
-                    previewHold.Position = pos;
-                    previewHold.EndPosition = GetPreviewNotePosition(column, endTime, time, flippedRight);
-
-                    notesLayer.Add(previewHold);
-
-
-                    var ubhelper = new UbNoteBuilder(note);
-
-                    var iconType = ubhelper.InferObjectTypeIcon();
 
                     var endNote = new PreviewNote()
                     {
@@ -332,17 +371,15 @@ namespace osu.Game.Rulesets.UMania.Edit
                         Scale = new Vector2(0.5f),
                         IconType = iconType
                     };
-                    endNote.Position = GetPreviewNotePosition(column, endTime, time, flippedRight);
+                    endNote.Position = tailPos;
                     notesLayer.Add(endNote);
 
-
-                    if (!flippedRight)
+                    // Flash the receptor on the opposite lane when a Double hold ends
+                    if (iconType == UbIconType.Double && Math.Abs(time - endTime) < hit_window)
                     {
-                        previewHold.Position = endNote.Position;
-                        previewHold.EndPosition = GetPreviewNotePosition(column, startTime, time, flippedRight);
-
-                        // Clamp width between left receptor
-                        previewHold.Width = Math.Min(previewHold.Width, left_receptor - previewHold.X);
+                        int endInnerCircle = getInnerCircleIndexForColumnAndFlip(endColumn, flippedRight);
+                        if (endInnerCircle >= 0)
+                            hitCircles[endInnerCircle].FlashColour(colourProvider.Background1, (float)flash_duration);
                     }
                 }
 
