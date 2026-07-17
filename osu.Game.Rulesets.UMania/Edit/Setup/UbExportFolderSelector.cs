@@ -161,8 +161,8 @@ public partial class UbExportFolderSelector : FormBeatmapFileSelector
             var userPackagesPath = UbSteamDirectoryFinder.FindUnbeatableUserPackages();
             if (userPackagesPath == null)
                 userPackagesButton.Alpha = 0;
-
-            if (!UbExportSection.IsWindows() || !Directory.Exists(UbExportSection.GetCustomSongsDirectory()))
+            
+            if (!Directory.Exists(UbExportSection.GetCustomSongsDirectory()))
             {
                 customSongsButton.Alpha = 0;
             }

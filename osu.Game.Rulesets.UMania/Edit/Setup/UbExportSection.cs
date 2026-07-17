@@ -11,11 +11,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Graphics.Containers;
 using osu.Game.IO.Serialization;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
@@ -122,6 +125,13 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             // Save files to temp folder
             string beatmapPath = Path.Combine(tempPath, "temp.osu");
+            
+            // On linux, add Z:/ in front to emulate a wine path,
+            // which points to the root filesystem
+            if (!IsWindows())
+            {
+                beatmapPath = Path.Combine("Z:/", tempPath, "temp.osu");
+            }
 
             using (var fs = File.Create(beatmapPath))
             {
@@ -482,34 +492,34 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
         public static string GetDataDirectory()
         {
-            var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            var localLowPath = Path.Combine(userProfile, "AppData", "LocalLow");
+            if (IsWindows())
+            {
+                var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                var localLowPath = Path.Combine(userProfile, "AppData", "LocalLow");
 
-            var unbeatablePath = Path.Combine(localLowPath, "D-CELL GAMES", "UNBEATABLE");
-            
-            return unbeatablePath;
+                return Path.Combine(localLowPath, "D-CELL GAMES", "UNBEATABLE");
+            }
+
+            return Path.Combine(GetWinePrefixRoot(), "users", "steamuser", "AppData", "LocalLow", "D-CELL GAMES", "UNBEATABLE");
         }
 
         public static string GetCustomSongsDirectory()
         {
+            return Path.Combine(GetDataDirectory(), "CustomSongs");
+        }
+
+        private static string GetWinePrefixRoot()
+        {
             var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            var localLowPath = Path.Combine(userProfile, "AppData", "LocalLow");
-
-            var unbeatablePath = Path.Combine(localLowPath, "D-CELL GAMES", "UNBEATABLE", "CustomSongs");
-
-            return unbeatablePath;
+            var steamPath = Path.Combine(userProfile, ".local", "share", "Steam");
+            return Path.Combine(steamPath, "steamapps", "compatdata", "2240620", "pfx", "drive_c");
         }
         
         public void OpenGameFolder()
         {
             // Open
             // %USERPROFILE%\AppData\LocalLow\D-CELL GAMES\UNBEATABLE
-
-            if (!IsWindows())
-            {
-                showToast("Error", "Opening Unbeatable folder is only supported on Windows.");
-                return;
-            }
+            // (or the equivalent Proton prefix path on Linux)
 
             try
             {
@@ -523,11 +533,24 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     return;
                 }
 
-                // Use explorer.exe to open the folder (works reliably for directories)
+                string fileName;
+                string arguments;
+
+                if (IsWindows())
+                {
+                    fileName = "explorer.exe";
+                    arguments = '"' + unbeatablePath + '"';
+                }
+                else
+                {
+                    fileName = "xdg-open";
+                    arguments = '"' + unbeatablePath + '"';
+                }
+
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
                 {
-                    FileName = "explorer.exe",
-                    Arguments = '"' + unbeatablePath + '"',
+                    FileName = fileName,
+                    Arguments = arguments,
                     UseShellExecute = true
                 });
 
@@ -557,7 +580,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         private UbExportFolderSelector exportFolderSelector;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             Children = new Drawable[]
             {
@@ -583,12 +606,20 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     Caption = "Export folder",
                     PlaceholderText = "Select folder to export Unbeatable beatmaps to",
                 },
+                new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 14))
+                {
+                    Text = "Tip: Select the game's \"CustomSongs\" folder and set \"Export as\" to \"As Folder (.txt)\" to quickly add your custom charts to Unbeatable.",
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Colour = colourProvider.Content1.Opacity(0.7f),
+                    Padding = new MarginPadding { Top = 2 },
+                },
                 new FormButton()
                 {
                     Caption = "Open UNBEATABLE Folder",
                     ButtonText = "Open Folder",
                     Action = OpenGameFolder,
-                    Alpha = IsWindows() ? 1f : 0f,
+                    Alpha = (IsWindows() || Directory.Exists(GetDataDirectory())) ? 1f : 0f,
                     Margin = new MarginPadding() {Top = 24},
                 }
 
