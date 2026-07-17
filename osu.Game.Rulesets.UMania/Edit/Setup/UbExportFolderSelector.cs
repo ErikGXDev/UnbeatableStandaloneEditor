@@ -149,6 +149,9 @@ public partial class UbExportFolderSelector : FormBeatmapFileSelector
                             {
                                 var unbeatablePath = UbExportSection.GetCustomSongsDirectory();
                                 
+                                if (!Directory.Exists(unbeatablePath))
+                                    Directory.CreateDirectory(unbeatablePath);
+                                
                                 selectedDirectory.Value = unbeatablePath;
                                 
                                 PopoverExtensions.HidePopover(this);
@@ -162,7 +165,9 @@ public partial class UbExportFolderSelector : FormBeatmapFileSelector
             if (userPackagesPath == null)
                 userPackagesButton.Alpha = 0;
             
-            if (!Directory.Exists(UbExportSection.GetCustomSongsDirectory()))
+            var customSongsPath = UbExportSection.GetCustomSongsDirectory();
+            var customSongsParent = Path.GetDirectoryName(customSongsPath);
+            if (!Directory.Exists(customSongsPath) && (customSongsParent == null || !Directory.Exists(customSongsParent)))
             {
                 customSongsButton.Alpha = 0;
             }
