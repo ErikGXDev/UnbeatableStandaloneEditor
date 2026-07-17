@@ -35,10 +35,9 @@ Some data will be saved to an "unbeatable-beatmap-editor" folder. Find it in the
 
 - Simple note presets: Remembering and manually setting samples no longer required
 - Note modifier menus: Easily customize notes
-- In-editor note preview: See the type and modifiers of any note
+- Preview area: Visualize how your notes are going to look in-game
 - Column guides: Make sure you place notes where they belong
 - Placement order: More control over how your notes spawn in-game
-- Inspector: Easily check what side the notes are currently on.
 - Simple export options: Export as your map as .zip or playtest directly in UNBEATABLE
 - Cute icons
 - Everything else the osu!mania editor has to offer (composition, timing, great ui)
