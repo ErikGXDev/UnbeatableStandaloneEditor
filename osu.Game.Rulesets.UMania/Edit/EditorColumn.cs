@@ -2,9 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UMania.Objects.Drawables;
 using osu.Game.Rulesets.UMania.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.UMania.Edit
 {
@@ -13,6 +16,35 @@ namespace osu.Game.Rulesets.UMania.Edit
         public EditorColumn(int index, bool isSpecial)
             : base(index, isSpecial)
         {
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            string? label = Index switch
+            {
+                2 => "Top",
+                3 => "Bottom",
+                4 => "Camera",
+                5 => "Middle",
+                _ => null,
+            };
+
+            if (label != null)
+            {
+                AddInternal(new SpriteText
+                {
+                    Text = label,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Y = -3,
+                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                    Colour = Colour4.White.Opacity(0.7f),
+                    Shadow = true,
+                    ShadowColour = Colour4.Black
+                });
+            }
         }
 
         protected override void OnNewDrawableHitObject(DrawableHitObject drawableHitObject)

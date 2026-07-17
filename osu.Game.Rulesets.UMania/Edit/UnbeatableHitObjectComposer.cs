@@ -5,8 +5,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Audio;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -45,6 +47,71 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
         };
         
         PlayfieldContentContainer.Add(previewArea);
+
+        // Timing reminder popup
+        var timingPopup = new Container
+        {
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopCentre,
+            Y = 20,
+            AutoSizeAxes = Axes.Both,
+            Alpha = EditorBeatmap.HasTiming.Value ? 0 : 1,
+            Children = new Drawable[]
+            {
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    CornerRadius = 8,
+                    Masking = true,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.Black.Opacity(0.75f),
+                    },
+                },
+                new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Padding = new MarginPadding(16),
+                    Spacing = new Vector2(0, 4),
+                    Children = new Drawable[]
+                    {
+                        new SpriteIcon
+                        {
+                            Icon = FontAwesome.Solid.Clock,
+                            Size = new Vector2(24),
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Colour = Colour4.Orange,
+                        },
+                        new SpriteText
+                        {
+                            Text = "No timing points set",
+                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Colour = Colour4.White,
+                        },
+                        new SpriteText
+                        {
+                            Text = "Go to the Timing tab to add one",
+                            Font = OsuFont.GetFont(size: 13),
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Colour = Colour4.White.Opacity(0.8f),
+                        },
+                    },
+                },
+            },
+        };
+
+        PlayfieldContentContainer.Add(timingPopup);
+
+        EditorBeatmap.HasTiming.BindValueChanged(hasTiming =>
+        {
+            timingPopup.FadeTo(hasTiming.NewValue ? 0 : 1, 300, Easing.OutQuint);
+        });
     }
     
     private UManiaPreviewArea previewArea;
