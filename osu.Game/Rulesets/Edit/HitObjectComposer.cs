@@ -250,7 +250,7 @@ namespace osu.Game.Rulesets.Edit
                             Colour = colourProvider.Background5,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        RightToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_RIGHT, 250)
+                        RightToolbox = new ExpandingToolboxContainer(TOOLBOX_CONTRACTED_SIZE_RIGHT, 200)
                         {
                             Child = new EditorToolboxGroup("inspector")
                             {

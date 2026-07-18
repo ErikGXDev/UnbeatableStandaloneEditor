@@ -215,7 +215,7 @@ namespace osu.Game.Rulesets.UMania.Edit
             if (rightToolbox == null)
                 return;
 
-            float offset = rightToolbox.Expanded.Value ? rightToolbox.Width + inspector_padding : 0;
+            float offset = rightToolbox.Expanded.Value ? rightToolbox.Width - 50 + inspector_padding : 0;
             this.MoveToX(-offset, 200, Easing.OutQuint);
         }
 
