@@ -68,6 +68,14 @@ public partial class SettingsPopover : OsuPopover
                             Current = osuConfig.GetBindable<bool>(OsuSetting.EditorNudgeByMilliseconds),
                             Margin = new MarginPadding { Bottom = 10 },
                         },
+                        new TooltipCheckbox
+                        {
+                            LabelText = "Play hitsounds in camera lane",
+                            TooltipText = "When off, hitting notes in the camera lane will not play their hit sound.",
+                            RelativeSizeAxes = Axes.X,
+                            Current = osuConfig.GetBindable<bool>(OsuSetting.PlaySamplesInCameraLane),
+                            Margin = new MarginPadding { Bottom = 10 },
+                        },
                     },
                 },
                 new SettingsGroup
@@ -119,7 +127,7 @@ public partial class SettingsPopover : OsuPopover
                 keybindingsContainer = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 200,
+                    Height = 190,
                     Masking = true,
                     AlwaysPresent = false,
                     Child = new EditorKeyBindingsSubsection(),

@@ -207,7 +207,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorScaleOrigin, EditorOrigin.GridCentre);
             SetDefault(OsuSetting.EditorRotationOrigin, EditorOrigin.GridCentre);
             SetDefault(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges, true);
-            SetDefault(OsuSetting.EditorNudgeByMilliseconds, true); // FIX: Add Config over here because it is used in osu code 
+            SetDefault(OsuSetting.EditorNudgeByMilliseconds, true); // FIX: Add Config over here because it is used in osu code
+            SetDefault(OsuSetting.PlaySamplesInCameraLane, true); // FIX: Camera lane hit sounds on by default
 
             SetDefault(OsuSetting.HideCountryFlags, false);
 
@@ -497,5 +498,6 @@ namespace osu.Game.Configuration
         
         
         EditorNudgeByMilliseconds, // FIX: New config, see above fix
+        PlaySamplesInCameraLane, // FIX: New config, used by UMania editor to gate camera-lane hit sounds
     }
 }

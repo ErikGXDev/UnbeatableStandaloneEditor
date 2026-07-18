@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.UMania.UI;
@@ -25,6 +26,11 @@ namespace osu.Game.Rulesets.UMania.Objects.Drawables
 
         [Resolved(canBeNull: true)]
         private ManiaPlayfield playfield { get; set; }
+
+        [Resolved]
+        private OsuConfigManager osuConfig { get; set; } = null!;
+
+        private bool playSamplesInCameraLane;
 
         protected override float SamplePlaybackPosition
         {
@@ -56,6 +62,17 @@ namespace osu.Game.Rulesets.UMania.Objects.Drawables
                 Action.BindTo(action);
 
             Direction.BindTo(scrollingInfo.Direction);
+
+            playSamplesInCameraLane = osuConfig.Get<bool>(OsuSetting.PlaySamplesInCameraLane);
+        }
+
+        public override void PlaySamples()
+        {
+            // The camera lane (column 4) can be muted
+            if (HitObject.Column == 4 && !playSamplesInCameraLane)
+                return;
+
+            base.PlaySamples();
         }
 
         protected override void LoadComplete()
