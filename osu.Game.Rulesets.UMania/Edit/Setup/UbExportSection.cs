@@ -125,12 +125,14 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             // Save files to temp folder
             string beatmapPath = Path.Combine(tempPath, "temp.osu");
+
+            string websocketPath = beatmapPath;
             
             // On linux, add Z:/ in front to emulate a wine path,
             // which points to the root filesystem
             if (!IsWindows())
             {
-                beatmapPath = Path.Combine("Z:/", tempPath, "temp.osu");
+                websocketPath = "Z:/" + beatmapPath;
             }
 
             using (var fs = File.Create(beatmapPath))
@@ -155,7 +157,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 using (var ws = new WebSocket("ws://localhost:5080"))
                 {
                     ws.Connect();
-                    ws.Send("play " + beatmapPath);
+                    ws.Send("play " + websocketPath);
 
                     showToast("Export successful", "Sent to Unbeatable!");
                 }
@@ -589,7 +591,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     Caption = "Test your map in Unbeatable (Through Websocket)",
                     ButtonText = "Test Beatmap",
                     Action = ExportToUnbeatable,
-                    Alpha = 0f,
                 },
                 new FormButton
                 {
