@@ -119,7 +119,7 @@ public partial class SettingsPopover : OsuPopover
                 keybindingsContainer = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 280,
+                    Height = 200,
                     Masking = true,
                     AlwaysPresent = false,
                     Child = new EditorKeyBindingsSubsection(),
