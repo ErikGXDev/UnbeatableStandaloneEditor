@@ -42,7 +42,59 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
         [Resolved(canBeNull: true)] private OnScreenDisplay onScreenDisplay { get; set; }
 
+        private FormButton websocketButton = null!;
+        private CancellationTokenSource websocketCheckCancellation = new CancellationTokenSource();
+
         public void ExportToUnbeatable() => Task.Run(exportToUnbeatable);
+
+        private bool IsWebsocketAvailable()
+        {
+            try
+            {
+                using (var ws = new WebSocket("ws://localhost:5080"))
+                {
+                    ws.Connect();
+
+                    if (ws.ReadyState != WebSocketState.Open)
+                        return false;
+
+                    ws.Close();
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private void StartWebsocketChecks()
+        {
+            Task.Run(async () =>
+            {
+                while (!websocketCheckCancellation.IsCancellationRequested)
+                {
+                    try
+                    {
+                        bool available = IsWebsocketAvailable();
+
+                        Schedule(() =>
+                        {
+                            if (IsDisposed)
+                                return;
+
+                            websocketButton.Alpha = available ? 1f : 0f;
+                        });
+
+                        await Task.Delay(TimeSpan.FromSeconds(5), websocketCheckCancellation.Token);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
+                }
+            }, websocketCheckCancellation.Token);
+        }
 
         private void exportToUnbeatable()
         {
@@ -586,11 +638,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         {
             Children = new Drawable[]
             {
-                new FormButton
+                websocketButton = new FormButton
                 {
                     Caption = "Test your map in Unbeatable (Through Websocket)",
                     ButtonText = "Test Beatmap",
                     Action = ExportToUnbeatable,
+                    Alpha = 0f,
                 },
                 new FormButton
                 {
@@ -626,6 +679,16 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 }
 
             };
+
+
+            StartWebsocketChecks();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            websocketCheckCancellation.Cancel();
+            websocketCheckCancellation.Dispose();
+            base.Dispose(isDisposing);
         }
 
         enum ExportMode

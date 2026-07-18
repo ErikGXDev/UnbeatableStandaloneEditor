@@ -84,6 +84,32 @@ public partial class SettingsPopover : OsuPopover
                     },
                 },
 
+                new SettingsGroup
+                {
+                    Label = "Websocket",
+                    Controls = new Drawable[]
+                    {
+                        new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 14, weight: FontWeight.Regular))
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Text = "Install the Websocket mod to quickly test your maps in UNBEATABLE through the editor.",
+                            Colour = colourProvider.Content1.Opacity(0.75f),
+                            Margin = new MarginPadding { Bottom = 8 },
+                        },
+                        new RoundedButton
+                        {
+                            Width = 150,
+                            Height = 30,
+                            Text = "Download",
+                            Colour = colourProvider.Colour1,
+                            BackgroundColour = colourProvider.Background2,
+                            Scale = new Vector2(0.9f),
+                            Action = () => BrowserUtil.OpenUrl("https://github.com/ErikGXDev/UnbeatableWebsocket#readme-start"),
+                        },
+                    },
+                },
+
                 new OsuSpriteText
                 {
                     Text = "Key Bindings",
