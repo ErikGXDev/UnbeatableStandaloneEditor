@@ -4,6 +4,7 @@
 #nullable disable
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
@@ -141,7 +142,7 @@ namespace osu.Game.Rulesets.UMania.Objects
             new List<IList<HitSampleInfo>>
             {
                 obj.Samples,
-                new List<HitSampleInfo>(),
+                new List<HitSampleInfo>(obj.Samples.Select(s => s.With(newVolume: 75))),
             };
     }
 }
