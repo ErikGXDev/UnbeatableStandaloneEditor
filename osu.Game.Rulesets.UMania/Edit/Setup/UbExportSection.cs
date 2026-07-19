@@ -182,7 +182,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             
             // On linux, add Z:/ in front to emulate a wine path,
             // which points to the root filesystem
-            if (!IsWindows())
+            if (UbPlatform.IsLinux())
             {
                 websocketPath = "Z:/" + beatmapPath;
             }
@@ -539,14 +539,9 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         }
 
 
-        public static bool IsWindows()
-        {
-            return Environment.OSVersion.Platform == PlatformID.Win32NT;
-        }
-
         public static string GetDataDirectory()
         {
-            if (IsWindows())
+            if (UbPlatform.IsWindows())
             {
                 var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 var localLowPath = Path.Combine(userProfile, "AppData", "LocalLow");
@@ -554,7 +549,13 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 return Path.Combine(localLowPath, "D-CELL GAMES", "UNBEATABLE");
             }
 
-            return Path.Combine(GetWinePrefixRoot(), "users", "steamuser", "AppData", "LocalLow", "D-CELL GAMES", "UNBEATABLE");
+            if (UbPlatform.IsLinux())
+            {
+                return Path.Combine(GetWinePrefixRoot(), "users", "steamuser", "AppData", "LocalLow", "D-CELL GAMES", "UNBEATABLE");
+            }
+
+            // macOS won't have this for now
+            return string.Empty;
         }
 
         public static string GetCustomSongsDirectory()
@@ -590,15 +591,20 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 string fileName;
                 string arguments;
 
-                if (IsWindows())
+                if (UbPlatform.IsWindows())
                 {
                     fileName = "explorer.exe";
                     arguments = '"' + unbeatablePath + '"';
                 }
-                else
+                else if (UbPlatform.IsLinux())
                 {
                     fileName = "xdg-open";
                     arguments = '"' + unbeatablePath + '"';
+                }
+                else
+                {
+                    showToast("Not supported on macOS yet", "");
+                    return;
                 }
 
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
@@ -674,7 +680,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     Caption = "Open UNBEATABLE Folder",
                     ButtonText = "Open Folder",
                     Action = OpenGameFolder,
-                    Alpha = (IsWindows() || Directory.Exists(GetDataDirectory())) ? 1f : 0f,
+                    Alpha = (UbPlatform.IsWindows() || Directory.Exists(GetDataDirectory())) ? 1f : 0f,
                     Margin = new MarginPadding() {Top = 24},
                 }
 

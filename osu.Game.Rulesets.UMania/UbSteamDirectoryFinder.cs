@@ -53,9 +53,8 @@ public static class UbSteamDirectoryFinder
                 Logger.Log("Failed to find Steam directory from windows registry");
             }
         }
-        else
+        else if (RuntimeInfo.OS == RuntimeInfo.Platform.Linux)
         {
-            // Unix-like (Linux/macOS)
             try
             {
                 string steamPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
