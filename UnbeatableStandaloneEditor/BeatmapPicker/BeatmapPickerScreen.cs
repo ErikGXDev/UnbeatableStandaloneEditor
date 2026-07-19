@@ -233,6 +233,7 @@ public partial class BeatmapPickerScreen : OsuScreen
                         Origin = Anchor.TopRight,
                         Width = 180,
                         Height = 28,
+                        Scale = new Vector2(0f),
                         Y = 30,
                         Colour = colours.Colour1,
                         BackgroundColour = colours.Background3,
@@ -241,6 +242,11 @@ public partial class BeatmapPickerScreen : OsuScreen
                     };
                     versionText.Y = -36;
                     updateButtonContainer!.Add(updateButton);
+                    Schedule(() =>
+                    {
+                        updateButton.ScaleTo(1f, 800, Easing.OutElastic);
+
+                    });
                 });
             }
         });
