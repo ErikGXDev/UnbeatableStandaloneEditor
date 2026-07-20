@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
@@ -19,15 +18,14 @@ using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Graphics.Containers;
-using osu.Game.IO.Serialization;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
 using osu.Game.Rulesets.UMania.Beatmaps;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
-using osuTK;
 using WebSocketSharp;
+using Container = osu.Framework.Graphics.Containers.Container;
 using Logger = osu.Framework.Logging.Logger;
 
 namespace osu.Game.Rulesets.UMania.Edit.Setup
@@ -40,9 +38,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
         [Resolved] private BeatmapManager beatmapManager { get; set; } = null!;
 
-        [Resolved(canBeNull: true)] private OnScreenDisplay onScreenDisplay { get; set; }
+        [Resolved(canBeNull: true)] private OnScreenDisplay onScreenDisplay { get; set; } = null!;
 
-        private FormButton websocketButton = null!;
+        [Resolved] private EditorClock editorClock { get; set; } = null!;
+
+        private UbPlaytestButton websocketButton = null!;
         private CancellationTokenSource websocketCheckCancellation = new CancellationTokenSource();
 
         public void ExportToUnbeatable() => Task.Run(exportToUnbeatable);
@@ -77,6 +77,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     try
                     {
                         bool available = IsWebsocketAvailable();
+                        bool practiceFileExists = File.Exists(UbPracticeManager.GetPracticeModeSettingsPath());
 
                         Schedule(() =>
                         {
@@ -84,6 +85,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                                 return;
 
                             websocketButton.Alpha = available ? 1f : 0f;
+                            websocketButton.Enabled.Value = available;
+                            websocketButton.SecondButtonVisible = practiceFileExists;
                         });
 
                         await Task.Delay(TimeSpan.FromSeconds(5), websocketCheckCancellation.Token);
@@ -94,6 +97,31 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     }
                 }
             }, websocketCheckCancellation.Token);
+        }
+        
+        private async void testAtPracticeTime()
+        {
+            int startTime = (int)editorClock.CurrentTime;
+
+            string title = Beatmap.Metadata.Title;
+
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                showToast("Missing song title", "The beatmap needs a title for practice mode to match it.");
+                return;
+            }
+
+            UbPracticeManager.WritePracticeEntry(title, startTime);
+
+            Task.Run(async () =>
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5));
+                UbPracticeManager.RemovePracticeEntry();
+            });
+
+            await Task.Delay(50);
+
+            ExportToUnbeatable();
         }
 
         private void exportToUnbeatable()
@@ -216,9 +244,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             });
         }
 
-
-
-
         private IBeatmap[] getBeatmapsFromSet(BeatmapSetInfo beatmapSet)
         {
             var beatmaps = new IBeatmap[beatmapSet.Beatmaps.Count];
@@ -277,8 +302,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         }
 
         public void ExportToZip(string extension = ".osu") => Task.Run(() => {exportToZip(extension);});
-
-
+        
         private void exportToZip(string extension = ".osu")
         {
 
@@ -505,8 +529,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             showToast("Export successful", $"Saved to folder {baseFolderName}");
         }
-
-
+        
         public void ExportMap()
         {
 
@@ -537,8 +560,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 ExportToZip();
             }
         }
-
-
+        
         public static string GetDataDirectory()
         {
             if (UbPlatform.IsWindows())
@@ -622,7 +644,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             }
         }
 
-
         private partial class BeatmapEditorToast : Toast
         {
             public BeatmapEditorToast(LocalisableString value, string beatmapDisplayName)
@@ -644,11 +665,10 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         {
             Children = new Drawable[]
             {
-                websocketButton = new FormButton
+                websocketButton = new UbPlaytestButton
                 {
-                    Caption = "Test your map in Unbeatable (Through Websocket)",
-                    ButtonText = "Test Beatmap",
-                    Action = ExportToUnbeatable,
+                    ExportToUnbeatable = ExportToUnbeatable,
+                    TestAtPracticeTime = testAtPracticeTime,
                     Alpha = 0f,
                 },
                 new FormButton
@@ -689,7 +709,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             StartWebsocketChecks();
         }
-
+        
         protected override void Dispose(bool isDisposing)
         {
             websocketCheckCancellation.Cancel();
