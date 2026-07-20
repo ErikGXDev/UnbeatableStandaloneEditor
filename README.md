@@ -32,7 +32,7 @@ Some data will be saved to an "unbeatable-beatmap-editor" folder. Find it in the
 - `%AppData%\unbeatable-beatmap-editor` on Windows
 - `~/.local/share/unbeatable-beatmap-editor` on Linux/macOS
 
-macOS support is experimental and untested. The download contains both an Intel and Apple Silicon version.
+macOS support is experimental and untested.
 
 
 ## Features
