@@ -18,6 +18,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Edit
@@ -529,6 +530,36 @@ namespace osu.Game.Screens.Edit
         public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
 
         public int BeatDivisor => beatDivisor?.Value ?? 1;
+        
+        public void SnapAllHitObjectsToCurrentDivisor()
+        {
+            if (HitObjects.Count == 0)
+                return;
+
+            BeginChange();
+
+            foreach (var hitObject in HitObjects.ToArray())
+            {
+                double oldStart = hitObject.StartTime;
+                double oldEnd = hitObject.GetEndTime();
+
+                double newStart = SnapTime(oldStart, null);
+                double newEnd = Math.Max(newStart + GetBeatLengthAtTime(newStart), SnapTime(oldEnd, newStart));
+
+                hitObject.StartTime = newStart;
+
+                switch (hitObject)
+                {
+                    case IHasDuration hasDuration:
+                        hasDuration.Duration = newEnd - newStart;
+                        break;
+                }
+            }
+
+            UpdateAllHitObjects();
+
+            EndChange();
+        }
 
         protected override void Dispose(bool isDisposing)
         {

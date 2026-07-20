@@ -1,12 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Screens.Edit.Timing
@@ -50,6 +52,41 @@ namespace osu.Game.Screens.Edit.Timing
                 if (hitObject is not IHasRepeats && hitObject is IHasDuration hitObjectWithDuration)
                     hitObjectWithDuration.Duration *= timingControlPoint.BeatLength / oldBeatLength;
             }
+        }
+        
+        public static void ApplyGlobalOffset(IBeatmap beatmap, double offset)
+        {
+            if (offset == 0)
+                return;
+
+            var editorBeatmap = (EditorBeatmap)beatmap;
+
+            foreach (var group in editorBeatmap.ControlPointInfo.Groups.ToArray())
+            {
+                double newTime = group.Time + offset;
+
+                var controlPoints = group.ControlPoints.ToArray();
+
+                editorBeatmap.ControlPointInfo.RemoveGroup(group);
+
+                foreach (var controlPoint in controlPoints)
+                    editorBeatmap.ControlPointInfo.Add(newTime, controlPoint);
+            }
+
+            foreach (var hitObject in editorBeatmap.HitObjects.ToArray())
+            {
+                hitObject.StartTime += offset;
+
+                if (hitObject is IHasDuration hasDuration)
+                    hasDuration.Duration = Math.Max(0, hasDuration.Duration);
+            }
+
+            editorBeatmap.UpdateAllHitObjects();
+
+            for (int i = 0; i < editorBeatmap.Bookmarks.Count; i++)
+                editorBeatmap.Bookmarks[i] += (int)offset;
+
+            editorBeatmap.PreviewTime.Value += (int)offset;
         }
     }
 }

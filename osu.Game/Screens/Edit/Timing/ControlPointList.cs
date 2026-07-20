@@ -84,6 +84,45 @@ namespace osu.Game.Screens.Edit.Timing
                                 },
                             }
                         },
+                        new Container
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Masking = true,
+                            CornerRadius = 6,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = colourProvider.Background4,
+                                },
+                                new Container
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding(2),
+                                    Child = new TimingAdjustButton(1)
+                                    {
+                                        Text = "Offset all points",
+                                        Action = offset =>
+                                        {
+                                            var selected = selectedGroup.Value;
+                                            double selectedTime = selected?.Time ?? double.NaN;
+
+                                            Beatmap.BeginChange();
+                                            TimingSectionAdjustments.ApplyGlobalOffset(Beatmap, offset);
+                                            Beatmap.EndChange();
+
+                                            // The selected group was removed and re-added at a new time, so re-point at it.
+                                            if (selected != null)
+                                                selectedGroup.Value = Beatmap.ControlPointInfo.GroupAt(selectedTime + offset);
+                                        },
+                                        Size = new Vector2(125, 30),
+                                    },
+                                },
+                            },
+                        },
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
