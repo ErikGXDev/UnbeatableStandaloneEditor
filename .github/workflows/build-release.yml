@@ -84,6 +84,13 @@ jobs:
           New-Item -ItemType Directory -Force -Path "macos-staging/${{ matrix.rid }}" | Out-Null
           Copy-Item -Recurse -Force "UnbeatableStandaloneEditor/publish/*" "macos-staging/${{ matrix.rid }}/"
 
+      - name: Create release package (macOS staging)
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: unbeatable-editor-macos-${{ matrix.rid }}
+          path: macos-staging/${{ matrix.rid }}
+
       - name: Create release package (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -97,10 +104,11 @@ jobs:
           Compress-Archive -Path "UnbeatableStandaloneEditor/publish/*" -DestinationPath "unbeatable-editor-${{ matrix.platform }}-x64.zip"
 
       - name: Upload artifact
+        if: matrix.os != 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
           name: unbeatable-editor-${{ matrix.platform }}-${{ matrix.rid }}
-          path: ${{ matrix.os == 'macos-latest' && 'macos-staging' || format('unbeatable-editor-{0}-x64.zip', matrix.platform) }}
+          path: ${{ format('unbeatable-editor-{0}-x64.zip', matrix.platform) }}
 
   bundle-macos:
     needs: build
