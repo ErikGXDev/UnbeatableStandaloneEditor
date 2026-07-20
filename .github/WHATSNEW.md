@@ -1,7 +1,8 @@
 ﻿## What's new
 
-- Added an option in settings to mute camera notes.
-- Hold and Double notes will now play their hitsound again when they end (but slightly quieter).
-- Added a little animation to the "New version available!" button to encourage you to update.
+- Added support for [Stefy's practice mod](https://github.com/Stefyfresh/UNBEATABLE-practice-mode) for quickly testing charts (requires the latest version of the [Websocket Mod](https://github.com/ErikGXDev/UnbeatableWebsocket) as well)
+- Added the option "Timing > Snap all notes to current snap divisor" from newer osu!lazer versions
+- Added a way to offset all timing points at once, find it in the timing tab
+- macOS support (experimental and untested)
 
 **Happy mapping!**

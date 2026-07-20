@@ -19,6 +19,8 @@ A modified standalone osu!lazer editor that makes creating UNBEATABLE custom map
 > | Windows | [Download](https://github.com/ErikGXDev/UnbeatableStandaloneEditor/releases/latest/download/unbeatable-editor-windows-x64.zip) |
 > |---------|--------------------------------------------------------------------------------------------------------------------------------|
 > | Linux   | [Download](https://github.com/ErikGXDev/UnbeatableStandaloneEditor/releases/latest/download/unbeatable-editor-linux-x64.zip)   |
+> | macOS   | [Download](https://github.com/ErikGXDev/UnbeatableStandaloneEditor/releases/latest/download/unbeatable-editor-macos-x64.zip)   |
+> |---------|--------------------------------------------------------------------------------------------------------------------------------|
 > 
 > You can also find specific versions on the [releases page](https://github.com/ErikGXDev/UnbeatableStandaloneEditor/releases).
 
@@ -30,6 +32,9 @@ Some data will be saved to an "unbeatable-beatmap-editor" folder. Find it in the
 
 - `%AppData%\unbeatable-beatmap-editor` on Windows
 - `~/.local/share/unbeatable-beatmap-editor` on Linux/macOS
+
+macOS support is experimental and untested. The download contains both an Intel and Apple Silicon version.
+
 
 ## Features
 
