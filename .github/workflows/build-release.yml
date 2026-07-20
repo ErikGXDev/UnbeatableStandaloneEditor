@@ -20,9 +20,6 @@ jobs:
             rid: win-x64
             platform: windows
           - os: macos-latest
-            rid: osx-x64
-            platform: macos
-          - os: macos-latest
             rid: osx-arm64
             platform: macos
 
@@ -81,15 +78,8 @@ jobs:
         shell: pwsh
         run: |
           ./scripts/publish.ps1 -Runtime ${{ matrix.rid }} -Configuration Release -Version ${{ steps.version-macos.outputs.VERSION }}
-          New-Item -ItemType Directory -Force -Path "macos-staging/${{ matrix.rid }}" | Out-Null
-          Copy-Item -Recurse -Force "UnbeatableStandaloneEditor/publish/*" "macos-staging/${{ matrix.rid }}/"
-
-      - name: Create release package (macOS staging)
-        if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: unbeatable-editor-macos-${{ matrix.rid }}
-          path: macos-staging/${{ matrix.rid }}
+          cd UnbeatableStandaloneEditor/publish
+          zip -r "../../unbeatable-editor-${{ matrix.platform }}-${{ matrix.rid }}.zip" *
 
       - name: Create release package (Linux)
         if: matrix.os == 'ubuntu-latest'
@@ -104,40 +94,13 @@ jobs:
           Compress-Archive -Path "UnbeatableStandaloneEditor/publish/*" -DestinationPath "unbeatable-editor-${{ matrix.platform }}-x64.zip"
 
       - name: Upload artifact
-        if: matrix.os != 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
           name: unbeatable-editor-${{ matrix.platform }}-${{ matrix.rid }}
-          path: ${{ format('unbeatable-editor-{0}-x64.zip', matrix.platform) }}
-
-  bundle-macos:
-    needs: build
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    steps:
-      - name: Download macOS staging artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: unbeatable-editor-macos-*
-          merge-multiple: true
-          path: macos-staging
-
-      - name: Bundle macOS architectures into a single package
-        run: |
-          cp "macos-staging/osx-arm64/UnbeatableStandaloneEditor" "macos-staging/osx-x64/UnbeatableStandaloneEditor-arm64"
-          mv "macos-staging/osx-x64/UnbeatableStandaloneEditor" "macos-staging/osx-x64/UnbeatableStandaloneEditor-x64"
-          chmod +x "macos-staging/osx-x64/UnbeatableStandaloneEditor-x64" "macos-staging/osx-x64/UnbeatableStandaloneEditor-arm64"
-          cd "macos-staging/osx-x64"
-          zip -r "../../unbeatable-editor-macos-x64.zip" *
-
-      - name: Upload bundled macOS package
-        uses: actions/upload-artifact@v4
-        with:
-          name: unbeatable-editor-macos
-          path: unbeatable-editor-macos-x64.zip
+          path: unbeatable-editor-${{ matrix.platform }}-${{ matrix.rid }}.zip
 
   release:
-    needs: [build, bundle-macos]
+    needs: [build]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     permissions:
