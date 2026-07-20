@@ -20,7 +20,6 @@ A modified standalone osu!lazer editor that makes creating UNBEATABLE custom map
 > |---------|--------------------------------------------------------------------------------------------------------------------------------|
 > | Linux   | [Download](https://github.com/ErikGXDev/UnbeatableStandaloneEditor/releases/latest/download/unbeatable-editor-linux-x64.zip)   |
 > | macOS   | [Download](https://github.com/ErikGXDev/UnbeatableStandaloneEditor/releases/latest/download/unbeatable-editor-macos-x64.zip)   |
-> |---------|--------------------------------------------------------------------------------------------------------------------------------|
 > 
 > You can also find specific versions on the [releases page](https://github.com/ErikGXDev/UnbeatableStandaloneEditor/releases).
 
