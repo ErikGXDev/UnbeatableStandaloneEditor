@@ -78,7 +78,7 @@ public partial class SettingsPopover : OsuPopover
                         new TooltipCheckbox
                         {
                             LabelText = "Enable 4-key mode in editor",
-                            TooltipText = "The first two columns turn into another set of top and bottom lanes.\nThe columns will also be re-arranged slightly.\nWhen zoomed out, notes in the new columns will automatically be flipped.\nWhen zoomed in, the colums simply act as another set of top and bottom lanes.",
+                            TooltipText = "The first two columns turn into another set of top and bottom lanes.\nThe columns will also be re-arranged slightly.\nWhen zoomed out, notes in the new columns will automatically be flipped.\nWhen zoomed in, the columns simply act as another set of top and bottom lanes.\n(Experimental!)",
                             RelativeSizeAxes = Axes.X,
                             Current = osuConfig.GetBindable<bool>(OsuSetting.Editor4KeyMode),
                             Margin = new MarginPadding { Bottom = 10 },
