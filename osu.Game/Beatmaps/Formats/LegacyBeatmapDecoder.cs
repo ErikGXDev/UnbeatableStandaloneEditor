@@ -543,7 +543,6 @@ namespace osu.Game.Beatmaps.Formats
                 addControlPoint(time, controlPoint, true);
             }
 
-            int onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
 
             addControlPoint(time, new DifficultyControlPoint
             {
@@ -557,7 +556,10 @@ namespace osu.Game.Beatmaps.Formats
             };
 
             // osu!taiko and osu!mania use effect points rather than difficulty points for scroll speed adjustments.
-            if (onlineRulesetID == 1 || onlineRulesetID == 3)
+            int onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
+            
+            // FIX: Quick fix for UMania
+            if (onlineRulesetID == 1 || onlineRulesetID == 3 || onlineRulesetID == 5)
                 effectPoint.ScrollSpeed = speedMultiplier;
 
             addControlPoint(time, effectPoint, timingChange);
