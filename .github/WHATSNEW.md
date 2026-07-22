@@ -1,8 +1,8 @@
 ﻿## What's new
 
-- Added support for [Stefy's practice mod](https://github.com/Stefyfresh/UNBEATABLE-practice-mode) for quickly testing charts (requires the latest version of the [Websocket Mod](https://github.com/ErikGXDev/UnbeatableWebsocket) as well)
-- Added the option "Timing > Snap all notes to current snap divisor" from newer osu!lazer versions
-- Added a way to offset all timing points at once, find it in the timing tab
-- macOS support (experimental and untested)
+- Fixed scroll speed not being saved in the editor.
+- Added a "4-key" mode, enable it in the settings.
+  - It rearranges the columns in the editor to allow for a second set of top and bottom lanes.
+  - When zoomed out, it will place flips automatically for notes placed in that second set, to easily create 4-key charts.
 
 **Happy mapping!**
