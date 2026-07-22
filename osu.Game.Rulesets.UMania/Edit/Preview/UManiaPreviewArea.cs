@@ -1,18 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UMania.Edit.Blueprints;
 using osu.Game.Rulesets.UMania.Objects;
@@ -219,6 +215,19 @@ namespace osu.Game.Rulesets.UMania.Edit
             this.MoveToX(-offset, 200, Easing.OutQuint);
         }
 
+        private int getDoubleEndLane(int startLane)
+        {
+            if (startLane == 2) return 3;
+            if (startLane == 3) return 2;
+            
+            if (composer.Is4Key)
+            {
+                if (startLane == 0) return 1;
+                if (startLane == 1) return 0;
+            }
+            return startLane;
+        }
+
 
         protected override void Update()
         {
@@ -248,9 +257,15 @@ namespace osu.Game.Rulesets.UMania.Edit
             {
                 if (obj is not ManiaHitObject note)
                     continue;
+                
+                int column = note.Column;
+                
+                if (!composer.Is4Key && (column == 0 || column == 1))
+                    continue;
+                
 
                 // Target camera notes
-                if (note.Column == 4)
+                if (column == 4)
                 {
                     if (note.StartTime > time + view_field + view_field_tolerance)
                         continue;
@@ -285,10 +300,9 @@ namespace osu.Game.Rulesets.UMania.Edit
                 bool isHold = note is IHasDuration;
                 double endTime = note is IHasDuration duration ? startTime + duration.Duration : startTime;
 
-                int column = note.Column;
 
                 // Check if this note is being hit (within hit window)
-                if ((column == 2 || column == 3) && Math.Abs(time - startTime) < hit_window)
+                if (column >= 0 && column < 4 && Math.Abs(time - startTime) < hit_window)
                 {
                     int innerCircleIndex = getInnerCircleIndexForColumnAndFlip(column, flippedRight);
                     if (innerCircleIndex >= 0)
@@ -299,18 +313,20 @@ namespace osu.Game.Rulesets.UMania.Edit
 
                 if (isHold && endTime > time && startTime < time + view_field + view_field_tolerance)
                 {
-                    var pos = GetPreviewNotePosition(column, startTime, time, flippedRight);
+                    var pos = GetPreviewNotePosition(column, startTime, time, flippedRight, zoomedIn);
 
                     var ubhelper = new UbNoteBuilder(note);
                     var iconType = ubhelper.InferObjectTypeIcon();
 
                     int endColumn = column;
                     if (iconType == UbIconType.Double)
-                        endColumn = column == 2 ? 3 : 2;
+                        endColumn = getDoubleEndLane(column);
 
-                    var tailPos = GetPreviewNotePosition(endColumn, endTime, time, flippedRight);
+                    var tailPos = GetPreviewNotePosition(endColumn, endTime, time, flippedRight, zoomedIn);
 
                     // diagonal for double holds
+                    bool holdFlippedRight = flippedRight;
+                    if (column < 2 && !zoomedIn) holdFlippedRight = !holdFlippedRight;
 
                     if (iconType == UbIconType.Double)
                     {
@@ -318,7 +334,7 @@ namespace osu.Game.Rulesets.UMania.Edit
                         float endY = tailPos.Y;
 
                         double holdDuration = endTime - startTime;
-                        float speedX = flippedRight
+                        float speedX = holdFlippedRight
                             ? (float)((1.0 - right_receptor) / view_field)
                             : -(float)(left_receptor / view_field);
                         float D = (float)holdDuration * speedX;
@@ -328,7 +344,7 @@ namespace osu.Game.Rulesets.UMania.Edit
                             float deltaY = endY - startY;
                             float slope = deltaY / D;
 
-                            float clampedX = flippedRight
+                            float clampedX = holdFlippedRight
                                 ? Math.Max(pos.X, right_receptor)
                                 : Math.Min(pos.X, left_receptor);
                             float lineStartY = tailPos.Y - slope * (tailPos.X - clampedX);
@@ -351,24 +367,24 @@ namespace osu.Game.Rulesets.UMania.Edit
                     else
                     {
                         // clamp hold start to corresponding receptor
-                        if (flippedRight)
+                        if (holdFlippedRight)
                             pos.X = Math.Max(pos.X, right_receptor);
                         else
                             pos.X = Math.Min(pos.X, left_receptor);
 
-                        var holdVisualStart = flippedRight ? pos : tailPos;
-                        var holdVisualEnd = flippedRight ? tailPos : pos;
+                        var holdVisualStart = holdFlippedRight ? pos : tailPos;
+                        var holdVisualEnd = holdFlippedRight ? tailPos : pos;
 
                         var previewHold = getPooledHold();
                         previewHold.Position = holdVisualStart;
                         previewHold.EndPosition = holdVisualEnd;
 
-                        if (!flippedRight)
+                        if (!holdFlippedRight)
                             previewHold.Width = Math.Min(previewHold.Width, left_receptor - previewHold.X);
 
                         previewHold.Show();
 
-                        if (Math.Abs(pos.X - (flippedRight ? right_receptor : left_receptor)) < 0.01f)
+                        if (Math.Abs(pos.X - (holdFlippedRight ? right_receptor : left_receptor)) < 0.01f)
                         {
                             var previewNote2 = getPooledNote();
                             previewNote2.SetIconType(iconType);
@@ -389,7 +405,7 @@ namespace osu.Game.Rulesets.UMania.Edit
                     // Flash the receptor on the opposite lane when a Double hold ends
                     if (iconType == UbIconType.Double && Math.Abs(time - endTime) < hit_window)
                     {
-                        int endInnerCircle = getInnerCircleIndexForColumnAndFlip(endColumn, flippedRight);
+                        int endInnerCircle = getInnerCircleIndexForColumnAndFlip(endColumn, holdFlippedRight);
                         if (endInnerCircle >= 0)
                             hitCircles[endInnerCircle].FlashColour(colourProvider.Background1, (float)flash_duration);
                     }
@@ -445,15 +461,15 @@ namespace osu.Game.Rulesets.UMania.Edit
                 if (note.StartTime > time + view_field + view_field_tolerance) break;
 
 
-                if (column != 2 && column != 3 && column != 5)
+                if (column == 4)
                     continue;
 
                 var previewNote = makeNote(note);
-                previewNote.Position = GetPreviewNotePosition(column, startTime, time, flippedRight);
+                previewNote.Position = GetPreviewNotePosition(column, startTime, time, flippedRight, zoomedIn);
 
                 if (previewNote.IconType == UbIconType.Dodge)
                 {
-                    if (column == 2)
+                    if (column == 2 || column == 0)
                     {
                         // Flip spike when they are on top lane
                         previewNote.Scale = new Vector2(previewNote.Scale.X, -previewNote.Scale.Y);
@@ -520,11 +536,11 @@ namespace osu.Game.Rulesets.UMania.Edit
         private int getInnerCircleIndexForColumnAndFlip(int column, bool flippedRight)
         {
             // Inner circles are at odd indices
-            if (column == 2) // Top column
+            if (column == 2 || column == 0) // Top column
             {
                 return flippedRight ? 5 : 1; // right or left top inner circle
             }
-            else if (column == 3) // Bottom column
+            else if (column == 3 || column == 1) // Bottom column
             {
                 return flippedRight ? 7 : 3; // right or left bottom inner circle
             }
@@ -572,9 +588,15 @@ namespace osu.Game.Rulesets.UMania.Edit
             return note;
         }
 
-        private Vector2 GetPreviewNotePosition(int column, double hitTime, double currentTime, bool flippedRight)
+        private Vector2 GetPreviewNotePosition(int column, double hitTime, double currentTime, bool flippedRight, bool zoomedIn)
         {
             var vector = new Vector2(0);
+
+            if (column <= 1 && !zoomedIn)
+            {
+                flippedRight = !flippedRight;
+            }
+            
             if (flippedRight)
             {
                 vector.X = (float)Map(hitTime, currentTime, currentTime + view_field, right_receptor, 1);
@@ -584,11 +606,11 @@ namespace osu.Game.Rulesets.UMania.Edit
                 vector.X = (float)Map(hitTime, currentTime, currentTime + view_field, left_receptor, 0);
             }
 
-            if (column == 2)
+            if (column == 2 || column == 0)
             {
                 vector.Y = top_receptor;
             }
-            else if (column == 3)
+            else if (column == 3 || column == 1)
             {
                 vector.Y = bottom_receptor;
             }

@@ -209,6 +209,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges, true);
             SetDefault(OsuSetting.EditorNudgeByMilliseconds, true); // FIX: Add Config over here because it is used in osu code
             SetDefault(OsuSetting.PlaySamplesInCameraLane, true); // FIX: Camera lane hit sounds on by default
+            SetDefault(OsuSetting.Editor4KeyMode, false); // FIX: 4-key mode should persist as a config
 
             SetDefault(OsuSetting.HideCountryFlags, false);
 
@@ -499,5 +500,6 @@ namespace osu.Game.Configuration
         
         EditorNudgeByMilliseconds, // FIX: New config, see above fix
         PlaySamplesInCameraLane, // FIX: New config, used by UMania editor to gate camera-lane hit sounds
+        Editor4KeyMode // FIX: 4-key mode should persist as a config
     }
 }

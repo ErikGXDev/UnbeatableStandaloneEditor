@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
@@ -18,12 +19,18 @@ namespace osu.Game.Rulesets.UMania.Edit
         {
         }
 
+        [Resolved] private UnbeatableHitObjectComposer composer { get; set; } = null!;
+
+        private SpriteText labelText;
+        
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             string? label = Index switch
             {
+                0 => "Top F",
+                1 => "Bottom F",
                 2 => "Top",
                 3 => "Bottom",
                 4 => "Camera",
@@ -33,7 +40,7 @@ namespace osu.Game.Rulesets.UMania.Edit
 
             if (label != null)
             {
-                TopLevelContainer.Add(new SpriteText
+                TopLevelContainer.Add(labelText = new SpriteText
                 {
                     Text = label,
                     Anchor = Anchor.BottomCentre,
@@ -44,6 +51,12 @@ namespace osu.Game.Rulesets.UMania.Edit
                     Shadow = true,
                     ShadowColour = Colour4.Black
                 });
+            }
+
+            var is4Key = composer.Is4Key;
+            if (!is4Key && (Index == 0 || Index == 1))
+            {
+                labelText.Alpha = 0;
             }
         }
 

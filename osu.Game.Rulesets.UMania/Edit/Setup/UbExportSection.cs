@@ -14,6 +14,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -42,7 +43,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
         [Resolved] private EditorClock editorClock { get; set; } = null!;
 
-        private UbPlaytestButton websocketButton = null!;
+        [Resolved] private OsuConfigManager config { get; set; } = null!;
+        
+        private bool is4Key => config.Get<bool>(OsuSetting.Editor4KeyMode);
+
+    private UbPlaytestButton websocketButton = null!;
         private CancellationTokenSource websocketCheckCancellation = new CancellationTokenSource();
 
         public void ExportToUnbeatable() => Task.Run(exportToUnbeatable);
@@ -154,7 +159,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             }
 
             PassBeatmapConverter passConverter =
-                new PassBeatmapConverter(targetBeatmap, targetBeatmap.BeatmapInfo.Ruleset.CreateInstance());
+                new PassBeatmapConverter(targetBeatmap, targetBeatmap.BeatmapInfo.Ruleset.CreateInstance(), is4Key);
 
             var playableBeatmap = passConverter.ConvertBeatmap(targetBeatmap, CancellationToken.None);
 
@@ -264,7 +269,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             Logger.Log(beatmap.HitObjects.Count + " hitobjects found.");
 
             PassBeatmapConverter passConverter =
-                new PassBeatmapConverter(beatmap, beatmap.BeatmapInfo.Ruleset.CreateInstance());
+                new PassBeatmapConverter(beatmap, beatmap.BeatmapInfo.Ruleset.CreateInstance(), is4Key);
 
             var playableBeatmap = passConverter.ConvertBeatmap(beatmap, CancellationToken.None);
 

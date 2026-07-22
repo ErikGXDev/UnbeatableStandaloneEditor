@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
@@ -29,6 +30,10 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
         : base(ruleset)
     {
     }
+    
+    [Resolved] private OsuConfigManager config { get; set; } = null!;
+
+    public bool Is4Key => config.Get<bool>(OsuSetting.Editor4KeyMode);
 
     protected override void LoadComplete()
     {

@@ -23,6 +23,16 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
         [Resolved]
         private UnbeatableHitObjectComposer composer { get; set; } = null!;
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            if (composer.Is4Key && columns.Contains(2) && columns.Contains(3))
+            {
+                columns.Add(0);
+                columns.Add(1);
+            }
+        }
+
         protected override bool IsValidForPlacement => base.IsValidForPlacement &&
                                                        (composer.SettingShowAllowedColumns.Value ==
                                                            TernaryState.False || columns.Contains(HitObject.Column));

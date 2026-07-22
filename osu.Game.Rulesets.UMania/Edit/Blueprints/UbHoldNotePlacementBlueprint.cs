@@ -18,6 +18,16 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
             this.columns = columns;
             this.mainBank = mainBank;
         }
+        
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            if (composer.Is4Key && columns.Contains(2) && columns.Contains(3))
+            {
+                columns.Add(0);
+                columns.Add(1);
+            }
+        }
 
         [Resolved]
         private UnbeatableHitObjectComposer? composer { get; set; }

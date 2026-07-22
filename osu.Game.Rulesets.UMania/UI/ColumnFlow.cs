@@ -9,11 +9,13 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
+using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.UMania.Beatmaps;
 using osu.Game.Rulesets.UMania.Configuration;
 using osu.Game.Rulesets.UMania.Skinning;
 using osu.Game.Skinning;
-using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.UMania.UI
 {
@@ -66,17 +68,70 @@ namespace osu.Game.Rulesets.UMania.UI
         [Resolved]
         private ISkinSource skin { get; set; } = null!;
 
+        [Resolved] private OsuConfigManager configManager { get; set; } = null!;
+
 
         [BackgroundDependencyLoader]
-        private void load(ManiaRulesetConfigManager? rulesetConfig)
+        private void load(ManiaRulesetConfigManager? rulesetConfig, OsuColour color)
         {
 
             skin.SourceChanged += invalidateLayout;
         }
 
+        private bool is4Key = false;
+        private Color4 c1Color = Color4.LightBlue;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            
+            // FIX: Move columns based on 4 key
+            is4Key = configManager.Get<bool>(OsuSetting.Editor4KeyMode);
+
+            if (is4Key)
+            {
+                // Old: 0,1,2,3,4,5
+                // New: 0,2,3,1,4,5
+
+                var c2 = Content[2];
+                var tl2 = c2.Position;
+                
+                var c1 = Content[1];
+                var tl1  = c1.Position;
+                
+                var delta12 = tl1.X - tl2.X;
+                c2.X = -62;
+                
+                var c3 = Content[3];
+                c3.X = -62;
+
+                c1.X = 124;
+
+                if (c1 is Column column)
+                {
+                    c1Color = skin.GetManiaSkinConfig<Color4>(
+                        LegacyManiaSkinConfigurationLookups.ColumnBackgroundColour,
+                        0)?.Value ?? Color4.LightBlue;
+                    column.AccentColour.Value = c1Color;
+                }
+
+            }
+        }
+
+
         protected override void Update()
         {
             base.Update();
+
+            // Odd fix
+            if (is4Key)
+            {
+                var c1 = Content[1];
+                if (c1 is Column column)
+                {
+                    column.AccentColour.Value = c1Color;
+                }
+            }
 
             if (!layout.IsValid)
             {

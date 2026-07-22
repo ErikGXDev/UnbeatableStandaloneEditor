@@ -26,7 +26,6 @@ public partial class SettingsPopover : OsuPopover
     { }
 
     private OsuCheckbox mouseCheckbox = null!;
-    private TooltipCheckbox nudgeCheckbox = null!;
     private OsuScrollContainer keybindingsContainer = null!;
     private RoundedButton editKeybindingsButton = null!;
 
@@ -60,7 +59,7 @@ public partial class SettingsPopover : OsuPopover
                             Margin = new MarginPadding { Bottom = 10, Top = 5 },
 
                         },
-                        nudgeCheckbox = new TooltipCheckbox
+                        new TooltipCheckbox
                         {
                             LabelText = "Nudge by 1ms (J/K)",
                             TooltipText = "When on, pressing J/K nudges notes 1ms up/down instead of a full beat.\n(This feature may be useful for placement ordering.)",
@@ -76,6 +75,14 @@ public partial class SettingsPopover : OsuPopover
                             Current = osuConfig.GetBindable<bool>(OsuSetting.PlaySamplesInCameraLane),
                             Margin = new MarginPadding { Bottom = 10 },
                         },
+                        new TooltipCheckbox
+                        {
+                            LabelText = "Enable 4-key mode in editor",
+                            TooltipText = "The first two columns turn into another set of top and bottom lanes.\nThe columns will also be re-arranged slightly.\nWhen zoomed out, notes in the new columns will automatically be flipped.\nWhen zoomed in, the colums simply act as another set of top and bottom lanes.",
+                            RelativeSizeAxes = Axes.X,
+                            Current = osuConfig.GetBindable<bool>(OsuSetting.Editor4KeyMode),
+                            Margin = new MarginPadding { Bottom = 10 },
+                        }
                     },
                 },
                 new SettingsGroup
@@ -122,12 +129,12 @@ public partial class SettingsPopover : OsuPopover
                 {
                     Text = "Key Bindings",
                     Font = OsuFont.Default.With(size: 16, weight: FontWeight.Bold),
-                    Margin = new MarginPadding { Top = 15, Bottom = 5 },
+                    Margin = new MarginPadding { Top = 10, Bottom = 5 },
                 },
                 keybindingsContainer = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 190,
+                    Height = 165,
                     Masking = true,
                     AlwaysPresent = false,
                     Child = new EditorKeyBindingsSubsection(),

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
-using MongoDB.Bson;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UMania.Objects;
@@ -14,10 +13,13 @@ namespace osu.Game.Rulesets.UMania.Beatmaps;
 
 public class PassBeatmapConverter : BeatmapConverter<HitObject>
 {
-    public PassBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
+    public PassBeatmapConverter(IBeatmap beatmap, Ruleset ruleset, bool is4key)
         : base(beatmap, ruleset)
     {
+        this.is4Key = is4key;
     }
+    
+    private bool is4Key;
 
     public override bool CanConvert() => true;
 
@@ -32,6 +34,8 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
 
         // Clone hitobjects to avoid mutating the original beatmap
         var clonedHitObjects = new List<HitObject>(convertBeatmap.HitObjects.Count);
+
+        var zoomedOut4Key = false;
         
         foreach (var hitObject in convertBeatmap.HitObjects)
         {
@@ -78,8 +82,44 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
             {
                 xPosition.X = GetColumn(xPosition.X);
             }
+
+            if (is4Key && cloned is IHasXPosition xPosition3)
+            {
+                // Manual check here because UbNoteBuilder wasnt working
+                if ((int)(xPosition3.X) == 4)
+                {
+                    if (cloned.Samples.Any(s => s.Name == HitSampleInfo.HIT_WHISTLE))
+                    {
+                        Logger.Log("Found zoomout");
+                        zoomedOut4Key = !zoomedOut4Key;
+                    }
+                
+                }
+            }
+
+            if (cloned is IHasXPosition xPosition2 && xPosition2.X < 2 && is4Key)
+            {
+                xPosition2.X += 2;
+
+                if (zoomedOut4Key)
+                {
+                    var flip1 = new Note() { StartTime = cloned.StartTime - 0.3, Column = 4 };
+                    clonedHitObjects.Add(flip1);
+                }
+
+                clonedHitObjects.Add(cloned);
+                
+                if (zoomedOut4Key)
+                {
+                    var flip2 = new Note() { StartTime = cloned.StartTime + 0.3, Column = 4 };
+                    clonedHitObjects.Add(flip2);
+                }
+            }
+            else
+            {
+                clonedHitObjects.Add(cloned);
+            }
             
-            clonedHitObjects.Add(cloned);
         }
 
         convertBeatmap.HitObjects = clonedHitObjects;
