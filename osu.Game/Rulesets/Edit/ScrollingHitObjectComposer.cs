@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Edit
         private readonly Bindable<TernaryState> showSpeedChanges = new Bindable<TernaryState>();
         private Bindable<bool> configShowSpeedChanges = null!;
 
-        private BeatSnapGrid? beatSnapGrid;
+        protected BeatSnapGrid? BeatSnapGrid { get; private set; }
 
         /// <summary>
         /// Construct an optional beat snap grid.
@@ -78,10 +78,10 @@ namespace osu.Game.Rulesets.Edit
                 }, true);
             }
 
-            beatSnapGrid = CreateBeatSnapGrid();
+            BeatSnapGrid = CreateBeatSnapGrid();
 
-            if (beatSnapGrid != null)
-                AddInternal(beatSnapGrid);
+            if (BeatSnapGrid != null)
+                AddInternal(BeatSnapGrid);
 
             EditorBeatmap.ControlPointInfo.ControlPointsChanged += expireComposeScreenOnControlPointChange;
         }
@@ -90,30 +90,30 @@ namespace osu.Game.Rulesets.Edit
         {
             base.UpdateAfterChildren();
 
-            updateBeatSnapGrid();
+            UpdateBeatSnapGrid();
         }
 
-        private void updateBeatSnapGrid()
+        protected virtual void UpdateBeatSnapGrid()
         {
-            if (beatSnapGrid == null)
+            if (BeatSnapGrid == null)
                 return;
 
             if (BlueprintContainer.CurrentTool is SelectTool)
             {
                 if (EditorBeatmap.SelectedHitObjects.Any())
                 {
-                    beatSnapGrid.SelectionTimeRange = (EditorBeatmap.SelectedHitObjects.Min(h => h.StartTime), EditorBeatmap.SelectedHitObjects.Max(h => h.GetEndTime()));
+                    BeatSnapGrid.SelectionTimeRange = (EditorBeatmap.SelectedHitObjects.Min(h => h.StartTime), EditorBeatmap.SelectedHitObjects.Max(h => h.GetEndTime()));
                 }
                 else
-                    beatSnapGrid.SelectionTimeRange = null;
+                    BeatSnapGrid.SelectionTimeRange = null;
             }
             else
             {
                 var result = FindSnappedPositionAndTime(InputManager.CurrentState.Mouse.Position);
                 if (result.Time is double time)
-                    beatSnapGrid.SelectionTimeRange = (time, time);
+                    BeatSnapGrid.SelectionTimeRange = (time, time);
                 else
-                    beatSnapGrid.SelectionTimeRange = null;
+                    BeatSnapGrid.SelectionTimeRange = null;
             }
         }
 
