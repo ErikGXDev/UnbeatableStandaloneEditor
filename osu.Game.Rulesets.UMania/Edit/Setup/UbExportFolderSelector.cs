@@ -23,6 +23,7 @@ public partial class UbExportFolderSelector : FormBeatmapFileSelector
     public UbExportFolderSelector(bool beatmapHasMultipleDifficulties, params string[] handledExtensions)
         : base(beatmapHasMultipleDifficulties, handledExtensions)
     {
+        ShouldAcceptFiles = false;
     }
 
     [BackgroundDependencyLoader]
