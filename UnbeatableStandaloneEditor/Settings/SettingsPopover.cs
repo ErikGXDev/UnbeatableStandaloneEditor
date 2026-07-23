@@ -82,6 +82,14 @@ public partial class SettingsPopover : OsuPopover
                             RelativeSizeAxes = Axes.X,
                             Current = osuConfig.GetBindable<bool>(OsuSetting.Editor4KeyMode),
                             Margin = new MarginPadding { Bottom = 10 },
+                        },
+                        new TooltipCheckbox
+                        {
+                            LabelText = "Enable key-based charting",
+                            TooltipText = "Press 1-6 to place notes in the corresponding column, similar to the official editor.\nHold a key and scroll to create hold notes.\nUse Shift to place a Dodge, Double or Zoom note (depending on the column).\nModifier buttons (Q-P) still apply to placed notes.\n(Experimental!)",
+                            RelativeSizeAxes = Axes.X,
+                            Current = osuConfig.GetBindable<bool>(OsuSetting.EditorKeyBasedCharting),
+                            Margin = new MarginPadding { Bottom = 10 },
                         }
                     },
                 },

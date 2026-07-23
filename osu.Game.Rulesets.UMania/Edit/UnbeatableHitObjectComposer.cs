@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -18,7 +19,10 @@ using osu.Game.Rulesets.UMania.Edit.Blueprints;
 using osu.Game.Rulesets.UMania.Edit.Composition;
 using osu.Game.Rulesets.UMania.Objects;
 using osu.Game.Rulesets.UMania.Objects.Drawables;
+using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
+using osu.Framework.Testing;
 using osuTK;
 
 namespace osu.Game.Rulesets.UMania.Edit;
@@ -34,6 +38,10 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     [Resolved] private OsuConfigManager config { get; set; } = null!;
 
     public bool Is4Key => config.Get<bool>(OsuSetting.Editor4KeyMode);
+
+    public Bindable<bool> KeyBasedCharting { get; private set; } = null!;
+
+    private KeyBasedChartingHandler keyBasedChartingHandler = null!;
 
     protected override void LoadComplete()
     {
@@ -115,6 +123,35 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
 
         PlayfieldContentContainer.Add(timingPopup);
 
+        keyBasedChartingHandler = new KeyBasedChartingHandler
+        {
+            RelativeSizeAxes = Axes.Both,
+        };
+        PlayfieldContentContainer.Add(keyBasedChartingHandler);
+
+        KeyBasedCharting = config.GetBindable<bool>(OsuSetting.EditorKeyBasedCharting);
+        KeyBasedCharting.BindValueChanged(v =>
+        {
+            keyBasedChartingHandler.Enabled = v.NewValue;
+            EditorKeyBasedCharting.IsActive = v.NewValue;
+            SettingUseKeyCharting.Value = v.NewValue ? TernaryState.True : TernaryState.False;
+
+            foreach (var button in toolboxCollection.ChildrenOfType<EditorRadioButton>())
+            {
+                if (button.Button is HitObjectCompositionToolButton toolButton)
+                {
+                    bool isSelect = toolButton.Tool is SelectTool;
+                    button.Alpha = isSelect || !v.NewValue ? 1 : 0;
+                }
+            }
+
+            // Auto-switch to select tool when enabling key-based charting on a non-select tool.
+            if (v.NewValue && BlueprintContainer.CurrentTool is not SelectTool)
+                SetSelectTool();
+        }, true);
+
+        SettingUseKeyCharting.BindValueChanged(v => KeyBasedCharting.Value = v.NewValue == TernaryState.True);
+
         hasTimingHandler = hasTiming =>
         {
             timingPopup.FadeTo(hasTiming.NewValue ? 0 : 1, 300, Easing.OutQuint);
@@ -159,6 +196,8 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     public Bindable<TernaryState> SettingShowPlacementOrder = new Bindable<TernaryState>(TernaryState.True);
     
     public Bindable<TernaryState> SettingShowPreview = new Bindable<TernaryState>(TernaryState.True);
+
+    private Bindable<TernaryState> SettingUseKeyCharting = new Bindable<TernaryState>(TernaryState.False);
     
     public DrawableTernaryButton ModFlyingButton = null!;
     public DrawableTernaryButton ModInvisibleButton = null!;
@@ -411,6 +450,13 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
                         Current = SettingShowPreview,
                         Description = "Show preview",
                         CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Tv },
+                    },
+                    new DrawableTernaryButton
+                    {
+                        Current = SettingUseKeyCharting,
+                        Description = "Key-based charting",
+                        TooltipText = "Press 1-6 to place notes in the corresponding column, similar to the official editor.\nHold a key and scroll to create hold notes.\nUse Shift to place a Dodge, Double or Zoom note (depending on the column).\nModifier buttons (Q-P) still apply to placed notes.\n(Experimental!)",
+                        CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Keyboard },
                     }
                 ]
             },
@@ -530,7 +576,7 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
                 // With a selection, a button is only revealed if it applies to EVERY selected notes tool
                 // Without a selection, fall back to the current placement tool.
                 bool appliesToSelection = selectedToolNames.Count > 0 && selectedToolNames.All(tools.Contains);
-                bool appliesToTool = selectedToolNames.Count == 0 && tools.Contains(currentToolName);
+                bool appliesToTool = selectedToolNames.Count == 0 && (tools.Contains(currentToolName) || KeyBasedCharting.Value);
                 bool shouldEnable = (appliesToSelection || appliesToTool) && predicateResult;
 
                 // Cop conversion is only valid when every selected note can be a cop note.
@@ -592,9 +638,55 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
         }
     }
 
+    protected override void UpdateBeatSnapGrid()
+    {
+        base.UpdateBeatSnapGrid();
+
+        // When key-charting is active with the Select tool and no selection,
+        // show the grid across the entire visible column range.
+        if (KeyBasedCharting.Value
+            && BlueprintContainer.CurrentTool is SelectTool
+            && !EditorBeatmap.SelectedHitObjects.Any()
+            && BeatSnapGrid != null)
+        {
+            double currentTime = EditorClock.CurrentTime;
+            double visibleTime = ScrollingInfo.TimeRange.Value;
+            BeatSnapGrid.SelectionTimeRange = (currentTime - visibleTime, currentTime + visibleTime);
+        }
+    }
+
+    protected override bool OnKeyDown(KeyDownEvent e)
+    {
+        if (!e.ControlPressed && !e.AltPressed && !e.SuperPressed)
+        {
+            if (keyBasedChartingHandler != null && keyBasedChartingHandler.TryPlaceNote(e.Key, e.ShiftPressed))
+                return true;
+        }
+
+        return base.OnKeyDown(e);
+    }
+
+    protected override void OnKeyUp(KeyUpEvent e)
+    {
+        keyBasedChartingHandler?.TryReleaseKey(e.Key);
+    }
+
+    protected override bool OnScroll(ScrollEvent e)
+    {
+        double scrollDelta = e.ScrollDelta.Y != 0 ? e.ScrollDelta.Y : e.ScrollDelta.X;
+
+        if (keyBasedChartingHandler != null && keyBasedChartingHandler.TryAdjustHold(scrollDelta, e.ShiftPressed))
+            return true;
+
+        return base.OnScroll(e);
+    }
+
     protected override void Dispose(bool isDisposing)
     {
         base.Dispose(isDisposing);
+
+        if (KeyBasedCharting.Value)
+            EditorKeyBasedCharting.IsActive = false;
 
         if (hasTimingHandler != null)
             EditorBeatmap.HasTiming.ValueChanged -= hasTimingHandler;

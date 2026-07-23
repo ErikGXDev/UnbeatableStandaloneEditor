@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
             ApplyModifierLayer();
         }
 
-        private void ApplyModifierLayer()
+        public void ApplyModifierLayer()
         {
             if (isModActive(composer.ModCopButton))
             {
