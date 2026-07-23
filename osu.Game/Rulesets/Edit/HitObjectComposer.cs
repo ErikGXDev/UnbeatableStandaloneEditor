@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Edit
         private Box leftToolboxBackground;
         private Box rightToolboxBackground;
 
-        private EditorRadioButtonCollection toolboxCollection;
+        protected EditorRadioButtonCollection toolboxCollection;
         private FillFlowContainer togglesCollection;
         private FillFlowContainer sampleBankTogglesCollection;
 
@@ -425,7 +425,8 @@ namespace osu.Game.Rulesets.Edit
                 }
                 else
                 {
-                    if (togglesCollection.ChildrenOfType<DrawableTernaryButton>().ElementAtOrDefault(rightIndex) is DrawableTernaryButton button)
+                    // FIX: Don't factor in hidden modifiers when pressing Q-P
+                    if (togglesCollection.ChildrenOfType<DrawableTernaryButton>().Where(b => b.Alpha > 0).ElementAtOrDefault(rightIndex) is DrawableTernaryButton button)
                     {
                         button.Toggle();
                         return true;
