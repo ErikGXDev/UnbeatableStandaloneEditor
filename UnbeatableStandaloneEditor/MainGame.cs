@@ -67,7 +67,6 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
 
         if (host.Window != null)
         {
-            host.Window.CursorState |= CursorState.Hidden;
             host.Window.DragDrop += onWindowDragDrop;
         }
     }
