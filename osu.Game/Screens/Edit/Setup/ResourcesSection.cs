@@ -97,6 +97,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Caption = "Custom Hitsound (global)",
                     PlaceholderText = "Click to add a hitsound",
+                    ShouldAcceptFiles = false,
                     Margin = new MarginPadding { Top = 8 }
                 },
                 hitsoundDeleteButton = new HitsoundDeleteButton()

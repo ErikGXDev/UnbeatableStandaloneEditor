@@ -39,6 +39,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public IEnumerable<string> HandledExtensions => handledExtensions;
 
+        /// FIX: Add another check to prevent the hitsound input from accepting drag-and-drop
+        public bool ShouldAcceptFiles = true;
+
         private readonly string[] handledExtensions;
 
         /// <summary>
@@ -176,7 +179,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 onFileSelected();
             }, true);
             FinishTransforms(true);
-            game.RegisterImportHandler(this);
+            
+            if (ShouldAcceptFiles)
+                game.RegisterImportHandler(this);
         }
 
         private void onFileSelected()

@@ -6,6 +6,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.Handlers.Mouse;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Threading;
 using osu.Game;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
@@ -64,7 +65,44 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
             host.Window.CursorState |= CursorState.Hidden;
         }
 
+        if (host.Window != null)
+        {
+            host.Window.CursorState |= CursorState.Hidden;
+            host.Window.DragDrop += onWindowDragDrop;
+        }
     }
+
+
+    // Drag and drop logic taken straight from OsuGame.cs
+    private readonly List<string> dragDropFiles = new List<string>();
+    private ScheduledDelegate dragDropImportSchedule;
+
+    private void onWindowDragDrop(string path)
+    {
+        lock (dragDropFiles)
+        {
+            dragDropFiles.Add(path);
+
+            Logger.Log($@"Adding ""{Path.GetFileName(path)}"" for import");
+
+            dragDropImportSchedule?.Cancel();
+            dragDropImportSchedule = Scheduler.AddDelayed(handlePendingDragDropImports, 100);
+        }
+
+        void handlePendingDragDropImports()
+        {
+            lock (dragDropFiles)
+            {
+                Logger.Log($"Handling batch import of {dragDropFiles.Count} files");
+
+                string[] paths = dragDropFiles.ToArray();
+                dragDropFiles.Clear();
+
+                Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
+            }
+        }
+    }
+
 
     public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
     {
