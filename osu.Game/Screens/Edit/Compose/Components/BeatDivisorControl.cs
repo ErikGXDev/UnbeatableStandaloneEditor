@@ -205,6 +205,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             if (e.ShiftPressed && e.Key >= Key.Number1 && e.Key <= Key.Number9)
             {
+                // FIX: When key-based charting is active, Shift+1-6 are used for modifier placement.
+                if (EditorKeyBasedCharting.IsActive && e.Key <= Key.Number6)
+                    return false;
+
                 beatDivisor.SetArbitraryDivisor(e.Key - Key.Number0);
                 return true;
             }

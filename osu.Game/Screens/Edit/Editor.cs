@@ -1391,7 +1391,8 @@ namespace osu.Game.Screens.Edit
 
         private void seek(UIEvent e, int direction)
         {
-            double amount = e.ShiftPressed ? 4 : 1;
+            // FIX: Don't scroll fast with key-charting
+            double amount = e.ShiftPressed && !EditorKeyBasedCharting.IsActive ? 4 : 1;
 
             bool trackPlaying = clock.IsRunning;
 
