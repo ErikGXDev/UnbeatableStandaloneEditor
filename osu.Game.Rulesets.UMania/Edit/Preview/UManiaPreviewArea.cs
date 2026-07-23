@@ -524,8 +524,8 @@ namespace osu.Game.Rulesets.UMania.Edit
 
                 if (ubhelper.InferObjectModifierIcons().Contains(UbIconType.ModSwapImmediate))
                     continue;
-
-                double twoBeats = editorBeatmap.GetBeatLengthAtTime(note.StartTime) * 2;
+                
+                double twoBeats = editorBeatmap.ControlPointInfo.TimingPointAt(note.StartTime).BeatLength;
                 if (note.StartTime - currentTime <= twoBeats)
                     return true;
             }
