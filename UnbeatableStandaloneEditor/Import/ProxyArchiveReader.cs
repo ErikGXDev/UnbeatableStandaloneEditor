@@ -64,8 +64,12 @@ public class ProxyArchiveReader : ArchiveReader
         var isBeatmap = false;
         if (name.EndsWith(".txt.osu"))
         {
-            isBeatmap = true;
             entryName = name.Substring(0, name.Length - 4);
+        }
+
+        if (name.EndsWith(".txt") || name.EndsWith(".osu"))
+        {
+            isBeatmap = true;
         }
 
         var entry = archive.Entries.SingleOrDefault(e => e.Key == entryName);

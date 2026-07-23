@@ -18,6 +18,7 @@ using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
+using osuTK;
 using osuTK.Graphics;
 
 namespace UnbeatableStandaloneEditor.Import;
@@ -41,28 +42,42 @@ public partial class ImportPopover : OsuPopover
         {
             Direction = FillDirection.Vertical,
             Width = 600,
-            Height = 400,
+            Height = 355,
             Children = new Drawable[]
             {
-                new OsuSpriteText()
+                new FillFlowContainer()
                 {
-                    Text = "Import Beatmap Package (.zip)",
-                    Font = OsuFont.Default.With(size: 18, weight: FontWeight.Bold),
-                    Margin = new MarginPadding() { Left = 16, Top = 16, Bottom = 4},
+                    Size = new Vector2(600, 55),
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText()
+                        {
+                            Text = "Import Beatmap Package (.zip)",
+                            Font = OsuFont.Default.With(size: 18, weight: FontWeight.Bold),
+                            Margin = new MarginPadding() { Left = 16, Top = 16, Bottom = 4},
+                        },
+                        new OsuSpriteText()
+                        {
+                            AllowMultiline = true,
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Select a .zip file and it will be imported automatically. (Highly experimental!)",
+                            Font = OsuFont.Default.With(size: 14, weight: FontWeight.Regular),
+                            Colour = colourProvider.Content1.Opacity(0.75f),
+                            Margin = new MarginPadding { Left = 16, Bottom = 6 },
+                        },
+                    }
                 },
-                new OsuSpriteText()
+                new Container
                 {
-                    AllowMultiline = true,
-                    RelativeSizeAxes = Axes.X,
-                    Text = "Select a .zip file and it will be imported automatically. (Highly experimental!)",
-                    Font = OsuFont.Default.With(size: 14, weight: FontWeight.Regular),
-                    Colour = colourProvider.Content1.Opacity(0.75f),
-                    Margin = new MarginPadding { Left = 16, Bottom = 6 },
-                },
-                fileSelector = new OsuFileSelector(validFileExtensions: new[] { ".zip" })
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
+                    Size = new Vector2(600, 300),
+                    Padding = new MarginPadding { Bottom = 1 },
+                    Child = fileSelector = new OsuFileSelector(validFileExtensions: new[] { ".zip", ".txt", ".osu" })
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                }
+
             }
         };
 
@@ -120,10 +135,20 @@ public partial class ImportPopover : OsuPopover
         try
         {
 
-            var archiveReader = new ProxyArchiveReader(filePath);
-            Logger.Log(string.Join(",", archiveReader.Filenames));
+            if (filePath.EndsWith(".txt") || filePath.EndsWith(".osu"))
+            {
+                var archiveReader = new SingleFileArchiveReader(new List<string>() { filePath });
+                Logger.Log(string.Join(",", archiveReader.Filenames));
+                beatmapManager.Import(new BeatmapSetInfo(), archiveReader);
+            }
+            else if (filePath.EndsWith(".zip"))
+            {
+                var archiveReader = new ProxyArchiveReader(filePath);
+                Logger.Log(string.Join(",", archiveReader.Filenames));
 
-            beatmapManager.Import(new BeatmapSetInfo(), archiveReader);
+                beatmapManager.Import(new BeatmapSetInfo(), archiveReader);
+            }
+
 
             Logger.Log($"Beatmap successfully added to database!");
             showToast("Imported package successfully!");
