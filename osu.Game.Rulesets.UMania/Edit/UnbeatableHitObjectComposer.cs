@@ -646,12 +646,11 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
         // show the grid across the entire visible column range.
         if (KeyBasedCharting.Value
             && BlueprintContainer.CurrentTool is SelectTool
-            && !EditorBeatmap.SelectedHitObjects.Any()
             && BeatSnapGrid != null)
         {
             double currentTime = EditorClock.CurrentTime;
             double visibleTime = ScrollingInfo.TimeRange.Value;
-            BeatSnapGrid.SelectionTimeRange = (currentTime - visibleTime, currentTime + visibleTime);
+            BeatSnapGrid.SelectionTimeRange = (currentTime, currentTime + visibleTime - 700);
         }
     }
 
