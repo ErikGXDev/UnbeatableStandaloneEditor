@@ -195,7 +195,8 @@ public partial class BeatmapPickerScreen : OsuScreen
                         }
                     }
                 ]
-            }
+            },
+            new ImportDropper()
         ];
     }
 

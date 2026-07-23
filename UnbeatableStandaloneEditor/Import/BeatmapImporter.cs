@@ -16,9 +16,37 @@ using osu.Game.Rulesets.UMania.Edit.Blueprints;
 
 namespace UnbeatableStandaloneEditor.Import;
 
-public static class BeatmapImporter
+public class BeatmapImporter
 {
 
+    public static bool ImportBeatmap(string filePath, BeatmapManager beatmapManager)
+    {
+        try
+        {
+
+            if (filePath.EndsWith(".txt") || filePath.EndsWith(".osu"))
+            {
+                var archiveReader = new SingleFileArchiveReader(new List<string>() { filePath });
+                Logger.Log(string.Join(",", archiveReader.Filenames));
+                beatmapManager.Import(new BeatmapSetInfo(), archiveReader);
+            }
+            else if (filePath.EndsWith(".zip"))
+            {
+                var archiveReader = new ProxyArchiveReader(filePath);
+                Logger.Log(string.Join(",", archiveReader.Filenames));
+
+                beatmapManager.Import(new BeatmapSetInfo(), archiveReader);
+            }
+
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"Error importing beatmap: {ex.Message}");
+            return false;
+        }
+    }
 
     // Simply take in a stream, re-encode the beatmap, and put it in a new stream
     public static Stream ModifyBeatmap(Stream stream)
