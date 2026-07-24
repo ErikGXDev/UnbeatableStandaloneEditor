@@ -23,156 +23,179 @@ namespace UnbeatableStandaloneEditor.Settings;
 public partial class SettingsPopover : OsuPopover
 {
     public SettingsPopover() : base(false)
-    { }
+    {
+    }
 
     private OsuCheckbox mouseCheckbox = null!;
     private OsuScrollContainer keybindingsContainer = null!;
     private RoundedButton editKeybindingsButton = null!;
 
     [BackgroundDependencyLoader]
-    private void load(OverlayColourProvider colourProvider, AudioManager audio, GameHost host, EditorConfigManager editorConfig, OsuConfigManager osuConfig)
+    private void load(OverlayColourProvider colourProvider, AudioManager audio, GameHost host,
+        EditorConfigManager editorConfig, OsuConfigManager osuConfig)
     {
-        Child = new FillFlowContainer
+        Child = new Container()
         {
             Width = 340,
-            AutoSizeAxes = Axes.Y,
-            Padding = new MarginPadding(16),
-            Direction = FillDirection.Vertical,
-            Children = new Drawable[]
+            Height = 700,
+            Child = new OsuScrollContainer()
             {
-                new OsuSpriteText()
-                {
-                    Text = "Settings",
-                    Font = OsuFont.Default.With(size: 18, weight: FontWeight.Bold),
-                    Margin = new MarginPadding { Bottom = 10 },
-                },
-                new SettingsGroup
-                {
-                    Label = "General",
-                    Controls = new Drawable[]
-                    {
-                        mouseCheckbox = new OsuCheckbox()
-                        {
-                            LabelText =  "Show system cursor",
-                            RelativeSizeAxes = Axes.X,
-                            Current = new Bindable<bool>(true),
-                            Margin = new MarginPadding { Bottom = 10, Top = 5 },
+                Padding = new MarginPadding(6),
 
-                        },
-                        new TooltipCheckbox
-                        {
-                            LabelText = "Nudge by 1ms (J/K)",
-                            TooltipText = "When on, pressing J/K nudges notes 1ms up/down instead of a full beat.\n(This feature may be useful for placement ordering.)",
-                            RelativeSizeAxes = Axes.X,
-                            Current = osuConfig.GetBindable<bool>(OsuSetting.EditorNudgeByMilliseconds),
-                            Margin = new MarginPadding { Bottom = 10 },
-                        },
-                        new TooltipCheckbox
-                        {
-                            LabelText = "Play hitsounds in camera lane",
-                            TooltipText = "When off, hitting notes in the camera lane will not play their hit sound.",
-                            RelativeSizeAxes = Axes.X,
-                            Current = osuConfig.GetBindable<bool>(OsuSetting.PlaySamplesInCameraLane),
-                            Margin = new MarginPadding { Bottom = 10 },
-                        },
-                        new TooltipCheckbox
-                        {
-                            LabelText = "Enable 4-key mode in editor",
-                            TooltipText = "The first two columns turn into another set of top and bottom lanes.\nThe columns will also be re-arranged slightly.\nWhen zoomed out, notes in the new columns will automatically be flipped.\nWhen zoomed in, the columns simply act as another set of top and bottom lanes.\n(Experimental!)",
-                            RelativeSizeAxes = Axes.X,
-                            Current = osuConfig.GetBindable<bool>(OsuSetting.Editor4KeyMode),
-                            Margin = new MarginPadding { Bottom = 10 },
-                        },
-                        new TooltipCheckbox
-                        {
-                            LabelText = "Enable key-based charting",
-                            TooltipText = "Press 1-6 to place notes in the corresponding column, similar to the official editor.\nHold a key and scroll to create hold notes.\nUse Shift to place a Dodge, Double or Zoom note (depending on the column).\nModifier buttons (Q-P) still apply to placed notes.\n(Experimental!)",
-                            RelativeSizeAxes = Axes.X,
-                            Current = osuConfig.GetBindable<bool>(OsuSetting.EditorKeyBasedCharting),
-                            Margin = new MarginPadding { Bottom = 10 },
-                        }
-                    },
-                },
-                new SettingsGroup
+                RelativeSizeAxes = Axes.Both,
+                Child = new FillFlowContainer()
                 {
-                    Label = "Volume",
-                    Controls = new Drawable[]
+                    Padding = new MarginPadding(12),
+                    Width = 320,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 5),
+                    Children = new Drawable[]
                     {
-                        new MenuLabel("Master Volume"),
-                        new VolumeSlider(audio.Volume),
-                        new MenuLabel("Music"),
-                        new VolumeSlider(audio.VolumeTrack),
-                        new MenuLabel("Effects"),
-                        new VolumeSlider(audio.VolumeSample),
-                    },
-                },
 
-                new SettingsGroup
-                {
-                    Label = "Websocket",
-                    Controls = new Drawable[]
-                    {
-                        new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 14, weight: FontWeight.Regular))
+                        new OsuSpriteText()
+                        {
+                            Text = "Settings",
+                            Font = OsuFont.Default.With(size: 18, weight: FontWeight.Bold),
+                            Margin = new MarginPadding { Bottom = 10 },
+                        },
+                        new SettingsGroup
+                        {
+                            Label = "General",
+                            Controls = new Drawable[]
+                            {
+                                mouseCheckbox = new OsuCheckbox()
+                                {
+                                    LabelText = "Show system cursor",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = new Bindable<bool>(true),
+                                    Margin = new MarginPadding { Bottom = 10, Top = 5 },
+                                },
+                                new TooltipCheckbox
+                                {
+                                    LabelText = "Nudge by 1ms (J/K)",
+                                    TooltipText =
+                                        "When on, pressing J/K nudges notes 1ms up/down instead of a full beat.\n(This feature may be useful for placement ordering.)",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = osuConfig.GetBindable<bool>(OsuSetting.EditorNudgeByMilliseconds),
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                },
+                                new TooltipCheckbox
+                                {
+                                    LabelText = "Play hitsounds in camera lane",
+                                    TooltipText =
+                                        "When off, hitting notes in the camera lane will not play their hit sound.",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = osuConfig.GetBindable<bool>(OsuSetting.PlaySamplesInCameraLane),
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                },
+                                new TooltipCheckbox
+                                {
+                                    LabelText = "Enable 4-key mode in editor",
+                                    TooltipText =
+                                        "The first two columns turn into another set of top and bottom lanes.\nThe columns will also be re-arranged slightly.\nWhen zoomed out, notes in the new columns will automatically be flipped.\nWhen zoomed in, the columns simply act as another set of top and bottom lanes.\n(Experimental!)",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = osuConfig.GetBindable<bool>(OsuSetting.Editor4KeyMode),
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                },
+                                new TooltipCheckbox
+                                {
+                                    LabelText = "Enable key-based charting",
+                                    TooltipText =
+                                        "Press 1-6 to place notes in the corresponding column, similar to the official editor.\nHold a key and scroll to create hold notes.\nUse Shift to place a Dodge, Double or Zoom note (depending on the column).\nModifier buttons (Q-P) still apply to placed notes.\n(Experimental!)",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = osuConfig.GetBindable<bool>(OsuSetting.EditorKeyBasedCharting),
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                }
+                            },
+                        },
+                        new SettingsGroup
+                        {
+                            Label = "Volume",
+                            Controls = new Drawable[]
+                            {
+                                new MenuLabel("Master Volume"),
+                                new VolumeSlider(audio.Volume),
+                                new MenuLabel("Music"),
+                                new VolumeSlider(audio.VolumeTrack),
+                                new MenuLabel("Effects"),
+                                new VolumeSlider(audio.VolumeSample),
+                            },
+                        },
+
+                        new SettingsGroup
+                        {
+                            Label = "Websocket",
+                            Controls = new Drawable[]
+                            {
+                                new OsuTextFlowContainer(t =>
+                                    t.Font = OsuFont.Default.With(size: 14, weight: FontWeight.Regular))
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Text =
+                                        "Install the Websocket mod to quickly test your maps in UNBEATABLE through the editor.",
+                                    Colour = colourProvider.Content1.Opacity(0.75f),
+                                    Margin = new MarginPadding { Bottom = 8 },
+                                },
+                                new RoundedButton
+                                {
+                                    Width = 150,
+                                    Height = 30,
+                                    Text = "Download",
+                                    Colour = colourProvider.Colour1,
+                                    BackgroundColour = colourProvider.Background2,
+                                    Scale = new Vector2(0.9f),
+                                    Action = () =>
+                                        BrowserUtil.OpenUrl(
+                                            "https://github.com/ErikGXDev/UnbeatableWebsocket#readme-start"),
+                                },
+                            },
+                        },
+
+                        new OsuSpriteText
+                        {
+                            Text = "Key Bindings",
+                            Font = OsuFont.Default.With(size: 16, weight: FontWeight.Bold),
+                            Margin = new MarginPadding { Top = 10, Bottom = 5 },
+                        },
+                        keybindingsContainer = new OsuScrollContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Text = "Install the Websocket mod to quickly test your maps in UNBEATABLE through the editor.",
-                            Colour = colourProvider.Content1.Opacity(0.75f),
-                            Margin = new MarginPadding { Bottom = 8 },
+                            Height = 250,
+                            Masking = true,
+                            Child = new EditorKeyBindingsSubsection(),
+                            ScrollDistance = 65
                         },
-                        new RoundedButton
+                        editKeybindingsButton = new RoundedButton
                         {
                             Width = 150,
                             Height = 30,
-                            Text = "Download",
+                            Text = "Click to show...",
                             Colour = colourProvider.Colour1,
                             BackgroundColour = colourProvider.Background2,
                             Scale = new Vector2(0.9f),
-                            Action = () => BrowserUtil.OpenUrl("https://github.com/ErikGXDev/UnbeatableWebsocket#readme-start"),
+                            Action = () =>
+                            {
+                                keybindingsContainer.Show();
+                                editKeybindingsButton.Hide();
+                            },
                         },
-                    },
-                },
 
-                new OsuSpriteText
-                {
-                    Text = "Key Bindings",
-                    Font = OsuFont.Default.With(size: 16, weight: FontWeight.Bold),
-                    Margin = new MarginPadding { Top = 10, Bottom = 5 },
-                },
-                keybindingsContainer = new OsuScrollContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 155,
-                    Masking = true,
-                    AlwaysPresent = false,
-                    Child = new EditorKeyBindingsSubsection(),
-                    ScrollDistance = 65
-                },
-                editKeybindingsButton = new RoundedButton
-                {
-                    Width = 150,
-                    Height = 30,
-                    Text = "Click to show...",
-                    Colour = colourProvider.Colour1,
-                    BackgroundColour = colourProvider.Background2,
-                    Scale = new Vector2(0.9f),
-                    Action = () =>
-                    {
-                        keybindingsContainer.Show();
-                        editKeybindingsButton.Hide();
-                    },
-                },
+                        new OsuSpriteText()
+                        {
+                            AllowMultiline = true,
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Tip: Use Alt+Shift+Scroll to summon the volume controls anywhere in the editor.",
+                            Font = OsuFont.Default.With(size: 12, weight: FontWeight.Regular),
+                            Colour = colourProvider.Content1.Opacity(0.75f),
+                            Margin = new MarginPadding { Top = 15 },
 
-                new OsuSpriteText()
-                {
-                    AllowMultiline = true,
-                    RelativeSizeAxes = Axes.X,
-                    Text = "Tip: Use Alt+Shift+Scroll to summon the volume controls anywhere in the editor.",
-                    Font = OsuFont.Default.With(size: 12, weight: FontWeight.Regular),
-                    Colour = colourProvider.Content1.Opacity(0.75f),
-                    Margin = new MarginPadding { Top = 15 },
+                        }
+                    }
+
+
                 }
-
             }
         };
 
@@ -206,9 +229,7 @@ public partial class SettingsPopover : OsuPopover
                     RelativeSizeAxes = Axes.Both,
                 },
             }
-
         });
-
     }
 
     public partial class MenuLabel : OsuSpriteText
