@@ -41,10 +41,16 @@ namespace osu.Game.Rulesets.UMania.Edit
             Origin = Anchor.Centre,
             Size = Vector2.One
         };
+        
+        public double TimeRangeMultiplier = 1.0;
 
         protected override void Update()
         {
-            TargetTimeRange = TimelineTimeRange == null || ShowSpeedChanges.Value ? ComputeScrollTime(Config.Get<double>(ManiaRulesetSetting.ScrollSpeed)) : TimelineTimeRange.Value;
+            if (!ShowSpeedChanges.Value)
+            {
+                TimeRangeMultiplier = 1;
+            }
+            TargetTimeRange = TimelineTimeRange == null || ShowSpeedChanges.Value ? ComputeScrollTime(Config.Get<double>(ManiaRulesetSetting.ScrollSpeed)) * TimeRangeMultiplier : TimelineTimeRange.Value;
             base.Update();
         }
     }

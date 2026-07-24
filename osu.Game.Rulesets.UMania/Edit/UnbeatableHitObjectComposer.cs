@@ -23,6 +23,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Framework.Testing;
+using osu.Game.Rulesets.UMania.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.UMania.Edit;
@@ -673,6 +674,16 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     protected override bool OnScroll(ScrollEvent e)
     {
         double scrollDelta = e.ScrollDelta.Y != 0 ? e.ScrollDelta.Y : e.ScrollDelta.X;
+
+        if (e.AltPressed)
+        {
+            if (DrawableRuleset is DrawableManiaEditorRuleset maniaRuleset)
+            {
+                maniaRuleset.TimeRangeMultiplier = Math.Clamp(maniaRuleset.TimeRangeMultiplier + scrollDelta * 0.1, 0.1, 5);
+            }
+            return true;
+
+        }
 
         if (keyBasedChartingHandler != null && keyBasedChartingHandler.TryAdjustHold(scrollDelta, e.ShiftPressed))
             return true;
