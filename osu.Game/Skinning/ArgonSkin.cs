@@ -102,6 +102,8 @@ namespace osu.Game.Skinning
                 
                     customSampleStore?.AddExtension(".mp3");
 
+                    customSampleStore?.AddExtension(".ogg");
+
                     var sample = customSampleStore?.Get("hitsound");
                     
                     Logger.Log("!!! Hitsound found!");
