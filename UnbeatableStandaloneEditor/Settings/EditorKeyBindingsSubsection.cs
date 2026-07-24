@@ -18,6 +18,8 @@ public partial class EditorKeyBindingsSubsection : KeyBindingsSubsection
         GlobalAction.EditorToggleRotateControl,
         GlobalAction.EditorToggleMoveControl,
         GlobalAction.EditorToggleScaleControl,
+        GlobalAction.EditorDecreaseDistanceSpacing,
+        GlobalAction.EditorIncreaseDistanceSpacing,
     };
 
     protected override LocalisableString Header => InputSettingsStrings.EditorSection;
