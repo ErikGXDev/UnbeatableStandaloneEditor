@@ -37,7 +37,7 @@ public partial class SettingsPopover : OsuPopover
         Child = new Container()
         {
             Width = 340,
-            Height = 700,
+            Height = 650,
             Child = new OsuScrollContainer()
             {
                 Padding = new MarginPadding(6),
