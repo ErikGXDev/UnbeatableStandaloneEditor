@@ -455,7 +455,7 @@ namespace osu.Game.Rulesets.UMania.Edit
                             Easing.OutCubic);
                     }
 
-                    indicatorLayer.UpdateIndicators(olFlippedRight, !olZoomedIn);
+                    indicatorLayer.UpdateIndicators(olFlippedRight, !olZoomedIn, centerForUpcomingFlip);
                 }
 
                 if (note.StartTime > time + view_field + view_field_tolerance) break;
