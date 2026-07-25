@@ -492,9 +492,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             // FIX: Make playsounds inside holds also play sounds (they are "missed" notes)
             if (!force && (newState == ArmedState.Hit || newState == ArmedState.Miss))
+            {
                 PlaySamples();
+            }
         }
-
         private void clearExistingStateTransforms()
         {
             base.ApplyTransformsAt(double.MinValue, true);
