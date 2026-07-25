@@ -1,11 +1,9 @@
 ﻿## What's new
 
-- Adjusting the scroll speed in the editor is now possible through Alt + Mouse Wheel
-- You can now drag and drop your audio and cover art into the editor
-- Importing single .osu and .txt files is possible now (drag and drop also works here)
-- Fixed camera peeks happening inconsistently on different beat divisors.
-- Fixed custom hitsounds not working with .ogg files.
-- Reworked the settings menu a little, there is now more space for more options in the future.
-- Also check out the recently added charting keybinds similar to the official editor and 4-key mapping support in the settings!
+- Fixed placement order changing when copy-pasting notes
+- Fixed camera peeks in the preview for the final time
+- Fixed notes that are inside holds not playing hitsounds
+- Fixed custom hitsounds potentially playing multiple times at once
+- Fixed the scroll speed shortcut overwriting the audio wheel shortcut (Alt+Shift + Scroll)
 
 **Happy mapping!**
