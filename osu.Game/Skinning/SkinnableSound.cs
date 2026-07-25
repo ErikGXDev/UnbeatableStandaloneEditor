@@ -125,10 +125,16 @@ namespace osu.Game.Skinning
             FlushPendingSkinChanges();
             
             // Detect custom hitsound
-            if (samplesContainer.Any(c => c.Sample.Name == "hitsound"))
+            if (samplesContainer.Any(c => c.Sample?.Name == "hitsound"))
             {
                 // Only play once
-                var sample1 = samplesContainer[0];
+                var sample1 = samplesContainer.First();
+
+                if (sample1 == null)
+                {
+                    return;
+                }
+                
                 if (PlayWhenZeroVolume || sample1.AggregateVolume.Value > 0)
                 {
                     sample1.Stop();
