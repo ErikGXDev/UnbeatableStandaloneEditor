@@ -675,7 +675,7 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     {
         double scrollDelta = e.ScrollDelta.Y != 0 ? e.ScrollDelta.Y : e.ScrollDelta.X;
 
-        if (e.AltPressed)
+        if (e.AltPressed && !e.ControlPressed && !e.ShiftPressed)
         {
             if (DrawableRuleset is DrawableManiaEditorRuleset maniaRuleset)
             {
