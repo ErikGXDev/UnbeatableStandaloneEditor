@@ -158,7 +158,13 @@ namespace osu.Game.Screens.Edit.Compose
             if (!CanPaste.Value)
                 return;
 
-            var objects = clipboard.Value.Deserialize<ClipboardContent>().HitObjects;
+            var content = clipboard.Value.Deserialize<ClipboardContent>();
+            
+            var objects = content.HitObjects
+                .Select((h, i) => (HitObject: h, Index: content.OriginalIndices[i]))
+                .OrderBy(x => x.Index)
+                .Select(x => x.HitObject)
+                .ToList();
 
             Debug.Assert(objects.Any());
 

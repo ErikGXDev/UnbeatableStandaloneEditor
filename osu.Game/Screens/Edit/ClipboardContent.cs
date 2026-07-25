@@ -15,6 +15,8 @@ namespace osu.Game.Screens.Edit
     {
         [JsonConverter(typeof(TypedListConverter<HitObject>))]
         public IList<HitObject> HitObjects;
+        
+        public List<int> OriginalIndices;
 
         public ClipboardContent()
         {
@@ -23,6 +25,10 @@ namespace osu.Game.Screens.Edit
         public ClipboardContent(EditorBeatmap editorBeatmap)
         {
             HitObjects = editorBeatmap.SelectedHitObjects.ToList();
+            
+            var editorHitObjects = editorBeatmap.HitObjects.ToList(); // Cast because it's a IReadOnlyList
+            
+            OriginalIndices = HitObjects.Select(h => editorHitObjects.IndexOf(h)).ToList();
         }
     }
 }
