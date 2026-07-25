@@ -128,8 +128,8 @@ namespace osu.Game.Rulesets.UMania.Scoring
         {
             // FIX: Adjusted hit windows to reduce delay between hit and missed notes
             perfect = 1;
-            great = good = ok = meh = 1.5;
-            miss = 2;
+            great = good = ok = meh = 2.5;
+            miss = 5;
             return;
             
             
