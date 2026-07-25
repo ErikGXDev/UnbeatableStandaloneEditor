@@ -11,6 +11,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Game.Audio;
 
 namespace osu.Game.Skinning
@@ -122,9 +123,24 @@ namespace osu.Game.Skinning
         public virtual void Play()
         {
             FlushPendingSkinChanges();
+            
+            // Detect custom hitsound
+            if (samplesContainer.Any(c => c.Sample.Name == "hitsound"))
+            {
+                // Only play once
+                var sample1 = samplesContainer[0];
+                if (PlayWhenZeroVolume || sample1.AggregateVolume.Value > 0)
+                {
+                    sample1.Stop();
+                    sample1.Play();
+                }
+
+                return;
+            }
 
             samplesContainer.ForEach(c =>
             {
+                Logger.Log(c.Sample?.Name);
                 if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
                 {
                     c.Stop();
