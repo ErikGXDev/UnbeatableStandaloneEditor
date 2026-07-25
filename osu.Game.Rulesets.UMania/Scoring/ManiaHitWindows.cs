@@ -126,6 +126,13 @@ namespace osu.Game.Rulesets.UMania.Scoring
 
         private void updateWindows()
         {
+            // FIX: Adjusted hit windows to reduce delay between hit and missed notes
+            perfect = 1;
+            great = good = ok = meh = 1.5;
+            miss = 2;
+            return;
+            
+            
             if (ClassicModActive && !ScoreV2Active)
             {
                 if (IsConvert)

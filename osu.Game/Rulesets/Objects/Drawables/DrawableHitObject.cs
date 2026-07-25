@@ -490,7 +490,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             // apply any custom state overrides
             ApplyCustomUpdateState?.Invoke(this, newState);
 
-            if (!force && newState == ArmedState.Hit)
+            // FIX: Make playsounds inside holds also play sounds (they are "missed" notes)
+            if (!force && (newState == ArmedState.Hit || newState == ArmedState.Miss))
                 PlaySamples();
         }
 

@@ -92,7 +92,8 @@ namespace osu.Game.Rulesets.UMania.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Miss:
-                    this.FadeOut(150, Easing.In);
+                    // Fade out missed notes immediately
+                    this.FadeOut();
                     break;
 
                 case ArmedState.Hit:
