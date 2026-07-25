@@ -57,8 +57,6 @@ namespace osu.Game.Skinning
             if (resources is SkinManager skinManager)
             {
                 storage = skinManager.storage.GetStorageForDirectory("custom");
-
-                Logger.Log("!!! Custom storage found.");
             }
 
             Configuration.CustomComboColours = new List<Color4>
@@ -106,17 +104,13 @@ namespace osu.Game.Skinning
 
                     var sample = customSampleStore?.Get("hitsound");
                     
-                    Logger.Log("!!! Hitsound found!");
-                    
                     if (sample != null)
                     {
-                        Logger.Log("!!! Hitsound returned!");
                         return sample;
                     }
                 }
             }
             
-            Logger.Log("!!! No hitsound found, apparently.");
             
             foreach (string lookup in sampleInfo.LookupNames)
             {
