@@ -515,7 +515,7 @@ namespace osu.Game.Rulesets.UMania.Edit
                 if (note.StartTime < currentTime)
                     continue;
 
-                if (note.StartTime > currentTime + view_field + view_field_tolerance)
+                if (note.StartTime > currentTime + view_field + view_field_tolerance * 2)
                     break;
 
                 var ubhelper = new UbNoteBuilder(note);
@@ -525,7 +525,7 @@ namespace osu.Game.Rulesets.UMania.Edit
                 if (ubhelper.InferObjectModifierIcons().Contains(UbIconType.ModSwapImmediate))
                     continue;
                 
-                double twoBeats = editorBeatmap.ControlPointInfo.TimingPointAt(note.StartTime).BeatLength;
+                double twoBeats = editorBeatmap.ControlPointInfo.TimingPointAt(note.StartTime).BeatLength * 2.0D;
                 if (note.StartTime - currentTime <= twoBeats)
                     return true;
             }
