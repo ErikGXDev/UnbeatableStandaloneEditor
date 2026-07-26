@@ -428,31 +428,31 @@ namespace osu.Game.Rulesets.UMania.Edit
                             float inwardPull = olFlippedRight ? 0.04f : -0.04f;
 
                             cameraBorder.MoveTo(new Vector2(cam_middle_receptor + inwardPull, cam_middle_receptor), 700,
-                                Easing.OutCubic);
+                                Easing.OutQuint);
                             cameraBorder.ResizeTo(new Vector2(preview_width * 0.52f, preview_height * 0.79f), 700,
-                                Easing.OutCubic);
+                                Easing.OutQuint);
                         }
                         else if (olFlippedRight)
                         {
                             cameraBorder.MoveTo(new Vector2(cam_right_receptor, cam_middle_receptor), 700,
-                                Easing.OutCubic);
+                                Easing.OutQuint);
                             cameraBorder.ResizeTo(new Vector2(preview_width * 0.48f, preview_height * 0.75f), 700,
-                                Easing.OutCubic);
+                                Easing.OutQuint);
                         }
                         else
                         {
                             cameraBorder.MoveTo(new Vector2(cam_left_receptor, cam_middle_receptor), 700,
-                                Easing.OutCubic);
+                                Easing.OutQuint);
                             cameraBorder.ResizeTo(new Vector2(preview_width * 0.48f, preview_height * 0.75f), 700,
-                                Easing.OutCubic);
+                                Easing.OutQuint);
                         }
                     }
                     else
                     {
                         cameraBorder.MoveTo(new Vector2(cam_middle_receptor, cam_middle_receptor), 700,
-                            Easing.OutCubic);
+                            Easing.OutQuint);
                         cameraBorder.ResizeTo(new Vector2(preview_width * 0.7f, preview_height * 0.90f), 700,
-                            Easing.OutCubic);
+                            Easing.OutQuint);
                     }
 
                     indicatorLayer.UpdateIndicators(olFlippedRight, !olZoomedIn, centerForUpcomingFlip);
