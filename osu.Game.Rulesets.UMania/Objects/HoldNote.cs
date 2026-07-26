@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.UMania.Objects
             new List<IList<HitSampleInfo>>
             {
                 obj.Samples,
-                new List<HitSampleInfo>(obj.Samples.Select(s => s.With(newVolume: 75))),
+                new List<HitSampleInfo>(obj.Samples.Select(s => s /*.With(newVolume: 75)*/)),
             };
     }
 }

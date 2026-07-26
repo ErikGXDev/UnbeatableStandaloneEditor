@@ -234,10 +234,13 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 if (controlPointProperties.IsRedundant(lastControlPointProperties))
                     continue;
 
+                // FIX: Don't write these -100 beat length timing points
+                /*
                 // Output any remaining effects as secondary non-timing control point.
                 writer.Write(FormattableString.Invariant($"{group.Time},"));
                 writer.Write(FormattableString.Invariant($"{-100 / controlPointProperties.SliderVelocity},"));
                 outputControlPointAt(controlPointProperties, false);
+                */
                 lastControlPointProperties = controlPointProperties;
             }
 
