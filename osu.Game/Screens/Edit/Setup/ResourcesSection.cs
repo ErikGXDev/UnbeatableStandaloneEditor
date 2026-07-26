@@ -78,7 +78,8 @@ namespace osu.Game.Screens.Edit.Setup
 
             Children = new Drawable[]
             {
-                audioTrackChooser = new FormBeatmapFileSelector(beatmapHasMultipleDifficulties, SupportedExtensions.AUDIO_EXTENSIONS)
+                // Remove ogg because it's actually laggy in-game
+                audioTrackChooser = new FormBeatmapFileSelector(beatmapHasMultipleDifficulties, SupportedExtensions.AUDIO_EXTENSIONS.Except(new[] { ".ogg" }).ToArray())
                 {
                     Caption = EditorSetupStrings.AudioTrack,
                     PlaceholderText = EditorSetupStrings.ClickToSelectTrack,
