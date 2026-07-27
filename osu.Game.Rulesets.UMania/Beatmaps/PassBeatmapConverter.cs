@@ -96,7 +96,6 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
                 {
                     if (cloned.Samples.Any(s => s.Name == HitSampleInfo.HIT_WHISTLE))
                     {
-                        Logger.Log("Found zoomout");
                         zoomedOut4Key = !zoomedOut4Key;
                     }
                 

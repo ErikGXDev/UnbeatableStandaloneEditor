@@ -525,7 +525,6 @@ namespace osu.Game.Rulesets.UMania.Edit
                 var ubhelper = new UbNoteBuilder(note);
                 if (ubhelper.InferObjectTypeIcon() == UbIconType.Zoom)
                 {
-                    Logger.Log("found zoom");
                     zoomTimes.Add(note.StartTime);
                     continue;
                 }
