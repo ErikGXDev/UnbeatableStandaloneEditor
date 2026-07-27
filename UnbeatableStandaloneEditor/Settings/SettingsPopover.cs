@@ -32,7 +32,7 @@ public partial class SettingsPopover : OsuPopover
 
     [BackgroundDependencyLoader]
     private void load(OverlayColourProvider colourProvider, AudioManager audio, GameHost host,
-        EditorConfigManager editorConfig, OsuConfigManager osuConfig)
+        EditorConfigManager editorConfig, OsuConfigManager osuConfig, Storage storage)
     {
         Child = new Container()
         {
@@ -128,6 +128,42 @@ public partial class SettingsPopover : OsuPopover
                                 new VolumeSlider(audio.VolumeTrack),
                                 new MenuLabel("Effects"),
                                 new VolumeSlider(audio.VolumeSample),
+                            },
+                        },
+                        new SettingsGroup()
+                        {
+                            Label = "Backups",
+                            Controls = new Drawable[]
+                            {
+                                new TooltipCheckbox()
+                                {
+                                    LabelText = "Automatically create backups",
+                                    TooltipText = "Prevent data loss with this simple trick!",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = osuConfig.GetBindable<bool>(OsuSetting.CreateBackups),
+                                    Margin = new MarginPadding { Bottom = 10, Top = 5 },
+                                },
+                                new OsuTextFlowContainer(t =>
+                                    t.Font = OsuFont.Default.With(size: 14, weight: FontWeight.Regular))
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Text =
+                                        "To use backups, you can import them through the import menu or with drag-and-drop.",
+                                    Colour = colourProvider.Content1.Opacity(0.75f),
+                                    Margin = new MarginPadding { Bottom = 8 },
+                                },
+                                new RoundedButton()
+                                {
+                                    Width = 180,
+                                    Height = 30,
+                                    Text = "Open backups folder",
+                                    Colour = colourProvider.Colour1,
+                                    BackgroundColour = colourProvider.Background2,
+                                    Scale = new Vector2(0.9f),
+                                    Action = () =>
+                                        host.OpenFileExternally(storage.GetFullPath("backups")),
+                                }
                             },
                         },
 

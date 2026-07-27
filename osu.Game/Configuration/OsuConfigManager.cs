@@ -212,7 +212,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Editor4KeyMode, false); // FIX: 4-key mode should persist as a config
             SetDefault(OsuSetting.EditorKeyBasedCharting, false); // FIX: key-based charting mode toggle
             SetDefault(OsuSetting.Editor60msOffset, false); // FIX: 60ms offset when exporting maps for editor parity
-
+            SetDefault(OsuSetting.CreateBackups, true); // FIX: Toggle backup creation on save
+            
             SetDefault(OsuSetting.HideCountryFlags, false);
 
             SetDefault(OsuSetting.MultiplayerRoomFilter, RoomPermissionsFilter.All);
@@ -504,6 +505,7 @@ namespace osu.Game.Configuration
         PlaySamplesInCameraLane, // FIX: New config, used by UMania editor to gate camera-lane hit sounds
         Editor4KeyMode, // FIX: 4-key mode should persist as a config
         EditorKeyBasedCharting, // FIX: key-based charting mode toggle
-        Editor60msOffset // FIX: 60ms offset when exporting maps for editor parity
+        Editor60msOffset, // FIX: 60ms offset when exporting maps for editor parity
+        CreateBackups // Toggle backup creation on save
     }
 }

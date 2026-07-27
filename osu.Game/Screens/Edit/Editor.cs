@@ -5,7 +5,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -26,6 +28,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
@@ -33,6 +36,7 @@ using osu.Framework.Timing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -622,6 +626,72 @@ namespace osu.Game.Screens.Edit
                     item.Action.Disabled = MutationTracker.InProgress.Value;
             }, true);
         }
+        
+        [Resolved] private Storage storage { get; set; }
+        
+        [Resolved] private OsuConfigManager osuConfig { get; set; }
+
+
+        public bool MakeBackup(bool sendToast = false)
+        {
+            if (!osuConfig.Get<bool>(OsuSetting.CreateBackups))
+            {
+                return false;
+            }
+            
+            
+            var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+
+            var encoder = new LegacyBeatmapEncoder(playableBeatmap, null);
+
+            using var beatmapStream = new MemoryStream();
+            using (var sw = new StreamWriter(beatmapStream, Encoding.UTF8, 1024, true))
+            {
+                encoder.Encode(sw);
+                sw.Flush();
+            }
+            
+            beatmapStream.Position = 0;
+            
+            // DD_MM_YY_HH_MM_SS
+            var timeFormatted = DateTime.Now.ToString("dd_MM_yy_HH_mm_ss");
+            
+            var artist = playableBeatmap.BeatmapInfo.Metadata.Artist;
+            var title = playableBeatmap.BeatmapInfo.Metadata.Title;
+            var author = playableBeatmap.BeatmapInfo.Metadata.Author.Username;
+            var difficulty = playableBeatmap.BeatmapInfo.DifficultyName;
+            
+            var beatmapFilename = $"{artist} - {title} ({author}) [{difficulty}]_{timeFormatted}.backup.osu".GetValidFilename();
+            
+            using (var stream = storage.CreateFileSafely("backups/" + beatmapFilename))
+            {
+                beatmapStream.CopyTo(stream);
+            }
+            
+            if (!storage.Exists("backups/_HOW_TO_RESTORE_A_BACKUP.txt"))
+            {
+                using (var stream = storage.CreateFileSafely("backups/_HOW_TO_RESTORE_A_BACKUP.txt"))
+                {
+                    using (var writer = new StreamWriter(stream))
+                    {
+                        writer.WriteLine("How to restore a backup:");
+                        writer.WriteLine("You can simply import a backup like a normal chart in 2 ways:");
+                        writer.WriteLine("1. Use the import menu on the start screen and select the file there");
+                        writer.WriteLine("2. Drag-and-drop the backup file into the window while the main menu is open");
+                        writer.WriteLine("You will need to re-add your audio and cover art, they are not backed up to save space.");
+                        writer.WriteLine("Do not change the file name or contents of the backup files to avoid breaking things.");
+                        
+                    }
+                }
+            }
+
+            if (sendToast)
+            {
+                onScreenDisplay?.Display(new BeatmapEditorToast("Backup created successfully", ""));
+            }
+
+            return true;
+        }
 
         protected override void Dispose(bool isDisposing)
         {
@@ -713,6 +783,9 @@ namespace osu.Game.Screens.Edit
                 notifications?.Post(new SimpleErrorNotification { Text = "Saving is not supported for this ruleset yet, sorry!" });
                 return false;
             }
+
+            // Make a backup before saving the beatmap.
+            MakeBackup();
 
             try
             {
@@ -995,6 +1068,9 @@ namespace osu.Game.Screens.Edit
         public override bool OnExiting(ScreenExitEvent e)
         {
             currentScreen?.OnExiting(e);
+
+            // Backup when exiting the map.
+            MakeBackup();
 
             if (!ExitConfirmed)
             {
@@ -1448,6 +1524,13 @@ namespace osu.Game.Screens.Edit
                 saveRelatedMenuItems.Add(externalEdit);
                 yield return externalEdit;
             }
+            
+            // FIX: Make backup button
+            var makeBackup = new EditorMenuItem("Make Backup", MenuItemType.Standard, () => { MakeBackup(true);});
+            saveRelatedMenuItems.Add(makeBackup);
+            yield return makeBackup;
+            
+            
 
             bool isSetMadeOfLegacyRulesetBeatmaps = (isNewBeatmap && Ruleset.Value.IsLegacyRuleset())
                                                     || (!isNewBeatmap && Beatmap.Value.BeatmapSetInfo.Beatmaps.All(b => b.Ruleset.IsLegacyRuleset()));

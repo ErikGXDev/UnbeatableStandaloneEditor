@@ -98,6 +98,13 @@ public class SingleFileArchiveReader : ArchiveReader
         {
             isBeatmap = true;
         }
+
+        // Backups are not "converted unbeatable" beatmaps that need to be modified.
+        if (name.EndsWith(".backup.osu"))
+        {
+            isBeatmap = false;
+        }
+
         /*if (name.EndsWith(".txt.osu"))
         {
             isBeatmap = true;
