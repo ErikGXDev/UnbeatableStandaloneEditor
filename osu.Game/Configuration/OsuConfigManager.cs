@@ -211,6 +211,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.PlaySamplesInCameraLane, true); // FIX: Camera lane hit sounds on by default
             SetDefault(OsuSetting.Editor4KeyMode, false); // FIX: 4-key mode should persist as a config
             SetDefault(OsuSetting.EditorKeyBasedCharting, false); // FIX: key-based charting mode toggle
+            SetDefault(OsuSetting.Editor60msOffset, false); // FIX: 60ms offset when exporting maps for editor parity
 
             SetDefault(OsuSetting.HideCountryFlags, false);
 
@@ -503,5 +504,6 @@ namespace osu.Game.Configuration
         PlaySamplesInCameraLane, // FIX: New config, used by UMania editor to gate camera-lane hit sounds
         Editor4KeyMode, // FIX: 4-key mode should persist as a config
         EditorKeyBasedCharting, // FIX: key-based charting mode toggle
+        Editor60msOffset // FIX: 60ms offset when exporting maps for editor parity
     }
 }

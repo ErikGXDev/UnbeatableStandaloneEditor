@@ -5,6 +5,7 @@ using System.Threading;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UMania.Objects;
@@ -13,13 +14,15 @@ namespace osu.Game.Rulesets.UMania.Beatmaps;
 
 public class PassBeatmapConverter : BeatmapConverter<HitObject>
 {
-    public PassBeatmapConverter(IBeatmap beatmap, Ruleset ruleset, bool is4key)
+    public PassBeatmapConverter(IBeatmap beatmap, Ruleset ruleset, bool is4key, int msOffset)
         : base(beatmap, ruleset)
     {
         this.is4Key = is4key;
+        this.msOffset = msOffset;
     }
     
     private bool is4Key;
+    private int msOffset = 0;
 
     public override bool CanConvert() => true;
 
@@ -34,7 +37,7 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
 
         // Clone hitobjects to avoid mutating the original beatmap
         var clonedHitObjects = new List<HitObject>(convertBeatmap.HitObjects.Count);
-
+        
         var zoomedOut4Key = false;
         
         foreach (var hitObject in convertBeatmap.HitObjects)
@@ -46,7 +49,7 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
             {
                 cloned = new Note
                 {
-                    StartTime = note.StartTime,
+                    StartTime = note.StartTime + msOffset,
                     Samples = cloneSamples(note.Samples),
                     Column = note.Column
                 };
@@ -55,7 +58,7 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
             {
                 cloned = new HoldNote
                 {
-                    StartTime = holdNote.StartTime,
+                    StartTime = holdNote.StartTime + msOffset,
                     Duration = holdNote.Duration,
                     Column = holdNote.Column,
                     Samples = cloneSamples(holdNote.Samples),
@@ -66,7 +69,7 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
             {
                 cloned = new ManiaHitObject
                 {
-                    StartTime = maniaHitObject.StartTime,
+                    StartTime = maniaHitObject.StartTime + msOffset,
                     Column = maniaHitObject.Column,
                     Samples = cloneSamples(maniaHitObject.Samples)
                 };
@@ -75,6 +78,9 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
             {
                 // Fallback for unknown types - just use original
                 cloned = hitObject;
+                
+                // Could this affect the editor beatmap?
+                cloned.StartTime += msOffset;
             }
             
             // Convert X position if needed
@@ -121,8 +127,21 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
             }
             
         }
+        
+        var controlPointInfo = new ControlPointInfo();
+
+        foreach (var timingPoint in convertBeatmap.ControlPointInfo.TimingPoints)
+        {
+            var clonedTimingPoint = timingPoint.DeepClone();
+            
+            clonedTimingPoint.Time += msOffset;
+            
+            controlPointInfo.Add(clonedTimingPoint.Time, clonedTimingPoint);
+        }
 
         convertBeatmap.HitObjects = clonedHitObjects;
+        convertBeatmap.ControlPointInfo = controlPointInfo;
+        
         return convertBeatmap;
     }
 
