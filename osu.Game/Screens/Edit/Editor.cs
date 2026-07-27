@@ -785,7 +785,9 @@ namespace osu.Game.Screens.Edit
             }
 
             // Make a backup before saving the beatmap.
-            MakeBackup();
+            // Can be a task here because surely the Beatmap will always be defined here.
+            // One might worry that using a Task in OnExiting could cause a race condition.
+            Task.Run(() => { MakeBackup();});
 
             try
             {
