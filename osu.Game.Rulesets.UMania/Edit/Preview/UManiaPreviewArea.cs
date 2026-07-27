@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -507,6 +509,7 @@ namespace osu.Game.Rulesets.UMania.Edit
 
         private bool shouldCenterForUpcomingFlip(double currentTime)
         {
+            List<double> zoomTimes = new List<double>();
             foreach (var obj in editorBeatmap.HitObjects)
             {
                 if (obj is not ManiaHitObject note || note.Column != 4)
@@ -518,7 +521,15 @@ namespace osu.Game.Rulesets.UMania.Edit
                 if (note.StartTime > currentTime + view_field + view_field_tolerance * 2)
                     break;
 
+
                 var ubhelper = new UbNoteBuilder(note);
+                if (ubhelper.InferObjectTypeIcon() == UbIconType.Zoom)
+                {
+                    Logger.Log("found zoom");
+                    zoomTimes.Add(note.StartTime);
+                    continue;
+                }
+
                 if (ubhelper.InferObjectTypeIcon() != UbIconType.Flip)
                     continue;
 
@@ -526,8 +537,19 @@ namespace osu.Game.Rulesets.UMania.Edit
                     continue;
                 
                 double twoBeats = editorBeatmap.ControlPointInfo.TimingPointAt(note.StartTime).BeatLength * 2.0D;
-                if (note.StartTime - currentTime <= twoBeats)
+
+                var probablyCenter = note.StartTime - currentTime <= twoBeats;
+
+                if (probablyCenter)
+                {
+                    // Prevent peeking if a zoom is coming up before the flip
+                    if (zoomTimes.Any(t => t > currentTime && t < note.StartTime))
+                    {
+                        return false;
+                    }
+                    
                     return true;
+                }
             }
 
             return false;
