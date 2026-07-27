@@ -38,7 +38,16 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             writer.WriteLine("// https://github.com/ErikGXDev/UnbeatableStandaloneEditor");
             writer.WriteLine("");
             
-           
+            /*var quote = UbExportHelper.GetQuoteOfTheDay();
+            
+            if (quote.Length > 0)
+            {
+                foreach (string line in quote)
+                {
+                    writer.WriteLine(line);
+                }
+            }*/
+
             Encode(tempWriter);
 
             string output = tempWriter.ToString();
