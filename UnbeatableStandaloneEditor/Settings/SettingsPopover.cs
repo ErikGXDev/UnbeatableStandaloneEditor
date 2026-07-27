@@ -139,7 +139,7 @@ public partial class SettingsPopover : OsuPopover
                                 new TooltipCheckbox()
                                 {
                                     LabelText = "Automatically create backups",
-                                    TooltipText = "Prevent data loss with this simple trick!",
+                                    TooltipText = "Backups are created every time you save or leave the editor.",
                                     RelativeSizeAxes = Axes.X,
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.CreateBackups),
                                     Margin = new MarginPadding { Bottom = 10, Top = 5 },
