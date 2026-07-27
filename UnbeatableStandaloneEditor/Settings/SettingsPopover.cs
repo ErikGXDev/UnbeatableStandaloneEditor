@@ -133,6 +133,7 @@ public partial class SettingsPopover : OsuPopover
                         new SettingsGroup()
                         {
                             Label = "Backups",
+                            Margin = new MarginPadding() {Top = 10, Bottom = 10},
                             Controls = new Drawable[]
                             {
                                 new TooltipCheckbox()
