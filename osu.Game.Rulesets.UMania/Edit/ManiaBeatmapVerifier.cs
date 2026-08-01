@@ -17,11 +17,11 @@ namespace osu.Game.Rulesets.UMania.Edit
             new CheckManiaConcurrentObjects(),
 
             // Spread
-            new CheckManiaLowestDiffDrainTime(),
+            //new CheckManiaLowestDiffDrainTime(),
 
             // Settings
-            new CheckKeyCount(),
-            new CheckManiaAbnormalDifficultySettings(),
+            //new CheckKeyCount(),
+            //new CheckManiaAbnormalDifficultySettings(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

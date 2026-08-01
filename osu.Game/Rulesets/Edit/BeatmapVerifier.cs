@@ -23,13 +23,13 @@ namespace osu.Game.Rulesets.Edit
 
             // Audio
             new CheckAudioPresence(),
-            new CheckAudioQuality(),
+            //new CheckAudioQuality(),
             new CheckMutedObjects(),
             new CheckFewHitsounds(),
             new CheckTooShortAudioFiles(),
             new CheckAudioInVideo(),
             new CheckDelayedHitsounds(),
-            new CheckSongFormat(),
+            //new CheckSongFormat(),
             new CheckHitsoundsFormat(),
             new CheckInconsistentAudio(),
 
@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Edit
             // Metadata
             new CheckTitleMarkers(),
             new CheckInconsistentMetadata(),
-            new CheckMissingGenreLanguage(),
+            //new CheckMissingGenreLanguage(),
 
             // Settings
             new CheckInconsistentSettings(),
