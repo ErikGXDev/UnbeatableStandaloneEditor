@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Edit
             // Compose
             new CheckUnsnappedObjects(),
             new CheckZeroLengthObjects(),
-            new CheckDrainLength(),
+            //new CheckDrainLength(),
             new CheckUnusedAudioAtEnd(),
 
             // Timing
