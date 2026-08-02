@@ -22,6 +22,9 @@ namespace osu.Game.Screens.Edit.Verify
                 TooltipText = "Select which type of checks to display",
                 Current = verify.VerifyChecksScope.GetBoundCopy()
             });
+
+            // Unneeded
+            Alpha = 0;
         }
     }
 }

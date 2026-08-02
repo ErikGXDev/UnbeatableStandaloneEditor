@@ -22,6 +22,9 @@ namespace osu.Game.Screens.Edit.Verify
                 TooltipText = "Affects checks that depend on difficulty level",
                 Current = verify.InterpretedDifficulty.GetBoundCopy()
             });
+
+            // FIX: Can be hidden
+            Alpha = 0;
         }
     }
 }

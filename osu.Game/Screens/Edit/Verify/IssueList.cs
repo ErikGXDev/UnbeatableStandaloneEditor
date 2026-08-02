@@ -118,8 +118,8 @@ namespace osu.Game.Screens.Edit.Verify
         private IEnumerable<Issue> filter(IEnumerable<Issue> issues)
         {
             return issues.Where(issue =>
-                !verify.HiddenIssueTypes.Contains(issue.Template.Type) &&
-                issue.Check.Metadata.Scope == verify.VerifyChecksScope.Value);
+                !verify.HiddenIssueTypes.Contains(issue.Template.Type) /*&&
+                issue.Check.Metadata.Scope == verify.VerifyChecksScope.Value*/);
         }
     }
 }
