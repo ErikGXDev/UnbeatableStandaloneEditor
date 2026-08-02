@@ -16,6 +16,8 @@ namespace osu.Game.Storyboards
         private readonly List<StoryboardLoopingGroup> loopingGroups = new List<StoryboardLoopingGroup>();
         private readonly List<StoryboardTriggerGroup> triggerGroups = new List<StoryboardTriggerGroup>();
 
+        public StoryboardElementSource Source { get; }
+
         public string Path { get; }
         public virtual bool IsDrawable => HasCommands;
 

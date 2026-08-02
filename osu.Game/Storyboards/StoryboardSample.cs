@@ -12,6 +12,9 @@ namespace osu.Game.Storyboards
     {
         public string Path { get; }
         public bool IsDrawable => true;
+        
+        public StoryboardElementSource Source { get; }
+
 
         public double StartTime { get; }
 

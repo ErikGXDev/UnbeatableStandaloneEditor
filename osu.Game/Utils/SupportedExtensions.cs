@@ -5,7 +5,7 @@ namespace osu.Game.Utils
 {
     public static class SupportedExtensions
     {
-        public static readonly string[] VIDEO_EXTENSIONS = [@".mp4", @".mov", @".avi", @".flv", @".mpg", @".wmv", @".m4v"];
+        public static readonly string[] VIDEO_EXTENSIONS = [@".mp4", @".webm"];
         public static readonly string[] AUDIO_EXTENSIONS = [@".mp3", @".ogg", @".wav"];
         public static readonly string[] IMAGE_EXTENSIONS = [/*@".jpg", @".jpeg",*/ @".png"]; // FIX: Only a cover.png is supported.
 

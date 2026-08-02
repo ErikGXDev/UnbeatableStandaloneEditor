@@ -20,9 +20,9 @@ namespace osu.Game.Localisation
         public static LocalisableString WaveformOpacity => new TranslatableString(getKey(@"waveform_opacity"), @"Waveform opacity");
 
         /// <summary>
-        /// "Show storyboard"
+        /// "Show cover art or video"
         /// </summary>
-        public static LocalisableString ShowStoryboard => new TranslatableString(getKey(@"show_storyboard"), @"Show storyboard");
+        public static LocalisableString ShowStoryboard => new TranslatableString(getKey(@"show_storyboard"), @"Show cover art or video");
 
         /// <summary>
         /// "Show hit markers"

@@ -7,8 +7,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -22,6 +20,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
@@ -32,6 +31,7 @@ namespace osu.Game.Screens.Edit.Setup
     {
         private FormBeatmapFileSelector audioTrackChooser = null!;
         private FormBeatmapFileSelector backgroundChooser = null!;
+        private FormBeatmapFileSelector videoChooser = null!;
         private FormBeatmapFileSelector hitsoundChooser = null!;
         private HitsoundDeleteButton hitsoundDeleteButton = null!;
 
@@ -60,6 +60,7 @@ namespace osu.Game.Screens.Edit.Setup
         private FormTextBox coverArtist = null!;
 
         private SetupScreenHeaderBackground headerBackground = null!;
+        private SetupScreenVideoPreview videoPreview = null!;
         
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -69,6 +70,12 @@ namespace osu.Game.Screens.Edit.Setup
         private void load()
         {
             headerBackground = new SetupScreenHeaderBackground
+            {
+                RelativeSizeAxes = Axes.X,
+                Height = 110,
+            };
+
+            videoPreview = new SetupScreenVideoPreview
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 110,
@@ -89,6 +96,14 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Caption = "Cover Art",
                     PlaceholderText = EditorSetupStrings.ClickToSelectBackground,
+                    AllowClear = true,
+                },
+                videoChooser = new FormBeatmapFileSelector(beatmapHasMultipleDifficulties, SupportedExtensions.VIDEO_EXTENSIONS)
+                {
+                    Caption = EditorSetupStrings.Video,
+                    PlaceholderText = EditorSetupStrings.ClickToSelectVideo,
+                    HintText = EditorSetupStrings.VideoHint,
+                    AllowClear = true,
                 },
                 coverArtist = new FormTextBox()
                 {
@@ -133,9 +148,18 @@ namespace osu.Game.Screens.Edit.Setup
             
 
             backgroundChooser.PreviewContainer.Add(headerBackground);
+            videoChooser.PreviewContainer.Add(videoPreview);
 
             if (!string.IsNullOrEmpty(working.Value.Metadata.BackgroundFile))
                 backgroundChooser.Current.Value = new FileInfo(working.Value.Metadata.BackgroundFile);
+
+            if (working.Value.Storyboard.PrimaryVideo is StoryboardVideo video)
+            {
+                // Find the actual file in the beatmap set that matches the video path
+                var videoFile = working.Value.BeatmapSetInfo.Files.FirstOrDefault(f => f.Filename.Equals(video.Path, StringComparison.OrdinalIgnoreCase));
+                if (videoFile != null)
+                    videoChooser.Current.Value = new FileInfo(videoFile.Filename);
+            }
 
             if (!string.IsNullOrEmpty(working.Value.Metadata.AudioFile))
                 audioTrackChooser.Current.Value = new FileInfo(working.Value.Metadata.AudioFile);
@@ -143,6 +167,7 @@ namespace osu.Game.Screens.Edit.Setup
             Schedule(hitsoundDisplayUpdate);
 
             backgroundChooser.Current.BindValueChanged(backgroundChanged);
+            videoChooser.Current.BindValueChanged(videoChanged);
             audioTrackChooser.Current.BindValueChanged(audioTrackChanged);
             hitsoundChooser.Current.BindValueChanged(hitsoundChanged);
         }
@@ -155,16 +180,36 @@ namespace osu.Game.Screens.Edit.Setup
         }
 
 
-        public bool ChangeBackgroundImage(FileInfo source, bool applyToAllDifficulties)
+        public bool ChangeBackgroundImage(FileInfo? source, bool applyToAllDifficulties)
         {
-            if (!source.Exists)
+            if (source != null && !source.Exists)
                 return false;
 
-            changeResource(source, applyToAllDifficulties, @"bg",
+            changeResource(source, applyToAllDifficulties, @"cover",
                 metadata => metadata.BackgroundFile,
                 (metadata, name) => metadata.BackgroundFile = name);
 
             headerBackground.UpdateBackground();
+            editor?.ApplyToBackground(bg => ((EditorBackgroundScreen)bg).RefreshBackground());
+            return true;
+        }
+
+        public bool ChangeVideo(FileInfo? source, bool applyToAllDifficulties)
+        {
+            if (source != null && !source.Exists)
+                return false;
+
+            changeResource(source, applyToAllDifficulties, @"video",
+                metadata => working.Value.Storyboard.PrimaryVideo?.Path ?? string.Empty,
+                (metadata, name) =>
+                {
+                    var videoLayer = working.Value.Storyboard.GetLayer(@"Video");
+                    videoLayer.Elements.RemoveAll(elem => elem is StoryboardVideo);
+                    if (name != null)
+                        videoLayer.Elements.Insert(0, new StoryboardVideo(name, 0));
+                });
+
+            videoPreview.UpdateVideo();
             editor?.ApplyToBackground(bg => ((EditorBackgroundScreen)bg).RefreshBackground());
             return true;
         }
@@ -215,7 +260,7 @@ namespace osu.Game.Screens.Edit.Setup
             return true;
         }
 
-        private void changeResource(FileInfo source, bool applyToAllDifficulties, string baseFilename, Func<BeatmapMetadata, string> readFilename, Action<BeatmapMetadata, string> writeMetadata)
+        private void changeResource(FileInfo? source, bool applyToAllDifficulties, string baseFilename, Func<BeatmapMetadata, string> readFilename, Action<BeatmapMetadata, string> writeMetadata)
         {
             var set = working.Value.BeatmapSetInfo;
             var beatmap = working.Value.BeatmapInfo;
@@ -244,19 +289,24 @@ namespace osu.Game.Screens.Edit.Setup
                 }
             }
 
-            // Choose a new filename that doesn't clash with any other existing files.
-            string newFilename = $"{baseFilename}{source.Extension}";
+            string? newFilename = null;
 
-            if (set.GetFile(newFilename) != null)
+            if (source != null)
             {
-                string[] existingFilenames = set.Files.Select(f => f.Filename).Where(f =>
-                    f.StartsWith(baseFilename, StringComparison.OrdinalIgnoreCase) &&
-                    f.EndsWith(source.Extension, StringComparison.OrdinalIgnoreCase)).ToArray();
-                newFilename = NamingUtils.GetNextBestFilename(existingFilenames, $@"{baseFilename}{source.Extension}");
-            }
+                // Choose a new filename that doesn't clash with any other existing files.
+                newFilename = $"{baseFilename}{source.Extension}";
 
-            using (var stream = source.OpenRead())
-                beatmaps.AddFile(set, stream, newFilename);
+                if (set.GetFile(newFilename) != null)
+                {
+                    string[] existingFilenames = set.Files.Select(f => f.Filename).Where(f =>
+                        f.StartsWith(baseFilename, StringComparison.OrdinalIgnoreCase) &&
+                        f.EndsWith(source.Extension, StringComparison.OrdinalIgnoreCase)).ToArray();
+                    newFilename = NamingUtils.GetNextBestFilename(existingFilenames, $@"{baseFilename}{source.Extension}");
+                }
+
+                using (var stream = source.OpenRead())
+                    beatmaps.AddFile(set, stream, newFilename);
+            }
 
             if (applyToAllDifficulties)
             {
@@ -269,7 +319,7 @@ namespace osu.Game.Screens.Edit.Setup
                     // note that this triggers a full save flow, including triggering a difficulty calculation.
                     // this is not a cheap operation and should be reconsidered in the future.
                     var beatmapWorking = beatmaps.GetWorkingBeatmap(b);
-                    beatmaps.Save(b, beatmapWorking.GetPlayableBeatmap(b.Ruleset), beatmapWorking.GetSkin());
+                    beatmaps.Save(b, beatmapWorking.GetPlayableBeatmap(b.Ruleset), beatmapWorking.GetSkin(), beatmapWorking.Storyboard);
                 }
             }
 
@@ -288,6 +338,7 @@ namespace osu.Game.Screens.Edit.Setup
         // note that this means that `Change{BackgroundImage,AudioTrack}()` are required to not have made any modifications to the beatmap files
         // (or at least cleaned them up properly themselves) if they return `false`.
         private bool rollingBackBackgroundChange;
+        private bool rollingBackVideoChange;
         private bool rollingBackAudioChange;
 
         private void backgroundChanged(ValueChangedEvent<FileInfo?> file)
@@ -295,11 +346,24 @@ namespace osu.Game.Screens.Edit.Setup
             if (rollingBackBackgroundChange)
                 return;
 
-            if (file.NewValue == null || !ChangeBackgroundImage(file.NewValue, backgroundChooser.ApplyToAllDifficulties.Value))
+            if (!ChangeBackgroundImage(file.NewValue, backgroundChooser.ApplyToAllDifficulties.Value))
             {
                 rollingBackBackgroundChange = true;
                 backgroundChooser.Current.Value = file.OldValue;
                 rollingBackBackgroundChange = false;
+            }
+        }
+
+        private void videoChanged(ValueChangedEvent<FileInfo?> file)
+        {
+            if (rollingBackVideoChange)
+                return;
+
+            if (!ChangeVideo(file.NewValue, videoChooser.ApplyToAllDifficulties.Value))
+            {
+                rollingBackVideoChange = true;
+                videoChooser.Current.Value = file.OldValue;
+                rollingBackVideoChange = false;
             }
         }
 

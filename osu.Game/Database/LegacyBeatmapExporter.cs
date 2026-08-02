@@ -66,13 +66,23 @@ namespace osu.Game.Database
             {
                 Configuration = new LegacySkinDecoder().Decode(skinStreamReader)
             };
+            
+            using var storyboardStream = base.GetFileContents(model, file);
+
+            if (storyboardStream == null)
+                return null;
+            
+            using var storyboardStreamReader = new LineBufferedReader(storyboardStream);
+            var beatmapStoryboard = new LegacyStoryboardDecoder().Decode(storyboardStreamReader);
+            beatmapStoryboard.Beatmap = beatmapContent;
+            beatmapStoryboard.BeatmapInfo = beatmapInfo;
 
             MutateBeatmap(model, playableBeatmap);
 
             // Encode to legacy format
             var stream = new MemoryStream();
             using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-                new LegacyBeatmapEncoder(playableBeatmap, beatmapSkin).Encode(sw);
+                new LegacyBeatmapEncoder(playableBeatmap, beatmapSkin, beatmapStoryboard).Encode(sw);
 
             stream.Seek(0, SeekOrigin.Begin);
 

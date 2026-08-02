@@ -53,7 +53,7 @@ public partial class UbExportFolderSelector : FormBeatmapFileSelector
     }
 
     protected override FileChooserPopover CreatePopover(string[] handledExtensions, Bindable<FileInfo?> current,
-        string? chooserPath)
+        string? chooserPath, bool allowClear)
     {
         var popover = new UbExportChoosePopover(handledExtensions, current, chooserPath, false, SelectedDirectory);
 
@@ -70,7 +70,7 @@ public partial class UbExportFolderSelector : FormBeatmapFileSelector
 
         public UbExportChoosePopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath,
             bool beatmapHasMultipleDifficulties, Bindable<string> selectedDirectory)
-            : base(handledExtensions, current, chooserPath)
+            : base(handledExtensions, current, chooserPath, false)
         {
             this.beatmapHasMultipleDifficulties = beatmapHasMultipleDifficulties;
 

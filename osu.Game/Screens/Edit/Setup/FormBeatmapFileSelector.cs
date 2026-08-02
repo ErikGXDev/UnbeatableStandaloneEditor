@@ -38,9 +38,9 @@ namespace osu.Game.Screens.Edit.Setup
             this.beatmapHasMultipleDifficulties = beatmapHasMultipleDifficulties;
         }
 
-        protected override FileChooserPopover CreatePopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath)
+        protected override FileChooserPopover CreatePopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath, bool allowClear)
         {
-            var popover = new BeatmapFileChooserPopover(handledExtensions, current, chooserPath, beatmapHasMultipleDifficulties);
+            var popover = new BeatmapFileChooserPopover(handledExtensions, current, chooserPath, beatmapHasMultipleDifficulties, allowClear);
             popover.ApplyToAllDifficulties.BindTo(ApplyToAllDifficulties);
             return popover;
         }
@@ -53,8 +53,8 @@ namespace osu.Game.Screens.Edit.Setup
 
             private Container selectApplicationScopeContainer = null!;
 
-            public BeatmapFileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath, bool beatmapHasMultipleDifficulties)
-                : base(handledExtensions, current, chooserPath)
+            public BeatmapFileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath, bool beatmapHasMultipleDifficulties, bool allowClear)
+                : base(handledExtensions, current, chooserPath, allowClear)
             {
                 this.beatmapHasMultipleDifficulties = beatmapHasMultipleDifficulties;
             }

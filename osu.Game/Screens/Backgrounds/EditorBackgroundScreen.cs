@@ -60,6 +60,7 @@ namespace osu.Game.Screens.Backgrounds
 
         private IEnumerable<Drawable> createContent() =>
         [
+            new Background(@"Backgrounds/bg1") { RelativeSizeAxes = Axes.Both, },
             new BeatmapBackground(beatmap.Value) { RelativeSizeAxes = Axes.Both, },
             // one reason for this kooky container nesting being here is that the storyboard needs a custom clock
             // but also needs it on an isolated-enough level that doesn't break screen stack expiry logic (which happens if the clock was put on `this`),
@@ -87,6 +88,7 @@ namespace osu.Game.Screens.Backgrounds
         private void updateState(double duration = 500)
         {
             storyboardContainer.FadeTo(showStoryboard.Value ? 1 : 0, duration, Easing.OutQuint);
+            background.FadeTo(showStoryboard.Value ? 1 : 0, duration, Easing.OutQuint);
             // yes, this causes overdraw, but is also a (crude) fix for bad-looking transitions on screen entry
             // caused by the previous background on the background stack poking out from under this one and then instantly fading out
             background.FadeColour(beatmap.Value.Storyboard.ReplacesBackground && showStoryboard.Value ? Colour4.Black : Colour4.White, duration, Easing.OutQuint);

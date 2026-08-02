@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UMania;
 using osu.Game.Rulesets.UMania.Beatmaps;
 using osu.Game.Rulesets.UMania.Edit.Blueprints;
+using osu.Game.Storyboards;
 
 namespace UnbeatableStandaloneEditor.Import;
 
@@ -69,10 +70,12 @@ public class BeatmapImporter
             }
             tempWriter.Flush();
         }
-        tempStream.Position = 0;
+
+        var beatmapStream = new MemoryStream(tempStream.ToArray());
+        var storyboardStream = new MemoryStream(tempStream.ToArray());
 
 
-        using (var reader = new LineBufferedReader(tempStream))
+        using (var reader = new LineBufferedReader(beatmapStream))
         {
             var decoder = Decoder.GetDecoder<Beatmap>(reader);
             beatmap = decoder.Decode(reader);
@@ -84,7 +87,23 @@ public class BeatmapImporter
             return tempStream;
         }
 
+        Storyboard storyboard;
+
+        using (var reader2 = new LineBufferedReader(storyboardStream))
+        {
+            var storyboardDecoder = Decoder.GetDecoder<Storyboard>(reader2);
+            storyboard = storyboardDecoder.Decode(reader2);
+            Logger.Log("Is storyboard null: " + (storyboard == null));
+        }
+
         beatmap.BeatmapInfo.Ruleset = UbRuleset.GetRulesetInfo();
+
+        // Ensure the beatmap metadata references the cover image.
+        beatmap.Metadata.BackgroundFile = "cover.png";
+
+        if (storyboard != null)
+            storyboard.BeatmapInfo.Metadata.BackgroundFile = beatmap.Metadata.BackgroundFile;
+
 
         var converter = new ManiaBeatmapConverter(beatmap, new UManiaRuleset());
 
@@ -92,7 +111,7 @@ public class BeatmapImporter
 
         reverseExportTransformations(converted);
 
-        var encoder = new LegacyBeatmapEncoder(converted, null);
+        var encoder = new LegacyBeatmapEncoder(converted, null, storyboard);
         var outputStream = new MemoryStream();
         using (var textWriter = new StreamWriter(outputStream, leaveOpen: true))
         {

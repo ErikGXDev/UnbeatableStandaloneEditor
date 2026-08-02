@@ -18,9 +18,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
@@ -69,6 +71,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// Text displayed in the selector when no file is selected.
         /// </summary>
         public LocalisableString PlaceholderText { get; init; }
+
+        /// <summary>
+        /// If set to <see langword="true"/>, the selector will display a button,
+        /// which when clicked, will change <see cref="Current"/>'s value to <see langword="null"/>.
+        /// </summary>
+        public bool AllowClear { get; set; }
 
         public Container PreviewContainer { get; private set; } = null!;
 
@@ -186,7 +194,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private void onFileSelected()
         {
-            if (Current.Value != null)
+            if (Current.Value != null || AllowClear)
                 this.HidePopover();
 
             initialChooserPath = Current.Value?.DirectoryName;
@@ -244,12 +252,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         Task ICanAcceptFiles.Import(ImportTask[] tasks, ImportParameters parameters) => throw new NotImplementedException();
 
-        protected virtual FileChooserPopover CreatePopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath) =>
-            new FileChooserPopover(handledExtensions, current, chooserPath);
+        protected virtual FileChooserPopover CreatePopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath, bool allowClear) =>
+            new FileChooserPopover(handledExtensions, current, chooserPath, allowClear);
 
         public Popover GetPopover()
         {
-            var popover = CreatePopover(handledExtensions, Current, initialChooserPath);
+            var popover = CreatePopover(handledExtensions, Current, initialChooserPath, AllowClear);
             popoverState.UnbindBindings();
             popoverState.BindTo(popover.State);
             return popover;
@@ -264,7 +272,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected OsuFileSelector FileSelector;
 
-            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath)
+            public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath, bool allowClear)
                 : base(false)
             {
                 Child = new Container
@@ -273,9 +281,37 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     // simplest solution to avoid underlying text to bleed through the bottom border
                     // https://github.com/ppy/osu/pull/30005#issuecomment-2378884430
                     Padding = new MarginPadding { Bottom = 1 },
-                    Child = FileSelector = new OsuFileSelector(chooserPath, handledExtensions)
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Bottom = allowClear ? 50 : 0 },
+                            Child = FileSelector = new OsuFileSelector(chooserPath, handledExtensions)
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                        },
+                        allowClear
+                            ? new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre,
+                                Padding = new MarginPadding(5),
+                                Child = new DangerousRoundedButton
+                                {
+                                    Text = "Clear",
+                                    Action = () => OnFileSelected(null),
+                                    Enabled = { Value = current.Value != null },
+                                    Padding = new MarginPadding(5),
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    Width = 80,
+                                }
+                            }
+                            : Empty()
                     },
                 };
 

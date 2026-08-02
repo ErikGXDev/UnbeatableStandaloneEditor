@@ -328,8 +328,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             var audioFile = beatmapSet.GetFile(audioFilename);
             
             string coverFilename = Beatmap.Metadata.BackgroundFile;
-            
+
             var coverFile = beatmapSet.GetFile(coverFilename);
+
+            string videoFilename = workingBeatmap.Storyboard.PrimaryVideo?.Path ?? string.Empty;
+            var videoFile = string.IsNullOrEmpty(videoFilename) ? null : beatmapSet.GetFile(videoFilename);
 
             var baseFilename = "";
 
@@ -409,6 +412,24 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                             coverStream.Dispose();
                         }
                     }
+
+                    if (videoFile != null)
+                    {
+                        var videoStream = workingBeatmap.GetStream(videoFile.File.GetStoragePath());
+                        if (videoStream != null)
+                        {
+                            string videoEntryName = videoFilename.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ? "video.webm" : "video.mp4";
+                            var videoEntry = archive.CreateEntry(videoEntryName, CompressionLevel.Optimal);
+
+                            using (var entryStream = videoEntry.Open())
+                            {
+                                videoStream.Seek(0, SeekOrigin.Begin);
+                                videoStream.CopyTo(entryStream);
+                            }
+
+                            videoStream.Dispose();
+                        }
+                    }
                 }
 
                 zipStream.Seek(0, SeekOrigin.Begin);
@@ -459,6 +480,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             
             var coverFile = beatmapSet.GetFile(coverFilename);
 
+            string videoFilename = workingBeatmap.Storyboard.PrimaryVideo?.Path ?? string.Empty;
+            var videoFile = string.IsNullOrEmpty(videoFilename) ? null : beatmapSet.GetFile(videoFilename);
 
             string artist = Beatmap.Metadata.Artist ?? "Unknown";
             string title = Beatmap.Metadata.Title ?? "Song";
@@ -529,6 +552,24 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     }
 
                     coverStream.Dispose();
+                }
+            }
+
+            if (videoFile != null)
+            {
+                var videoStream = workingBeatmap.GetStream(videoFile.File.GetStoragePath());
+                if (videoStream != null)
+                {
+                    string videoEntryName = videoFilename.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ? "video.webm" : "video.mp4";
+                    var videoPath = Path.Combine(directory, videoEntryName);
+
+                    using (var fs = File.Create(videoPath))
+                    {
+                        videoStream.Seek(0, SeekOrigin.Begin);
+                        videoStream.CopyTo(fs);
+                    }
+
+                    videoStream.Dispose();
                 }
             }
 

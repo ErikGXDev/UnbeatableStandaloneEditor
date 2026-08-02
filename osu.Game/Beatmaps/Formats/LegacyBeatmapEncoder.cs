@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
+using osu.Game.Storyboards;
 using osuTK;
 using osuTK.Graphics;
 
@@ -26,6 +27,9 @@ namespace osu.Game.Beatmaps.Formats
         private readonly IBeatmap beatmap;
 
         private readonly ISkin? skin;
+        
+        private readonly LegacyStoryboardEncoder? storyboardEncoder;
+
 
         private readonly int onlineRulesetID;
         
@@ -36,10 +40,14 @@ namespace osu.Game.Beatmaps.Formats
         /// </summary>
         /// <param name="beatmap">The beatmap to encode.</param>
         /// <param name="skin">The beatmap's skin, used for encoding combo colours.</param>
-        public LegacyBeatmapEncoder(IBeatmap beatmap, ISkin? skin)
+        /// <param name="storyboard">The beatmap's storyboard.</param>
+        public LegacyBeatmapEncoder(IBeatmap beatmap, ISkin? skin, Storyboard? storyboard = null)
         {
             this.beatmap = beatmap;
             this.skin = skin;
+            
+            if (storyboard != null)
+                storyboardEncoder = new LegacyStoryboardEncoder(storyboard);
 
             onlineRulesetID = beatmap.BeatmapInfo.Ruleset.OnlineID;
 
@@ -167,14 +175,21 @@ namespace osu.Game.Beatmaps.Formats
         {
             writer.WriteLine("[Events]");
 
-            if (!string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
-                writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,\"{beatmap.BeatmapInfo.Metadata.BackgroundFile}\",0,0"));
+            if (storyboardEncoder != null)
+            {
+                storyboardEncoder.EncodeEventsToBeatmap(writer);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
+                    writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,\"{beatmap.BeatmapInfo.Metadata.BackgroundFile}\",0,0"));
+            }
 
             foreach (var b in beatmap.Breaks)
                 writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Break},{b.StartTime},{b.EndTime}"));
 
-            foreach (string l in beatmap.UnhandledEventLines)
-                writer.WriteLine(l);
+            /*foreach (string l in beatmap.UnhandledEventLines)
+                writer.WriteLine(l);*/
         }
 
         private void handleControlPoints(TextWriter writer)

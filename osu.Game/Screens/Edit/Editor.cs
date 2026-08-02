@@ -306,7 +306,7 @@ namespace osu.Game.Screens.Edit
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
 
-            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin(), loadableBeatmap.BeatmapInfo));
+            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin(), loadableBeatmap.Storyboard, loadableBeatmap.BeatmapInfo));
             dependencies.CacheAs(editorBeatmap);
 
             editorBeatmap.UpdateInProgress.BindValueChanged(_ => updateSampleDisabledState());
@@ -642,7 +642,7 @@ namespace osu.Game.Screens.Edit
             
             var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
 
-            var encoder = new LegacyBeatmapEncoder(playableBeatmap, null);
+            var encoder = new LegacyBeatmapEncoder(playableBeatmap, null, Beatmap.Value.Storyboard);
 
             using var beatmapStream = new MemoryStream();
             using (var sw = new StreamWriter(beatmapStream, Encoding.UTF8, 1024, true))
@@ -792,7 +792,7 @@ namespace osu.Game.Screens.Edit
             try
             {
                 // save the loaded beatmap's data stream.
-                beatmapManager.Save(editorBeatmap.BeatmapInfo, editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin);
+                beatmapManager.Save(editorBeatmap.BeatmapInfo, editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin, editorBeatmap.Storyboard);
             }
             catch (Exception ex)
             {
