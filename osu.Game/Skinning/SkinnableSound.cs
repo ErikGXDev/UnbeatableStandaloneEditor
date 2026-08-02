@@ -126,7 +126,7 @@ namespace osu.Game.Skinning
             
             // Detect custom hitsound
             // Remove, potential corruption?
-            if (samplesContainer.Any(c => c.Sample?.Name == "hitsound"))
+            /*if (samplesContainer.Any(c => c.Sample?.Name == "hitsound"))
             {
                 // Only play once
                 var sample1 = samplesContainer.First();
@@ -143,7 +143,7 @@ namespace osu.Game.Skinning
                 }
 
                 return;
-            }
+            }*/
 
             samplesContainer.ForEach(c =>
             { 
