@@ -421,7 +421,10 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
                 case 3:
                     int totalColumns = (int)Math.Max(1, beatmap.Difficulty.CircleSize);
-                    position.X = (int)Math.Ceiling(((IHasXPosition)hitObject).X * (512f / totalColumns));
+                    
+                    if (totalColumns == 5) totalColumns = 6;
+                    
+                    position.X = (int)Math.Floor((((IHasXPosition)hitObject).X + 0.5f) * (512f / totalColumns));
                     break;
             }
 
