@@ -1,4 +1,7 @@
-﻿using osu.Framework.Screens;
+﻿using osu.Framework.Allocation;
+using osu.Framework.Screens;
+using osu.Game.Beatmaps.Formats;
+using osu.Game.Configuration;
 using osu.Game.Screens.Edit;
 
 namespace UnbeatableStandaloneEditor;
@@ -13,6 +16,17 @@ public partial class EditorLoader : osu.Game.Screens.Edit.EditorLoader
     {
         IsNewBeatmap = isNewBeatmap;
      }
+
+    [BackgroundDependencyLoader]
+    private void load(OsuConfigManager config)
+    {
+        var unanimatedBindable = config.GetBindable<bool>(OsuSetting.EditorUnanimated);
+
+        unanimatedBindable.BindValueChanged(v =>
+        {
+            LegacyBeatmapEncoder.IsUnanimatedStatic = v.NewValue;
+        }, true);
+    }
 
     // Allow the framework to exit this screen normally
     public override bool AllowUserExit => true;
