@@ -564,7 +564,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             int normalBankIndex = (int)toLegacySampleBank(normalLegacy?.Bank);
             int addBankIndex = (int)toLegacySampleBank(addLegacy?.Bank);
             
-            if (normalLegacy is ConvertHitObjectParser.LegacyHitSampleInfo legacyInfo)
+            if (normalLegacy is ConvertHitObjectParser.LegacyHitSampleInfo legacyInfo && LegacyBeatmapEncoder.IsUnanimatedStatic)
             {
                 if (legacyInfo?.RawLegacyBankIndex != null)
                 {

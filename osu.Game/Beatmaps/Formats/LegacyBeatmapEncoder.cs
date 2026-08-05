@@ -566,6 +566,8 @@ namespace osu.Game.Beatmaps.Formats
             writer.Write(FormattableString.Invariant($"{endTimeData.EndTime}{suffix}"));
         }
 
+        public static bool IsUnanimatedStatic = false;
+
         private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false)
         {
             var normalLegacy = samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
@@ -574,7 +576,7 @@ namespace osu.Game.Beatmaps.Formats
             int normalBankIndex = (int)toLegacySampleBank(normalLegacy?.Bank);
             int addBankIndex = (int)toLegacySampleBank(addLegacy?.Bank);
             
-            if (normalLegacy is ConvertHitObjectParser.LegacyHitSampleInfo legacyInfo)
+            if (normalLegacy is ConvertHitObjectParser.LegacyHitSampleInfo legacyInfo && IsUnanimatedStatic)
             {
                 if (legacyInfo?.RawLegacyBankIndex != null)
                 {

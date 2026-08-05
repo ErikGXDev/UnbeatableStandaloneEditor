@@ -23,6 +23,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps.Formats;
 using osuTK;
 using osuTK.Input;
 
@@ -469,6 +470,8 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
 
         if (IsUnanimated)
             RightToolbox.Add(new UbAnimateToolbox());
+        
+        LegacyBeatmapEncoder.IsUnanimatedStatic = IsUnanimated;
 
         // Wire modifier toggles to apply to selected notes
         var modButtons = new[] { ModFlyingButton, ModInvisibleButton, ModSwapImmediateButton, ModCopButton, ModCop1Button, ModCop2Button, ModCop3Button, ModCop4Button, ModCopFinishButton, ModCopHeavyButton };
