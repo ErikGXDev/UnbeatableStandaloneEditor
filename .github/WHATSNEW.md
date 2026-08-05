@@ -1,11 +1,9 @@
 ﻿## What's new
 
-- The "verify" tab in the editor is now more accurate to UNBEATABLE maps, and also easier to use.
-- Added video support
-  - You can add videos to your beatmaps, just like cover art.
-  - The video will be previewed in the editor.
-- Both the video and cover art input can be cleared now.
-- Added the option "View > Show cover art or video" to toggle the visibility of cover art and video in the compose tab.
-- Improved imports by automatically detecting the cover art and video in most cases.
+- Support for Stefy's UNANIMATED mod, which allows you to create more advanced camera controls. (Enable it in the settings)
+  - More notes/parameters will be added in the future according to the mod's format documentation.
+- Key-Charting now supports creating hold notes with the arrow keys, so placing notes can now be done with only a keyboard.
+- You can now change the beat divisor using the keyboard with G and Shift+G.
+- Fixed column hints still applying to hold notes, even when it was disabled.
 
 **Happy mapping!**
