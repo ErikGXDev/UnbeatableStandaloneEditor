@@ -37,6 +37,8 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     }
     
     [Resolved] private OsuConfigManager config { get; set; } = null!;
+    
+    [Resolved] private BindableBeatDivisor beatDivisor { get; set; } = null!;
 
     public bool Is4Key => config.Get<bool>(OsuSetting.Editor4KeyMode);
 
@@ -661,6 +663,34 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
         {
             if (keyBasedChartingHandler != null && keyBasedChartingHandler.TryPlaceNote(e.Key, e.ShiftPressed))
                 return true;
+
+            if (e.Key == Key.G)
+            {
+                if (e.ShiftPressed)
+                {
+                    beatDivisor.SelectPrevious();
+                }
+                else
+                {
+                    beatDivisor.SelectNext();
+                }
+            }
+
+            if (keyBasedChartingHandler != null && keyBasedChartingHandler.Enabled)
+            {
+                switch (e.Key)
+                {
+                    case Key.Left:
+                        if (keyBasedChartingHandler.TryAdjustHoldByKey(-1, e.ShiftPressed))
+                            return true;
+                        break;
+
+                    case Key.Right:
+                        if (keyBasedChartingHandler.TryAdjustHoldByKey(1, e.ShiftPressed))
+                            return true;
+                        break;
+                }
+            }
         }
 
         return base.OnKeyDown(e);

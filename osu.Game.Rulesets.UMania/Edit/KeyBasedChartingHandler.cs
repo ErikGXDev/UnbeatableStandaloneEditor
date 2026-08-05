@@ -129,6 +129,33 @@ public partial class KeyBasedChartingHandler : Drawable
         return false;
     }
 
+    public bool TryAdjustHoldByKey(int direction, bool shiftPressed)
+    {
+        if (!Enabled)
+            return false;
+
+        bool anyHeld = false;
+        bool blockedByMinLength = false;
+
+        for (int column = 0; column < 6; column++)
+        {
+            if (heldNotes[column] == null || noteWasRemoved[column])
+                continue;
+
+            anyHeld = true;
+
+            if (direction < 0 && !canShrink(column))
+            {
+                blockedByMinLength = true;
+                continue;
+            }
+
+            adjustHoldLength(column, direction, shiftPressed);
+        }
+
+        return blockedByMinLength;
+    }
+
     private bool canShrink(int column)
     {
         var note = heldNotes[column];
