@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
         {
             hitObject = newHitObject;
         }
+        
+        public bool HasHitObject => hitObject != null;
 
         static bool isModActive(DrawableTernaryButton modButton)
         {

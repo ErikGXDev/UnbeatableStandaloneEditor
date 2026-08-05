@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -174,15 +176,27 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
                 hintText.Alpha = 1;
             }
             
+            applyWhistleIfNeeded();
+            
         }, true);
         
-        addBankIndexSlider.BindValueChanged(v => noteBuilder.SetAdditionBankIndex(v.NewValue));
-        customSampleBankSlider.BindValueChanged(v => noteBuilder.SetCustomSampleBank(v.NewValue));
-        volumeSlider.BindValueChanged(v => noteBuilder.SetVolume(v.NewValue));
+        addBankIndexSlider.BindValueChanged(v => {noteBuilder.SetAdditionBankIndex(v.NewValue); applyWhistleIfNeeded();});
+        customSampleBankSlider.BindValueChanged(v => {noteBuilder.SetCustomSampleBank(v.NewValue); applyWhistleIfNeeded();});
+        volumeSlider.BindValueChanged(v => {noteBuilder.SetVolume(v.NewValue); applyWhistleIfNeeded();});
 
     }
 
     private EditorBeatmap beatmap = null!;
+
+    private void applyWhistleIfNeeded()
+    {
+        if (!noteBuilder.HasHitObject) return;
+        
+        if (!noteBuilder.HasSample(HitSampleInfo.HIT_WHISTLE))
+        {
+            noteBuilder.ApplySamples(new List<string>() {HitSampleInfo.HIT_WHISTLE});
+        }
+    }
 
     private void updateActiveState()
     {
