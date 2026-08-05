@@ -673,10 +673,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 : base(
                     name,
                     bank ?? SampleControlPoint.DEFAULT_BANK,
-                    suffix: customSampleBank >= 2 ? customSampleBank.ToString() : null,
+                    suffix: customSampleBank >= 2 || customSampleBank <= 0 ? customSampleBank.ToString() : null,
                     volume,
                     editorAutoBank,
-                    useBeatmapSamples: customSampleBank >= 1)
+                    useBeatmapSamples: customSampleBank >= 1 || customSampleBank <= 0)
             {
                 BankSpecified = !string.IsNullOrEmpty(bank);
                 IsLayered = isLayered;

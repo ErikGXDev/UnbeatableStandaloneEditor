@@ -43,8 +43,8 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         public readonly BindableInt SampleVolumeBindable = new BindableInt(100)
         {
-            MinValue = 0,
-            MaxValue = 100,
+            /*MinValue = 0,
+            MaxValue = 100,*/
         };
 
         /// <summary>

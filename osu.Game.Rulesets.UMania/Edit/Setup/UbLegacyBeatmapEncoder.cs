@@ -268,7 +268,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     TimingSignature = timingPoint.TimeSignature.Numerator,
                     SampleBank = updateSampleBank ? (int)toLegacySampleBank(tempHitSample.Bank) : lastControlPointProperties.SampleBank,
                     // Inherit the previous custom sample bank if the current custom sample bank is not set
-                    CustomSampleBank = customSampleBank >= 0 ? customSampleBank : lastControlPointProperties.CustomSampleBank,
+                    CustomSampleBank = customSampleBank >= 0 || true ? customSampleBank : lastControlPointProperties.CustomSampleBank,
                     SampleVolume = tempHitSample.Volume,
                     EffectFlags = effectFlags
                 };

@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
 {
     public class UbNoteBuilder
     {
-        private HitObject hitObject;
+        public HitObject HitObject;
         
         public static readonly Dictionary<UbIconType, List<string>> BaseSamples = new Dictionary<UbIconType, List<string>>
         {
@@ -33,15 +33,15 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
 
         public UbNoteBuilder(HitObject hitObject)
         {
-            this.hitObject = hitObject;
+            this.HitObject = hitObject;
         }
         
         public void ChangeHitObject(HitObject newHitObject)
         {
-            hitObject = newHitObject;
+            HitObject = newHitObject;
         }
         
-        public bool HasHitObject => hitObject != null;
+        public bool HasHitObject => HitObject != null;
 
         static bool isModActive(DrawableTernaryButton modButton)
         {
@@ -52,24 +52,24 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
         {
             var hitSamples = new List<HitSampleInfo>();
 
-            hitSamples = hitObject.Samples.ToList();
+            hitSamples = HitObject.Samples.ToList();
 
             foreach (string sample in samples)
             {
                 // EditorAutoBank must be false so the encoder preserves the explicit bank
-                HitSampleInfo sampleInfo = hitObject.CreateHitSampleInfo(sample).With(newEditorAutoBank: false);
+                HitSampleInfo sampleInfo = HitObject.CreateHitSampleInfo(sample).With(newEditorAutoBank: false);
                 hitSamples.Add(sampleInfo);
             }
 
-            hitObject.Samples = hitSamples;
+            HitObject.Samples = hitSamples;
         }
 
         public void ApplyModifierSample(DrawableTernaryButton modButton, string sample)
         {
             if (isModActive(modButton))
             {
-                HitSampleInfo sampleInfo = hitObject.CreateHitSampleInfo(sample).With(newVolume: 100, newEditorAutoBank: false);
-                hitObject.Samples.Add(sampleInfo);
+                HitSampleInfo sampleInfo = HitObject.CreateHitSampleInfo(sample).With(newVolume: 100, newEditorAutoBank: false);
+                HitObject.Samples.Add(sampleInfo);
             }
         }
 
@@ -95,26 +95,26 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
             if (!isModActive(modButton))
                 return;
 
-            bool hasAdditionSample = hitObject.Samples.Any(s => s.Name != HitSampleInfo.HIT_NORMAL);
+            bool hasAdditionSample = HitObject.Samples.Any(s => s.Name != HitSampleInfo.HIT_NORMAL);
             if (!hasAdditionSample)
-                hitObject.Samples.Add(hitObject.CreateHitSampleInfo(HitSampleInfo.HIT_FLOURISH).With(newVolume: 100, newEditorAutoBank: false));
+                HitObject.Samples.Add(HitObject.CreateHitSampleInfo(HitSampleInfo.HIT_FLOURISH).With(newVolume: 100, newEditorAutoBank: false));
 
             ApplyAdditionBank(HitSampleInfo.BANK_NORMAL);
         }
 
         public void ApplyMainBank(string bank)
         {
-            var normalSample = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            var normalSample = HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
 
             if (normalSample == null)
             {
-                hitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL, bank, string.Empty, 100, false));
+                HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL, bank, string.Empty, 100, false));
                 return;
             }
 
-            var index = hitObject.Samples.IndexOf(normalSample);
+            var index = HitObject.Samples.IndexOf(normalSample);
 
-            hitObject.Samples[index] = new HitSampleInfo(normalSample.Name,
+            HitObject.Samples[index] = new HitSampleInfo(normalSample.Name,
                 bank,
                 normalSample.Suffix,
                 100,
@@ -123,13 +123,13 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
 
         public void ApplyAdditionBank(string bank)
         {
-            var additionSamples = hitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL);
+            var additionSamples = HitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL);
 
             foreach (var additionSample in additionSamples.ToList())
             {
-                var index = hitObject.Samples.IndexOf(additionSample);
+                var index = HitObject.Samples.IndexOf(additionSample);
 
-                hitObject.Samples[index] = new HitSampleInfo(additionSample.Name,
+                HitObject.Samples[index] = new HitSampleInfo(additionSample.Name,
                     bank,
                     additionSample.Suffix,
                     additionSample.Volume,
@@ -140,25 +140,25 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
        
         public void SetNormalBankIndex(int bankIndex)
         {
-            var normalSample = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            var normalSample = HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
             if (normalSample == null) return;
 
-            var index = hitObject.Samples.IndexOf(normalSample);
+            var index = HitObject.Samples.IndexOf(normalSample);
             
             var existingAddIndex = (normalSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyAddBankIndex;
             
-            hitObject.Samples[index] = SetLegacyBankIndex(normalSample, legacyBankIndex: bankIndex, legacyAddBankIndex: existingAddIndex);
+            HitObject.Samples[index] = SetLegacyBankIndex(normalSample, legacyBankIndex: bankIndex, legacyAddBankIndex: existingAddIndex);
         }
 
         
         public void SetAdditionBankIndex(int bankIndex)
         {
-            var normalSample = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            var normalSample = HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
             
             if (normalSample != null)
             {
-                var normalIndex = hitObject.Samples.IndexOf(normalSample);
-                hitObject.Samples[normalIndex] = SetLegacyBankIndex(normalSample, legacyBankIndex: (normalSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyBankIndex, legacyAddBankIndex: bankIndex);
+                var normalIndex = HitObject.Samples.IndexOf(normalSample);
+                HitObject.Samples[normalIndex] = SetLegacyBankIndex(normalSample, legacyBankIndex: (normalSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyBankIndex, legacyAddBankIndex: bankIndex);
             }
             
             
@@ -167,14 +167,14 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
         
         public void SetCustomSampleBank(int customBankIndex)
         {
-            var normalSample = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            var normalSample = HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
             if (normalSample == null) return;
 
-            var index = hitObject.Samples.IndexOf(normalSample);
+            var index = HitObject.Samples.IndexOf(normalSample);
             string? newSuffix = customBankIndex >= 2 ? customBankIndex.ToString() : null;
             bool newUseBeatmapSamples = customBankIndex >= 1;
 
-            hitObject.Samples[index] = SetLegacyBankIndex(
+            HitObject.Samples[index] = SetLegacyBankIndex(
                 normalSample.With(newSuffix: newSuffix, newUseBeatmapSamples: newUseBeatmapSamples),
                 legacyBankIndex: (normalSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyBankIndex,
                 legacyAddBankIndex: (normalSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyAddBankIndex,
@@ -184,44 +184,55 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
         
         public void SetVolume(int volume)
         {
-            var normalSample = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            var normalSample = HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
             if (normalSample == null) return;
 
-            var index = hitObject.Samples.IndexOf(normalSample);
-            hitObject.Samples[index] = SetLegacyBankIndex(
+            var index = HitObject.Samples.IndexOf(normalSample);
+            HitObject.Samples[index] = SetLegacyBankIndex(
                 normalSample.With(newVolume: volume),
                 legacyBankIndex: (normalSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyBankIndex,
                 legacyAddBankIndex: (normalSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyAddBankIndex,
                 customSampleBank: (normalSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.CustomSampleBank);
+            
+            var otherSamples = HitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL).ToList();
+            foreach (var otherSample in otherSamples)
+            {
+                var otherIndex = HitObject.Samples.IndexOf(otherSample);
+                HitObject.Samples[otherIndex] = SetLegacyBankIndex(
+                    otherSample.With(newVolume: volume),
+                    legacyBankIndex: (otherSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyBankIndex,
+                    legacyAddBankIndex: (otherSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyAddBankIndex,
+                    customSampleBank: (otherSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.CustomSampleBank);
+            }
         }
 
         
         public int GetNormalBankIndex()
         {
-            return (hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyBankIndex ?? 0;
+            return (HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyBankIndex ?? 0;
         }
 
        
         public int GetAdditionBankIndex()
         {
-            var normalSample = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) as ConvertHitObjectParser.LegacyHitSampleInfo;
+            var normalSample = HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) as ConvertHitObjectParser.LegacyHitSampleInfo;
             
             if (normalSample != null && normalSample.RawLegacyAddBankIndex.HasValue)
                 return normalSample.RawLegacyAddBankIndex.Value;
             
-            return (hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyAddBankIndex ?? 0;
+            return (HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyAddBankIndex ?? 0;
         }
 
       
         public int GetCustomSampleBank()
         {
-            return (hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) as ConvertHitObjectParser.LegacyHitSampleInfo)?.CustomSampleBank ?? 0;
+            return (HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) as ConvertHitObjectParser.LegacyHitSampleInfo)?.CustomSampleBank ?? 0;
         }
 
         
         public int GetVolume()
         {
-            return hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Volume ?? 100;
+            return HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Volume ?? 100;
         }
 
         private static ConvertHitObjectParser.LegacyHitSampleInfo SetLegacyBankIndex(
@@ -245,43 +256,43 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
         
         public void Recompute(List<string> baseSamples, string baseBank)
         {
-            hitObject.Samples.Clear();
+            HitObject.Samples.Clear();
             ApplySamples(baseSamples);
             ApplyMainBank(baseBank);
         }
 
         public HitSampleInfo GetMainSample()
         {
-            var normalSample = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            var normalSample = HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
 
             return normalSample ?? new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "normal", string.Empty, 100);
         }
         
         public HitSampleInfo GetAdditionSample()
         {
-            var normalSample = hitObject.Samples.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL);
+            var normalSample = HitObject.Samples.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL);
 
             return normalSample ?? new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "normal", string.Empty, 100);
         }
 
         public bool HasSample(string sample)
         {
-            return hitObject.Samples.Any(s => s.Name == sample);
+            return HitObject.Samples.Any(s => s.Name == sample);
         }
 
         public bool HasMainBank(string bank)
         {
-            return hitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_NORMAL && s.Bank == bank);
+            return HitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_NORMAL && s.Bank == bank);
         }
 
         public bool HasAdditionBank(string bank)
         {
-            return hitObject.Samples.Any(s => s.Name != HitSampleInfo.HIT_NORMAL && s.Bank == bank);
+            return HitObject.Samples.Any(s => s.Name != HitSampleInfo.HIT_NORMAL && s.Bank == bank);
         }
 
         public UbIconType InferObjectTypeIcon()
         {
-            if (hitObject is ManiaHitObject maniaHitObject)
+            if (HitObject is ManiaHitObject maniaHitObject)
             {
                 int column = maniaHitObject.Column;
 
@@ -290,7 +301,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
                     return UbIconType.Brawl;
                 }
 
-                if (hitObject is HeadNote or HoldNote)
+                if (HitObject is HeadNote or HoldNote)
                 {
                     if (column == 5)
                     {
@@ -310,7 +321,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
                     return UbIconType.Hold;
                 }
 
-                if (hitObject is Note)
+                if (HitObject is Note)
                 {
                     if (column == 5)
                     {
@@ -343,7 +354,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
         {
             var icons = new List<UbIconType>();
 
-            if (hitObject is ManiaHitObject maniaHitObject)
+            if (HitObject is ManiaHitObject maniaHitObject)
             {
                 int column = maniaHitObject.Column;
 

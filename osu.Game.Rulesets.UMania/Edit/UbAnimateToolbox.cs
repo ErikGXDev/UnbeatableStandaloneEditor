@@ -180,13 +180,26 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
             
         }, true);
         
-        addBankIndexSlider.BindValueChanged(v => {noteBuilder.SetAdditionBankIndex(v.NewValue); applyWhistleIfNeeded();});
-        customSampleBankSlider.BindValueChanged(v => {noteBuilder.SetCustomSampleBank(v.NewValue); applyWhistleIfNeeded();});
-        volumeSlider.BindValueChanged(v => {noteBuilder.SetVolume(v.NewValue); applyWhistleIfNeeded();});
+        addBankIndexSlider.BindValueChanged(v => {doChange(() => noteBuilder.SetAdditionBankIndex(v.NewValue)); applyWhistleIfNeeded();});
+        customSampleBankSlider.BindValueChanged(v => {doChange(() => noteBuilder.SetCustomSampleBank(v.NewValue)); applyWhistleIfNeeded();});
+        volumeSlider.BindValueChanged(v => {doChange(() => noteBuilder.SetVolume(v.NewValue)); applyWhistleIfNeeded();});
 
     }
 
     private EditorBeatmap beatmap = null!;
+
+    private void doChange(Action action)
+    {
+        if (!noteBuilder.HasHitObject) return;
+        
+        beatmap.BeginChange();
+        
+        action();
+        
+        beatmap.EndChange();
+        
+        beatmap.Update(noteBuilder.HitObject);
+    }
 
     private void applyWhistleIfNeeded()
     {
