@@ -23,8 +23,8 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Framework.Testing;
-using osu.Game.Rulesets.UMania.UI;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.UMania.Edit;
 
@@ -41,6 +41,8 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     [Resolved] private BindableBeatDivisor beatDivisor { get; set; } = null!;
 
     public bool Is4Key => config.Get<bool>(OsuSetting.Editor4KeyMode);
+    
+    public bool IsUnanimated => config.Get<bool>(OsuSetting.EditorUnanimated);
 
     public Bindable<bool> KeyBasedCharting { get; private set; } = null!;
 
@@ -464,6 +466,9 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
                 ]
             },
         });
+
+        if (IsUnanimated)
+            RightToolbox.Add(new UbAnimateToolbox());
 
         // Wire modifier toggles to apply to selected notes
         var modButtons = new[] { ModFlyingButton, ModInvisibleButton, ModSwapImmediateButton, ModCopButton, ModCop1Button, ModCop2Button, ModCop3Button, ModCop4Button, ModCopFinishButton, ModCopHeavyButton };

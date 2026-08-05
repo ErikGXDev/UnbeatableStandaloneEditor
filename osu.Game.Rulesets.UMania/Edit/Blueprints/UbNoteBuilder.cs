@@ -8,6 +8,7 @@ using osu.Game.Audio;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.UMania.Objects;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 
@@ -132,8 +133,112 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
                     additionSample.Volume,
                     false);
             }
+        }
 
+       
+        public void SetNormalBankIndex(int bankIndex)
+        {
+            var normalSample = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            if (normalSample == null) return;
 
+            var index = hitObject.Samples.IndexOf(normalSample);
+            
+            var existingAddIndex = (normalSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyAddBankIndex;
+            
+            hitObject.Samples[index] = SetLegacyBankIndex(normalSample, legacyBankIndex: bankIndex, legacyAddBankIndex: existingAddIndex);
+        }
+
+        
+        public void SetAdditionBankIndex(int bankIndex)
+        {
+            var normalSample = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            
+            if (normalSample != null)
+            {
+                var normalIndex = hitObject.Samples.IndexOf(normalSample);
+                hitObject.Samples[normalIndex] = SetLegacyBankIndex(normalSample, legacyBankIndex: (normalSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyBankIndex, legacyAddBankIndex: bankIndex);
+            }
+            
+            
+        }
+
+        
+        public void SetCustomSampleBank(int customBankIndex)
+        {
+            var normalSample = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            if (normalSample == null) return;
+
+            var index = hitObject.Samples.IndexOf(normalSample);
+            string? newSuffix = customBankIndex >= 2 ? customBankIndex.ToString() : null;
+            bool newUseBeatmapSamples = customBankIndex >= 1;
+
+            hitObject.Samples[index] = SetLegacyBankIndex(
+                normalSample.With(newSuffix: newSuffix, newUseBeatmapSamples: newUseBeatmapSamples),
+                legacyBankIndex: (normalSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyBankIndex,
+                legacyAddBankIndex: (normalSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyAddBankIndex,
+                customSampleBank: customBankIndex);
+        }
+
+        
+        public void SetVolume(int volume)
+        {
+            var normalSample = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            if (normalSample == null) return;
+
+            var index = hitObject.Samples.IndexOf(normalSample);
+            hitObject.Samples[index] = SetLegacyBankIndex(
+                normalSample.With(newVolume: volume),
+                legacyBankIndex: (normalSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyBankIndex,
+                legacyAddBankIndex: (normalSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyAddBankIndex,
+                customSampleBank: (normalSample as ConvertHitObjectParser.LegacyHitSampleInfo)?.CustomSampleBank);
+        }
+
+        
+        public int GetNormalBankIndex()
+        {
+            return (hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyBankIndex ?? 0;
+        }
+
+       
+        public int GetAdditionBankIndex()
+        {
+            var normalSample = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) as ConvertHitObjectParser.LegacyHitSampleInfo;
+            
+            if (normalSample != null && normalSample.RawLegacyAddBankIndex.HasValue)
+                return normalSample.RawLegacyAddBankIndex.Value;
+            
+            return (hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) as ConvertHitObjectParser.LegacyHitSampleInfo)?.RawLegacyAddBankIndex ?? 0;
+        }
+
+      
+        public int GetCustomSampleBank()
+        {
+            return (hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL) as ConvertHitObjectParser.LegacyHitSampleInfo)?.CustomSampleBank ?? 0;
+        }
+
+        
+        public int GetVolume()
+        {
+            return hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Volume ?? 100;
+        }
+
+        private static ConvertHitObjectParser.LegacyHitSampleInfo SetLegacyBankIndex(
+            HitSampleInfo sample, int? legacyBankIndex = null, int? legacyAddBankIndex = null, int? customSampleBank = null)
+        {
+            if (sample is ConvertHitObjectParser.LegacyHitSampleInfo legacy)
+            {
+                return new ConvertHitObjectParser.LegacyHitSampleInfo(
+                    legacy.Name, legacy.Bank, legacy.Volume, legacy.EditorAutoBank,
+                    customSampleBank ?? legacy.CustomSampleBank, legacy.IsLayered,
+                    rawLegacyBankIndex: legacyBankIndex,
+                    rawLegacyAddBankIndex: legacyAddBankIndex);
+            }
+
+            return new ConvertHitObjectParser.LegacyHitSampleInfo(
+                sample.Name, sample.Bank, sample.Volume, sample.EditorAutoBank,
+                customSampleBank: customSampleBank ?? 0, isLayered: false,
+                rawLegacyBankIndex: legacyBankIndex,
+                rawLegacyAddBankIndex: legacyAddBankIndex);
         }
         
         public void Recompute(List<string> baseSamples, string baseBank)

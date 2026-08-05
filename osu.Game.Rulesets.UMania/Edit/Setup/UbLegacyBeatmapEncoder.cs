@@ -555,13 +555,29 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
         private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false)
         {
-            LegacySampleBank normalBank = toLegacySampleBank(samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank);
-            LegacySampleBank addBank = toLegacySampleAddBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL && !s.EditorAutoBank)?.Bank);
+            var normalLegacy = samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            var addLegacy = samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL && !s.EditorAutoBank);
+            
+            int normalBankIndex = (int)toLegacySampleBank(normalLegacy?.Bank);
+            int addBankIndex = (int)toLegacySampleBank(addLegacy?.Bank);
+            
+            if (normalLegacy is ConvertHitObjectParser.LegacyHitSampleInfo legacyInfo)
+            {
+                if (legacyInfo?.RawLegacyBankIndex != null)
+                {
+                    normalBankIndex = legacyInfo.RawLegacyBankIndex.Value;
+                }
+
+                if (legacyInfo?.RawLegacyAddBankIndex != null)
+                {
+                    addBankIndex = legacyInfo.RawLegacyAddBankIndex.Value;
+                }
+            }
 
             StringBuilder sb = new StringBuilder();
 
-            sb.Append(FormattableString.Invariant($"{(int)normalBank}:"));
-            sb.Append(FormattableString.Invariant($"{(int)addBank}"));
+            sb.Append(FormattableString.Invariant($"{normalBankIndex}:"));
+            sb.Append(FormattableString.Invariant($"{addBankIndex}"));
 
             if (!banksOnly)
             {

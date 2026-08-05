@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 formatVersion >= LegacyBeatmapEncoder.FIRST_LAZER_VERSION
                     ? new Vector2(Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE))
                     : new Vector2((int)Parsing.ParseFloat(split[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE));
-
+            
             double startTime = Parsing.ParseDouble(split[2]) + offset;
 
             LegacyHitObjectType type = (LegacyHitObjectType)Parsing.ParseInt(split[3]);
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 result = createHitCircle(pos, combo, comboOffset);
 
                 if (split.Length > 5)
-                    readCustomSampleBanks(split[5], bankInfo);
+                    readCustomSampleBanks(split[5], bankInfo, saveRaw: shouldSaveRaw(pos.X)); // FIXED
             }
             else if (type.HasFlag(LegacyHitObjectType.Slider))
             {
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
 
                 if (split.Length > 10)
-                    readCustomSampleBanks(split[10], bankInfo, true);
+                    readCustomSampleBanks(split[10], bankInfo, true, saveRaw: shouldSaveRaw(pos.X)); // FIXED
 
                 // One node for each repeat + the start and end nodes
                 int nodes = repeatCount + 2;
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                             break;
 
                         SampleBankInfo info = nodeBankInfos[i];
-                        readCustomSampleBanks(sets[i], info);
+                        readCustomSampleBanks(sets[i], info, saveRaw: shouldSaveRaw(pos.X)); // FIXED
                     }
                 }
 
@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 result = createSpinner(new Vector2(512, 384) / 2, combo, duration);
 
                 if (split.Length > 6)
-                    readCustomSampleBanks(split[6], bankInfo);
+                    readCustomSampleBanks(split[6], bankInfo, saveRaw: shouldSaveRaw(pos.X)); // FIXED
             }
             else if (type.HasFlag(LegacyHitObjectType.Hold))
             {
@@ -171,7 +171,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 {
                     string[] ss = split[5].Split(':');
                     endTime = Math.Max(startTime, Parsing.ParseDouble(ss[0]));
-                    readCustomSampleBanks(string.Join(':', ss.Skip(1)), bankInfo);
+                    readCustomSampleBanks(string.Join(':', ss.Skip(1)), bankInfo, saveRaw: shouldSaveRaw(pos.X)); // FIXED
                 }
 
                 result = createHold(pos, endTime + offset - startTime);
@@ -190,18 +190,27 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             return result;
         }
+        
+        bool shouldSaveRaw(float position)
+        {
+            float localXDivisor = 512f / 6;
+            return Math.Clamp((int)MathF.Floor(position / localXDivisor), 0, 6 - 1) == 1;
+        }
 
-        private void readCustomSampleBanks(string str, SampleBankInfo bankInfo, bool banksOnly = false)
+        private void readCustomSampleBanks(string str, SampleBankInfo bankInfo, bool banksOnly = false, bool saveRaw = false)
         {
             if (string.IsNullOrEmpty(str))
                 return;
 
             string[] split = str.Split(':');
 
+            bankInfo.RawLegacyBankIndex = saveRaw ? Parsing.ParseInt(split[0]) : null;
             var bank = (LegacySampleBank)Parsing.ParseInt(split[0]);
             if (!Enum.IsDefined(bank))
                 bank = LegacySampleBank.Normal;
+           
 
+            bankInfo.RawLegacyAddBankIndex = saveRaw ? Parsing.ParseInt(split[1]) : null;
             var addBank = (LegacySampleBank)Parsing.ParseInt(split[1]);
             if (!Enum.IsDefined(addBank))
                 addBank = LegacySampleBank.Normal;
@@ -209,8 +218,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
             string? stringBank = bank.ToString().ToLowerInvariant();
             string? stringAddBank = addBank.ToString().ToLowerInvariant();
 
-            if (stringBank == @"none")
-                stringBank = "none"; // FIX: Allows 0-type banks to exist
+            if (stringBank == @"none" && !saveRaw)
+                stringBank = "none";
 
             if (stringAddBank == @"none")
             {
@@ -546,21 +555,25 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_NORMAL, bankInfo.BankForNormal, bankInfo.Volume, true, bankInfo.CustomSampleBank,
                     // if the sound type doesn't have the Normal flag set, attach it anyway as a layered sample.
                     // None also counts as a normal non-layered sample: https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)#hitsounds
-                    type != LegacyHitSoundType.None && !type.HasFlag(LegacyHitSoundType.Normal)));
+                    type != LegacyHitSoundType.None && !type.HasFlag(LegacyHitSoundType.Normal),
+                    rawLegacyBankIndex: bankInfo.RawLegacyBankIndex, rawLegacyAddBankIndex: bankInfo.RawLegacyAddBankIndex));
             }
             else
             {
-                soundTypes.Add(new FileHitSampleInfo(bankInfo.Filename, bankInfo.Volume));
+                soundTypes.Add(new FileHitSampleInfo(bankInfo.Filename, bankInfo.Volume, rawLegacyBankIndex: bankInfo.RawLegacyBankIndex, rawLegacyAddBankIndex: bankInfo.RawLegacyAddBankIndex));
             }
 
             if (type.HasFlag(LegacyHitSoundType.Finish))
-                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_FINISH, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.EditorAutoBank, bankInfo.CustomSampleBank));
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_FINISH, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.EditorAutoBank, bankInfo.CustomSampleBank,
+                    isLayered: false, rawLegacyBankIndex: bankInfo.RawLegacyBankIndex, rawLegacyAddBankIndex: bankInfo.RawLegacyAddBankIndex));
 
             if (type.HasFlag(LegacyHitSoundType.Whistle))
-                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_WHISTLE, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.EditorAutoBank, bankInfo.CustomSampleBank));
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_WHISTLE, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.EditorAutoBank, bankInfo.CustomSampleBank,
+                    isLayered: false, rawLegacyBankIndex: bankInfo.RawLegacyBankIndex, rawLegacyAddBankIndex: bankInfo.RawLegacyAddBankIndex));
 
             if (type.HasFlag(LegacyHitSoundType.Clap))
-                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_CLAP, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.EditorAutoBank, bankInfo.CustomSampleBank));
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_CLAP, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.EditorAutoBank, bankInfo.CustomSampleBank,
+                    isLayered: false, rawLegacyBankIndex: bankInfo.RawLegacyBankIndex, rawLegacyAddBankIndex: bankInfo.RawLegacyAddBankIndex));
 
             return soundTypes;
         }
@@ -602,6 +615,17 @@ namespace osu.Game.Rulesets.Objects.Legacy
             /// </summary>
             public bool EditorAutoBank = true;
 
+            /// <summary>
+            /// The raw legacy bank index for the normal sample, preserved from the beatmap file.
+            /// Used to round-trip bank indices that don't map to the standard enum values.
+            /// </summary>
+            public int? RawLegacyBankIndex;
+
+            /// <summary>
+            /// The raw legacy bank index for the additions sample, preserved from the beatmap file.
+            /// </summary>
+            public int? RawLegacyAddBankIndex;
+
             public SampleBankInfo Clone() => (SampleBankInfo)MemberwiseClone();
         }
 
@@ -633,7 +657,19 @@ namespace osu.Game.Rulesets.Objects.Legacy
             /// </summary>
             public bool BankSpecified;
 
-            public LegacyHitSampleInfo(string name, string? bank = null, int volume = 0, bool editorAutoBank = false, int customSampleBank = 0, bool isLayered = false)
+            /// <summary>
+            /// The raw legacy bank index for the normal sample, preserved from the beatmap file.
+            /// Used to round-trip bank indices that don't map to the standard enum values.
+            /// </summary>
+            public int? RawLegacyBankIndex;
+
+            /// <summary>
+            /// The raw legacy bank index for the additions sample, preserved from the beatmap file.
+            /// </summary>
+            public int? RawLegacyAddBankIndex;
+
+            public LegacyHitSampleInfo(string name, string? bank = null, int volume = 0, bool editorAutoBank = false, int customSampleBank = 0, bool isLayered = false,
+                                       int? rawLegacyBankIndex = null, int? rawLegacyAddBankIndex = null)
                 : base(
                     name,
                     bank ?? SampleControlPoint.DEFAULT_BANK,
@@ -644,6 +680,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 BankSpecified = !string.IsNullOrEmpty(bank);
                 IsLayered = isLayered;
+                RawLegacyBankIndex = rawLegacyBankIndex;
+                RawLegacyAddBankIndex = rawLegacyAddBankIndex;
             }
 
             public sealed override HitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<string?> newSuffix = default, Optional<int> newVolume = default,
@@ -665,7 +703,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public virtual LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<int> newVolume = default,
                                                     Optional<bool> newEditorAutoBank = default, Optional<int> newCustomSampleBank = default, Optional<bool> newIsLayered = default)
                 => new LegacyHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newVolume.GetOr(Volume), newEditorAutoBank.GetOr(EditorAutoBank), newCustomSampleBank.GetOr(CustomSampleBank),
-                    newIsLayered.GetOr(IsLayered));
+                    newIsLayered.GetOr(IsLayered), RawLegacyBankIndex, RawLegacyAddBankIndex);
 
             public bool Equals(LegacyHitSampleInfo? other)
                 // The additions to equality checks here are *required* to ensure that pooling works correctly.
@@ -683,9 +721,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
         {
             public readonly string Filename;
 
-            public FileHitSampleInfo(string filename, int volume)
+            public FileHitSampleInfo(string filename, int volume, int? rawLegacyBankIndex = null, int? rawLegacyAddBankIndex = null)
                 // Force CSS=1 to make sure that the LegacyBeatmapSkin does not fall back to the user skin.
-                : base(HIT_NORMAL, SampleControlPoint.DEFAULT_BANK, customSampleBank: 1, volume: volume)
+                : base(HIT_NORMAL, SampleControlPoint.DEFAULT_BANK, customSampleBank: 1, volume: volume, rawLegacyBankIndex: rawLegacyBankIndex, rawLegacyAddBankIndex: rawLegacyAddBankIndex)
             {
                 Filename = filename;
             }
@@ -698,7 +736,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             public sealed override LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string> newBank = default, Optional<int> newVolume = default,
                                                             Optional<bool> newEditorAutoBank = default, Optional<int> newCustomSampleBank = default, Optional<bool> newIsLayered = default)
-                => new FileHitSampleInfo(Filename, newVolume.GetOr(Volume));
+                => new FileHitSampleInfo(Filename, newVolume.GetOr(Volume), rawLegacyBankIndex: RawLegacyBankIndex, rawLegacyAddBankIndex: RawLegacyAddBankIndex);
 
             public bool Equals(FileHitSampleInfo? other)
                 => base.Equals(other) && Filename == other.Filename;

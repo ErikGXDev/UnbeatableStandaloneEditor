@@ -30,8 +30,8 @@ namespace osu.Game.Graphics.Cursor
         {
             private const float max_width = 500;
 
-            private readonly Box background;
-            private readonly TextFlowContainer text;
+            protected readonly Box background;
+            protected readonly TextFlowContainer text;
             private bool instantMovement = true;
 
             private LocalisableString lastContent;

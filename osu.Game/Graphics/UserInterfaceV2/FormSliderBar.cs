@@ -12,14 +12,18 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Extensions;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osuTK.Graphics;
@@ -50,6 +54,137 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private readonly BindableNumber<T> currentNumberInstantaneous = new BindableNumber<T>();
         private readonly InnerSlider slider;
+
+
+        private partial class MarkerTooltip : OsuTooltipContainer.OsuTooltip
+        {
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                CornerRadius = 5;
+                Masking = true;
+
+                text.Colour = colours.Yellow;
+            }
+        }
+        
+        private partial class MarkerMarker<T> : Container, IHasCustomTooltip where T : struct, INumber<T>, IMinMaxValue<T>
+        {
+
+            [Resolved] private OsuColour colours { get; set; } = null!;
+            
+            private string tooltipText = string.Empty;
+
+            private Box box;
+
+            public object TooltipContent => new LocalisableString(tooltipText);
+
+            public ITooltip GetCustomTooltip() => new MarkerTooltip();
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                box.FadeColour(colours.Yellow, 250, Easing.OutQuint);
+                this.ResizeWidthTo(4.3f, 250, Easing.OutQuint);
+                //this.ResizeHeightTo(0.87f, 250, Easing.OutQuint);
+                box.FadeTo(1, 250, Easing.OutQuint);
+                return true;
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                box.FadeColour(Colour4.White, 250, Easing.OutQuint);
+                this.ResizeWidthTo(2.5f, 250, Easing.OutQuint);
+                //this.ResizeHeightTo(0.75f, 250, Easing.OutQuint);
+                box.FadeTo(0.5f, 250, Easing.OutQuint);
+                base.OnHoverLost(e);
+            }
+            
+            public Action<T>? OnClickAction { get; set; }
+            
+            protected override bool OnClick(ClickEvent e)
+            {
+                base.OnClick(e);
+                
+                OnClickAction?.Invoke(markerValue);
+                
+                return true;
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                
+                OnClickAction = null;
+            }
+
+            public override bool HandlePositionalInput => true;
+            
+            private T markerValue;
+            
+            public MarkerMarker(float x, string tooltipText, T markerValue)
+            {
+                this.tooltipText = tooltipText;
+                this.markerValue = markerValue;
+
+                Anchor = Anchor.CentreLeft;
+                Origin = Anchor.Centre;
+                Width = 2.5f;
+                CornerRadius = 2.5f;
+                RelativeSizeAxes = Axes.Y;
+                RelativePositionAxes = Axes.X;
+                Y = 0.5f;
+                X = x;
+                Height = 0.86f;
+                Masking = true;
+                Child = box = new Box
+                {
+                    RelativePositionAxes = Axes.X,
+                    Alpha = 0.5f,
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.White,
+                };
+            }
+        }
+
+        private Container? markerContainer;
+        public void SetMarkers(List<T> markers)
+        {
+            markerContainer?.Clear();
+
+            markerContainer = new Container()
+            {
+                RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding { Horizontal = slider.RangePadding, },
+            };
+
+            T minValue = current.MinValue;
+            T maxValue = current.MaxValue;
+            T range = maxValue - minValue;
+
+            Logger.Log($"Setting markers for {typeof(T)} slider with min: {minValue}, max: {maxValue}, range: {range}, markers: {string.Join(", ", markers)}");
+
+            foreach (T markerValue in markers)
+            {
+             
+                var copy = (BindableNumber<T>)currentNumberInstantaneous.GetUnboundCopy();
+
+                copy.Value = markerValue;
+                
+
+                var marker = new MarkerMarker<T>(copy.NormalizedValue, markerValue.ToString() ?? "", markerValue);
+                markerContainer.Add(marker);
+                
+                marker.OnClickAction = (value) =>
+                {
+                    currentNumberInstantaneous.Value = value;
+                };
+            }
+
+            slider.Add(markerContainer);
+        }
+        
+        public void ClearMarkers() => markerContainer?.Clear();
+
 
         /// <summary>
         /// Whether changes to the value should instantaneously transfer to outside bindables.
