@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Rulesets.UMania.Edit.Blueprints
 {
@@ -30,9 +31,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
         }
 
         [Resolved]
-        private UnbeatableHitObjectComposer? composer { get; set; }
+        private UnbeatableHitObjectComposer composer { get; set; } = null!;
 
-        protected override bool IsValidForPlacement => base.IsValidForPlacement && columns.Contains(HitObject.Column);
+        protected override bool IsValidForPlacement => base.IsValidForPlacement &&
+                                                       (composer.SettingShowAllowedColumns.Value ==
+                                                           TernaryState.False || columns.Contains(HitObject.Column));
 
         public override void EndPlacement(bool commit)
         {
