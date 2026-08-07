@@ -58,6 +58,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
                 ApplyModifierSample(composer.ModCop4Button, HitSampleInfo.HIT_WHISTLE);
                 ApplyModifierSample(composer.ModCop4Button, HitSampleInfo.HIT_CLAP);
 
+                ApplyAdditionBank("none");
                 ApplyHeavyBrawl(composer.ModCopHeavyButton);
             }
             else
