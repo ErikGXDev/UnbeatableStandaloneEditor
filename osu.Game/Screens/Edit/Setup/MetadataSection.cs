@@ -352,9 +352,9 @@ namespace osu.Game.Screens.Edit.Setup
                 return;
 
             Beatmap.Metadata.ArtistUnicode = ArtistTextBox.Current.Value;
-            Beatmap.Metadata.Artist = RomanisedArtistTextBox.Current.Value;
+            Beatmap.Metadata.Artist = ArtistTextBox.Current.Value;
             Beatmap.Metadata.TitleUnicode = TitleTextBox.Current.Value;
-            Beatmap.Metadata.Title = RomanisedTitleTextBox.Current.Value;
+            Beatmap.Metadata.Title = TitleTextBox.Current.Value;
             Beatmap.Metadata.Author.Username = creatorTextBox.Current.Value;
             Beatmap.Metadata.Source = difficultySlotToString(sourceTextBox.Current.Value);
             Beatmap.BeatmapInfo.DifficultyName = difficultyTextBox.Current.Value;
