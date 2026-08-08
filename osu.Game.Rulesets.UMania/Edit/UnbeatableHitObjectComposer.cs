@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -41,6 +42,8 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     [Resolved] private BindableBeatDivisor beatDivisor { get; set; } = null!;
 
     public bool Is4Key => config.Get<bool>(OsuSetting.Editor4KeyMode);
+    
+    public bool IsUnanimated => config.Get<bool>(OsuSetting.EditorUnanimated);
 
     public Bindable<bool> KeyBasedCharting { get; private set; } = null!;
 
@@ -166,8 +169,9 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
 
     protected override Drawable CreateHitObjectInspector() => new UManiaHitObjectInspector();
 
-    protected override IReadOnlyList<CompositionTool> CompositionTools => new CompositionTool[]
-    {
+    protected override IReadOnlyList<CompositionTool> CompositionTools =>
+    [
+
         // Unbeatable Note Predicates
 
         // Normal Notes
@@ -192,7 +196,17 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
         // new UbNoteCompositionTool("Brawl", UbIconType.Brawl, [2, 3], [], HitSampleInfo.BANK_STRONG),
         // Cop Hold
         // new UbHoldNoteCompositionTool("Brawl Hold", UbIconType.Brawl, [2, 3], [], HitSampleInfo.BANK_STRONG)
-    };
+        
+    ];
+
+    protected override Dictionary<OsuSetting, IReadOnlyList<CompositionTool>> ConfigGatedCompositionTools =>
+        new ()
+        {
+            { OsuSetting.EditorUnanimated, [
+                new UbNoteCompositionTool("Animate", UbIconType.Animated, [1], [HitSampleInfo.HIT_FINISH]),
+                new UbHoldNoteCompositionTool("Animate Hold", UbIconType.AnimatedHold, [1], [HitSampleInfo.HIT_FINISH]),
+            ]}
+        };
 
     public Bindable<TernaryState> SettingShowAllowedColumns = new Bindable<TernaryState>(TernaryState.True);
 
@@ -464,6 +478,9 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
                 ]
             },
         });
+
+        if (IsUnanimated)
+            RightToolbox.Add(new UbAnimateToolbox());
 
         // Wire modifier toggles to apply to selected notes
         var modButtons = new[] { ModFlyingButton, ModInvisibleButton, ModSwapImmediateButton, ModCopButton, ModCop1Button, ModCop2Button, ModCop3Button, ModCop4Button, ModCopFinishButton, ModCopHeavyButton };

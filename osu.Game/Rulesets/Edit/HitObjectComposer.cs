@@ -10,6 +10,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -261,9 +262,13 @@ namespace osu.Game.Rulesets.Edit
                 },
             };
 
-            toolboxCollection.Items = (CompositionTools.Prepend(new SelectTool()))
+            IEnumerable<CompositionTool> compositionTools = CompositionTools.Prepend(new SelectTool())
+                .Concat(ConfigGatedCompositionTools.Where(kvp => config.GetBindable<bool>(kvp.Key).Value).SelectMany(kvp => kvp.Value));
+                                        
+            toolboxCollection.Items = compositionTools
                                       .Select(t => new HitObjectCompositionToolButton(t, () => toolSelected(t)))
                                       .ToList();
+            
 
             togglesCollection.AddRange(CreateTernaryButtons().ToArray());
 
@@ -362,6 +367,10 @@ namespace osu.Game.Rulesets.Edit
         /// A "select" tool is automatically added as the first tool.
         /// </remarks>
         protected abstract IReadOnlyList<CompositionTool> CompositionTools { get; }
+        
+        // FIX: Add composition tools based on config, primarily for UNANIMATED.
+        protected abstract Dictionary<OsuSetting, IReadOnlyList<CompositionTool>> ConfigGatedCompositionTools { get; }
+
 
         /// <summary>
         /// Create all ternary states required to be displayed to the user.

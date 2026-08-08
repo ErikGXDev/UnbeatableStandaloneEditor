@@ -98,6 +98,9 @@ namespace osu.Game.Rulesets.UMania.Edit
         ModCop2,
         ModCop3,
         ModCop4,
-        ModCopHeavy
+        ModCopHeavy,
+        
+        Animated,
+        AnimatedHold
     }
 }
