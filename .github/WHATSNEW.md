@@ -1,11 +1,16 @@
 ﻿## What's new
 
-- The "verify" tab in the editor is now more accurate to UNBEATABLE maps, and also easier to use.
-- Added video support
-  - You can add videos to your beatmaps, just like cover art.
-  - The video will be previewed in the editor.
-- Both the video and cover art input can be cleared now.
-- Added the option "View > Show cover art or video" to toggle the visibility of cover art and video in the compose tab.
-- Improved imports by automatically detecting the cover art and video in most cases.
+This update combines the previous 1.4.x updates, along with new features.
+
+- Improved UNANIMATED support (0.1.5)
+  - 2 new notes types are added when enabling UNANIMATED in the settings menu.
+  - Selecting such a note in the editor will allow you to edit its event in a new menu underneath the inspector.
+  - Added "Character" category along with "Reset" and "Set Character" option.
+- Fixed cop notes being "Unprompted" which means "Impossible to hit".
+- Fixed hold notes still being affected by "Column hints", even when the feature is toggled off.
+- Fixed non-latin characters from not saving.
+- Lane numbers are correct now.
+- Key-Charting now supports creating hold notes with the arrow keys, so placing notes can now be done with only a keyboard.
+- You can now change the beat divisor using the keyboard with G and Shift+G.
 
 **Happy mapping!**
