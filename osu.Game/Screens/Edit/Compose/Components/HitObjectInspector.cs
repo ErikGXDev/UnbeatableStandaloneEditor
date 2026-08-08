@@ -59,8 +59,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 case 1:
                     var selected = objects.Single();
 
-                    AddHeader("Type");
+                    /*AddHeader("Type");
                     AddValue($"{selected.GetType().ReadableName()}");
+                    */
 
                     AddHeader("Time");
                     AddValue($"{selected.StartTime:#,0.##}ms");
