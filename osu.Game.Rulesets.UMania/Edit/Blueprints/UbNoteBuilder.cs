@@ -8,6 +8,7 @@ using osu.Game.Audio;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.UMania.Objects;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 
@@ -172,6 +173,62 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
             return hitObject.Samples.Any(s => s.Name != HitSampleInfo.HIT_NORMAL && s.Bank == bank);
         }
 
+        public bool HasFileHitSample()
+        {
+            return hitObject.Samples.Any(info => info is ConvertHitObjectParser.FileHitSampleInfo);
+        }
+
+        public bool TryGetFileHitSample(out ConvertHitObjectParser.FileHitSampleInfo fileHitSample)
+        {
+            var found = hitObject.Samples.OfType<ConvertHitObjectParser.FileHitSampleInfo>().FirstOrDefault();
+
+            if (found != null)
+            {
+                fileHitSample = found;
+            }
+            else
+            {
+                fileHitSample = null!;
+            }
+            
+            return found != null;
+        }
+
+        public void SetFileHitSampleData(string fileNameData)
+        {   
+            if (TryGetFileHitSample(out var fileHitSample))
+            {
+                var index = hitObject.Samples.IndexOf(fileHitSample);
+                hitObject.Samples[index] = new ConvertHitObjectParser.FileHitSampleInfo(fileNameData, 100);
+            }
+            else
+            {
+                // Find main normal sample
+                var normalSample = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+                if (normalSample != null)
+                {
+                    var index = hitObject.Samples.IndexOf(normalSample);
+                    hitObject.Samples[index] = new ConvertHitObjectParser.FileHitSampleInfo(fileNameData, 100);
+                }
+                else
+                {
+                    // If no normal sample, add a new file hit sample
+                    hitObject.Samples.Add(new ConvertHitObjectParser.FileHitSampleInfo(fileNameData, 100));
+                }
+            }
+        }
+        
+        public string GetFileHitSampleData()
+        {
+            if (TryGetFileHitSample(out var fileHitSample))
+            {
+                return fileHitSample.Filename;
+            }
+
+            return string.Empty;
+        }
+        
+
         public UbIconType InferObjectTypeIcon()
         {
             if (hitObject is ManiaHitObject maniaHitObject)
@@ -181,6 +238,15 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
                 if (HasMainBank(HitSampleInfo.BANK_DRUM))
                 {
                     return UbIconType.Brawl;
+                }
+                
+                if (column == 1 && HasSample(HitSampleInfo.HIT_FINISH))
+                {
+                    if (hitObject is HoldNote)
+                    {
+                        return UbIconType.AnimatedHold;
+                    }
+                    return UbIconType.Animated;
                 }
 
                 if (hitObject is HeadNote or HoldNote)
