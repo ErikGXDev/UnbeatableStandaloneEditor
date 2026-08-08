@@ -25,8 +25,8 @@ public enum CameraType
     [Description("Reset")]
     Reset = 0,
 
-    [Description("Camera Target Point")]
-    CameraTargetPoint = 1,
+    [Description("Camera Target")]
+    CameraTarget = 1,
 
     [Description("Zoom Offset")]
     ZoomOffset = 2,
@@ -35,10 +35,10 @@ public enum CameraType
     ZoomTarget = 3,
 
     [Description("Rotation Offset")]
-    RotationOffset = 4,
+    RotOffset = 4,
 
     [Description("Rotation Target")]
-    RotationTarget = 5,
+    RotTarget = 5,
 
     [Description("Horizontal Offset")]
     HorizontalOffset = 6,
@@ -46,8 +46,8 @@ public enum CameraType
     [Description("Horizontal Target")]
     HorizontalTarget = 7,
 
-    [Description("Custom Camera Target Point")]
-    CustomCameraTargetPoint = 8,
+    [Description("Custom Camera Target")]
+    CustomCameraTarget = 8,
 
     [Description("Ease Time")]
     EaseTime = 9,
@@ -56,10 +56,10 @@ public enum CameraType
     EaseMode = 10,
 
     [Description("FOV Target")]
-    FovTarget = 11,
+    FOVTarget = 11,
 
     [Description("FOV Offset")]
-    FovOffset = 12
+    FOVOffset = 12
 }
 
 public enum CharacterType
@@ -333,15 +333,15 @@ public class UbAnimateToolboxData
             CategoryType.Camera, new Dictionary<Enum, List<BaseOption>>
             {
                 { CameraType.Reset, [new IntOption("Position Only?", 0, 0, 1)] },
-                { CameraType.CameraTargetPoint, [new EnumStringOption<CameraPoint>("Camera Point")] },
+                { CameraType.CameraTarget, [new EnumStringOption<CameraPoint>("Camera Point")] },
                 { CameraType.ZoomOffset, [new IntOption("Offset", 0, -100, 100)] },
                 { CameraType.ZoomTarget, [new IntOption("Target", 0, -100, 100)] },
-                { CameraType.RotationOffset, [new IntOption("Degrees", 0, -180, 180)] },
-                { CameraType.RotationTarget, [new IntOption("Degrees", 0, -180, 180)] },
+                { CameraType.RotOffset, [new IntOption("Degrees", 0, -180, 180)] },
+                { CameraType.RotTarget, [new IntOption("Degrees", 0, -180, 180)] },
                 { CameraType.HorizontalOffset, [new IntOption("Offset", 0, -100, 100)] },
                 { CameraType.HorizontalTarget, [new IntOption("Target", 0, -100, 100)] },
                 {
-                    CameraType.CustomCameraTargetPoint,
+                    CameraType.CustomCameraTarget,
                     [
                         new IntOption("X", 0, -100, 100, new[] { -55, -19, -10, 0, 10, 19, 55 }),
                         new IntOption("Y", 0, -100, 100, new[] { 20, 35, 5 }),
@@ -350,8 +350,8 @@ public class UbAnimateToolboxData
                 },
                 { CameraType.EaseTime, [new IntOption("Time (ms)", 0, 0, 5000)] },
                 { CameraType.EaseMode, [new EnumStringOption<CameraEasing>("Easing")] },
-                { CameraType.FovTarget, [new IntOption("Target (Degrees)", 60, 1, 179)] },
-                { CameraType.FovOffset, [new IntOption("Offset (Degrees)", 0, -180, 180)] }
+                { CameraType.FOVTarget, [new IntOption("Target (Degrees)", 60, 1, 179)] },
+                { CameraType.FOVOffset, [new IntOption("Offset (Degrees)", 0, -180, 180)] }
             }
            
         },
