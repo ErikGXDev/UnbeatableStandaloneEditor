@@ -132,7 +132,12 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
         var eventTypeString = eventType.ToString();
         
         // Store category, type, and parameters as a string concatenated with |
-        var encoded = $"{eventCategorySlider.Value}|{eventTypeString}|{string.Join("|", bindables.Select(b => b.GetType().GetProperty("Value")?.GetValue(b)?.ToString() ?? ""))}";
+        var encoded = $"{eventCategorySlider.Value}|{eventTypeString}";
+
+        if (bindables.Count > 0)
+        {
+            encoded += $"|{string.Join("|", bindables.Select(b => b.GetType().GetProperty("Value")?.GetValue(b)?.ToString() ?? ""))}";
+        }
         
         noteBuilder.SetFileHitSampleData(encoded);
     }
