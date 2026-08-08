@@ -213,6 +213,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorKeyBasedCharting, false); // FIX: key-based charting mode toggle
             SetDefault(OsuSetting.Editor60msOffset, false); // FIX: 60ms offset when exporting maps for editor parity
             SetDefault(OsuSetting.CreateBackups, true); // FIX: Toggle backup creation on save
+            SetDefault(OsuSetting.EditorUnanimated, false); // FIX: Support for the UNANIMATED note feature
             
             SetDefault(OsuSetting.HideCountryFlags, false);
 
@@ -506,6 +507,8 @@ namespace osu.Game.Configuration
         Editor4KeyMode, // FIX: 4-key mode should persist as a config
         EditorKeyBasedCharting, // FIX: key-based charting mode toggle
         Editor60msOffset, // FIX: 60ms offset when exporting maps for editor parity
+        EditorUnanimated, // FIX: Support for the UNANIMATED note feature
+        
         CreateBackups // Toggle backup creation on save
     }
 }
