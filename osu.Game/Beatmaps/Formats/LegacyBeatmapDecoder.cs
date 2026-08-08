@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit;
 using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -477,6 +478,82 @@ namespace osu.Game.Beatmaps.Formats
                         lineSupportedByEncoder = true;
                         break;
                 }
+            }
+            
+            // UNANIMATED
+            // Attempt to read the line like a camera event
+            var splitLine = line.Split(',');
+            if (splitLine.First().StartsWith("Enable")) // Enable event is slightly special
+            {
+                return;
+            }
+            // Only handle line if it was not yet marked as supported
+            if (splitLine.Length >= 3 && !lineSupportedByEncoder)
+            {
+                bool handleFurther = true;
+                
+                var category = splitLine[0];
+
+                int? endTime = null;
+                
+                string[]? parameters = null;
+                
+                int? startTime = Parsing.ParseInt(splitLine[1]);
+                if (splitLine.Length == 4) // 3-element events do not have an endtime
+                {
+                    endTime = Parsing.ParseInt(splitLine[2]);
+                    parameters = splitLine[3].Split(":"); // Params come later here
+                }
+                else if (splitLine.Length == 3)
+                {
+                    parameters = splitLine[2].Split(":");
+                }
+                else
+                {
+                    handleFurther = false;
+                }
+                
+                if (parameters != null && handleFurther)
+                {
+                    ConvertHitObject? obj = null;
+                    if (endTime.HasValue)
+                    {
+                        obj = new ConvertHold()
+                        {
+                            StartTime = startTime.Value,
+                            Duration = endTime.Value - startTime.Value,
+                            Position = new Vector2(128, 192)
+                        };
+                        
+                        obj.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+                    }
+                    else
+                    {
+                        obj = new ConvertHitCircle()
+                        {
+                            StartTime = startTime.Value,
+                            Position = new Vector2(128, 192)
+                        };
+                        
+                        obj.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+                    }
+                    
+                    var filenameData = category + "|" + string.Join("|", parameters);
+
+                    obj.Samples = new List<HitSampleInfo>()
+                    {
+                        new ConvertHitObjectParser.FileHitSampleInfo(filenameData, 100),
+                        new ConvertHitObjectParser.LegacyHitSampleInfo(HitSampleInfo.HIT_FINISH, volume: 100)
+                    };
+                    
+                    beatmap.HitObjects.Add(obj);
+                    
+                    lineSupportedByEncoder = true;
+
+                }
+
+                
+                
             }
 
             if (!lineSupportedByEncoder)
