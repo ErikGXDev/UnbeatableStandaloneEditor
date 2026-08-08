@@ -3,7 +3,7 @@
 This update combines the previous 1.4.x updates, along with new features.
 
 - Improved UNANIMATED support (0.1.5)
-  - 2 new notes types are added when enabling UNANIMATED in the settings menu.
+  - 2 new note types are added when enabling UNANIMATED in the settings menu.
   - Selecting such a note in the editor will allow you to edit its event in a new menu underneath the inspector.
   - Added "Character" category along with "Reset" and "Set Character" option.
 - Fixed cop notes being "Unprompted" which means "Impossible to hit".
