@@ -641,12 +641,12 @@ namespace osu.Game.Beatmaps.Formats
 
             addControlPoint(time, effectPoint, timingChange);
 
-            addControlPoint(time, new LegacySampleControlPoint
+            /*addControlPoint(time, new LegacySampleControlPoint
             {
                 SampleBank = stringSampleSet,
                 SampleVolume = sampleVolume,
                 CustomSampleBank = customSampleBank,
-            }, timingChange);
+            }, timingChange);*/
         }
 
         private readonly List<ControlPoint> pendingControlPoints = new List<ControlPoint>();
@@ -678,7 +678,7 @@ namespace osu.Game.Beatmaps.Formats
 
                 beatmap.ControlPointInfo.Add(pendingControlPointsTime, pendingControlPoints[i]);
             }
-
+            
             pendingControlPoints.Clear();
             pendingControlPointTypes.Clear();
         }

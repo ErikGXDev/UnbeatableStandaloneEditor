@@ -322,10 +322,12 @@ namespace osu.Game.Beatmaps.Formats
                 if (controlPointProperties.IsRedundant(lastControlPointProperties))
                     continue;
 
+                
                 // Output any remaining effects as secondary non-timing control point.
-                writer.Write(FormattableString.Invariant($"{group.Time},"));
+                // Commented out because this behaviour is not wanted
+                /*writer.Write(FormattableString.Invariant($"{group.Time},"));
                 writer.Write(FormattableString.Invariant($"{-100 / controlPointProperties.SliderVelocity},"));
-                outputControlPointAt(controlPointProperties, false);
+                outputControlPointAt(controlPointProperties, false);*/
                 lastControlPointProperties = controlPointProperties;
             }
 
