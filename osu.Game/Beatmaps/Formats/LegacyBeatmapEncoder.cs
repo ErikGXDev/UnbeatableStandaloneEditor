@@ -187,81 +187,6 @@ namespace osu.Game.Beatmaps.Formats
 
             foreach (var b in beatmap.Breaks)
                 writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Break},{b.StartTime},{b.EndTime}"));
-
-            
-            // UNANIMATED support
-            // Parsed notes without UbNoteBuilder here to prevent circular dependencies.
-            // Logic:
-            /*
-             *  For every hitobject
-             *      if X == 1 && has FileHitSampleInfo:
-             *          parse data: Category|Type|P1|P2|P...
-             *          write event like this: Category,Time,EndTime,Type:P1:P2:P3:P...
-             *          endtime not needed when single note
-             */
-            
-            bool wroteEnableUnanimated = false;
-
-            foreach (var b in beatmap.HitObjects)
-            {
-                int? xPos = null;
-                int? endTime = null;
-                
-                if (b is IHasXPosition hasXPosition)
-                    xPos = (int)hasXPosition.X;
-
-                if (b is IHasDuration hasDuration)
-                    endTime = (int)hasDuration.EndTime;
-                
-                if (xPos == null)
-                    continue;
-                
-                // Check if the hitobject has a Finish sample
-                var finishSample = b.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_FINISH);
-                if (finishSample == null)
-                    continue;
-                
-                
-                var fileSample = b.Samples.FirstOrDefault(s => s is ConvertHitObjectParser.FileHitSampleInfo) as ConvertHitObjectParser.FileHitSampleInfo;
-                if (fileSample != null && xPos == 1)
-                {
-                    
-                    // This is an unanimated note, so write the enable command automatically
-                    if (!wroteEnableUnanimated)
-                    {
-                        writer.WriteLine("Enable,0,");
-                        wroteEnableUnanimated = true;
-                    }
-                    
-                    
-                    var filename = fileSample.Filename;
-                    
-                    if (string.IsNullOrEmpty(filename))
-                        continue;
-                    
-                    var data = filename.Split('|');
-                    
-                    // At least two parts are needed: Category|Type
-                    if (data.Length < 2)
-                        continue;
-                    
-                    var category = data[0];
-                    var type = data[1];
-                    var rest = data.Skip(2).ToArray();
-                    
-                    // Write the event line
-                    var stringBuilder = new StringBuilder();
-                    stringBuilder.Append($"{category},{(int)b.StartTime}");
-                    if (endTime != null)
-                        stringBuilder.Append($",{endTime}");
-                    stringBuilder.Append($",{type}");
-                    if (rest.Length > 0)
-                        stringBuilder.Append($":{string.Join(":", rest)}");
-                    
-                    writer.WriteLine(stringBuilder.ToString());
-                }
-            }
-            
             
             foreach (string l in beatmap.UnhandledEventLines)
                 writer.WriteLine(l);
@@ -497,18 +422,6 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleHitObject(TextWriter writer, HitObject hitObject)
         {
-            
-            int? xPos = null;
-            if (hitObject is IHasXPosition hasXPosition)
-                xPos = (int)hasXPosition.X;
-            
-            // UNANIMATED Support
-            // Hitobjects with a finish note in column 2 are encoded as events above.
-            var finishSample = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_FINISH);
-            if (finishSample != null && xPos == 1)
-                return;
-            
-            
             Vector2 position = new Vector2(256, 192);
 
             switch (onlineRulesetID)

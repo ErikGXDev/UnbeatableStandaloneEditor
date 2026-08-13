@@ -221,9 +221,9 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     
                     
                     var filename = fileSample.Filename;
-                    
+
                     if (string.IsNullOrEmpty(filename))
-                        continue;
+                        filename = "Camera|Reset|0"; // Basically the default
                     
                     var data = filename.Split('|');
                     

@@ -36,6 +36,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
             this.hitObject = hitObject;
         }
         
+        public bool HasHitObject => hitObject != null;
+        
         public void ChangeHitObject(HitObject newHitObject)
         {
             hitObject = newHitObject;

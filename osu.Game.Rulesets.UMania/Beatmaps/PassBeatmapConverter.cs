@@ -104,6 +104,15 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
 
             if (cloned is IHasXPosition xPosition2 && xPosition2.X < 2 && is4Key)
             {
+                // Notes with a Finish samples should be ignored in this logic
+                var hasFinishSample = cloned.Samples.Any(s => s.Name == HitSampleInfo.HIT_FINISH);
+                if (hasFinishSample)
+                {
+                    clonedHitObjects.Add(cloned);
+                    continue;
+                }
+                
+                
                 xPosition2.X += 2;
 
                 if (zoomedOut4Key)

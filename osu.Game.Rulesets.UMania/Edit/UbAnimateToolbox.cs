@@ -121,6 +121,12 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
     {
         Logger.Log("Parameters: " + string.Join(", ", bindables.Select(b => $"{b.GetType().Name}: {b.GetType().GetProperty("Value")?.GetValue(b)}")));
         
+        if (!noteBuilder.HasHitObject)
+        {
+            Logger.Log("[UNANIMATED] No hit object selected to write data to.");
+            return;
+        }
+        
         // Convert eventTypeSlider to a string according to the enum type of the current category
         var category = eventCategorySlider.Value;
         if (!Enum.IsDefined(typeof(CategoryType), category))
