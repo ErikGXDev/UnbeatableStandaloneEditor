@@ -31,11 +31,10 @@ public partial class UbExportFolderSelector : FormBeatmapFileSelector
     {
         SelectedDirectory.BindValueChanged(dir =>
         {
-            
-            Logger.Log("Selected export directory: " + dir.NewValue);
-            
-            var path = dir.NewValue;
 
+            Logger.Log("Selected export directory: " + dir.NewValue);
+
+            var path = dir.NewValue;
 
             filenameText.Text = path;
 
@@ -48,7 +47,7 @@ public partial class UbExportFolderSelector : FormBeatmapFileSelector
                 placeholderText.Alpha = 1;
             }
         });
-        
+
 
     }
 

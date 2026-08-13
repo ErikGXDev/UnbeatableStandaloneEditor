@@ -753,11 +753,62 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 }
 
             };
+            
+        
+            
 
 
             StartWebsocketChecks();
         }
-        
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            
+            var exportFolderConfig = config.GetBindable<string>(OsuSetting.EditorExportFolder);
+            
+            if (!string.IsNullOrEmpty(exportFolderConfig.Value))
+            {
+                // Hacky, but works
+                Schedule(() =>
+                {
+                    Schedule(() =>
+                    {
+                        exportFolderSelector.SelectedDirectory.Value = exportFolderConfig.Value;
+                    });
+                });
+          
+            }
+            
+            Logger.Log($"Export folder set to: {exportFolderSelector.SelectedDirectory.Value}");
+
+            exportFolderSelector.SelectedDirectory.BindValueChanged(_ =>
+            {
+                Logger.Log("Export folder changed to: " + exportFolderSelector.SelectedDirectory.Value);
+                config.SetValue(OsuSetting.EditorExportFolder, exportFolderSelector.SelectedDirectory.Value);
+            });
+            
+            var exportModeConfig = config.GetBindable<int>(OsuSetting.EditorExportMode);
+            
+            Logger.Log($"Export mode set to: {exportModeConfig.Value}");
+            
+            if (Enum.IsDefined(typeof(ExportMode), exportModeConfig.Value))
+            {
+                exportModeBindable.Value = (ExportMode)exportModeConfig.Value;
+            }
+            else
+            {
+                exportModeBindable.Value = ExportMode.OfficialZip;
+            }
+            
+            exportModeBindable.BindValueChanged(_ =>
+            {
+                config.SetValue(OsuSetting.EditorExportMode, (int)exportModeBindable.Value);
+            });
+            
+            
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             websocketCheckCancellation.Cancel();
