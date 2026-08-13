@@ -561,21 +561,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
             yield return new TernaryStateToggleMenuItem(whistle.Description)
             {
                 State = { BindTarget = whistle },
-                Hotkey = new Hotkey(new KeyCombination(InputKey.W))
+                //Hotkey = new Hotkey(new KeyCombination(InputKey.W)) // FIX: Remove HotKeys
             };
 
             var finish = SelectionSampleStates[HitSampleInfo.HIT_FINISH];
             yield return new TernaryStateToggleMenuItem(finish.Description)
             {
                 State = { BindTarget = finish },
-                Hotkey = new Hotkey(new KeyCombination(InputKey.E))
+                //Hotkey = new Hotkey(new KeyCombination(InputKey.E))
             };
 
             var clap = SelectionSampleStates[HitSampleInfo.HIT_CLAP];
             yield return new TernaryStateToggleMenuItem(clap.Description)
             {
                 State = { BindTarget = clap },
-                Hotkey = new Hotkey(new KeyCombination(InputKey.R))
+                //Hotkey = new Hotkey(new KeyCombination(InputKey.R))
             };
         }
 
