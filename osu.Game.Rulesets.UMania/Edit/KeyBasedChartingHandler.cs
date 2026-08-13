@@ -203,11 +203,14 @@ public partial class KeyBasedChartingHandler : Drawable
         };
 
         var baseSamples = new List<string>();
+        
+        if (column == 1 && shiftPressed && composer.IsUnanimated && !composer.Is4Key)
+            baseSamples.Add(HitSampleInfo.HIT_FINISH); // UNANIMATED
 
-        if (column >= 0 && column <= 3 && shiftPressed)
+        else if (column >= 0 && column <= 3 && shiftPressed)
             baseSamples.Add(HitSampleInfo.HIT_WHISTLE); // Dodge
 
-        if (column == 4 && shiftPressed)
+        else if (column == 4 && shiftPressed)
             baseSamples.Add(HitSampleInfo.HIT_WHISTLE); // Zoom
 
         var helper = new UbNoteBuilderHelper(composer, note);
@@ -310,7 +313,10 @@ public partial class KeyBasedChartingHandler : Drawable
     private void applyHoldSpecificSamples(int column, bool shiftPressed, HoldNote holdNote)
     {
         var helper = new UbNoteBuilderHelper(composer, holdNote);
-        if (column >= 0 && column <= 3 && shiftPressed)
+        
+        if (column == 1 && shiftPressed && composer.IsUnanimated && !composer.Is4Key)
+            helper.ApplySamples(new List<string> { HitSampleInfo.HIT_FINISH });
+        else if (column >= 0 && column <= 3 && shiftPressed)
             helper.ApplySamples(new List<string> { HitSampleInfo.HIT_WHISTLE }); // Double
         else if (column == 5)
             helper.ApplySamples(new List<string> { HitSampleInfo.HIT_FINISH }); // Spam
