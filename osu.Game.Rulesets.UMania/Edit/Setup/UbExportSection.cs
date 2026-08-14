@@ -44,12 +44,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         [Resolved] private EditorClock editorClock { get; set; } = null!;
 
         [Resolved] private OsuConfigManager config { get; set; } = null!;
-        
+
         private bool is4Key => config.Get<bool>(OsuSetting.Editor4KeyMode);
-        
+
         private int msOffset => config.Get<bool>(OsuSetting.Editor60msOffset) ? 60 : 0;
 
-    private UbPlaytestButton websocketButton = null!;
+        private UbPlaytestButton websocketButton = null!;
         private CancellationTokenSource websocketCheckCancellation = new CancellationTokenSource();
 
         public void ExportToUnbeatable() => Task.Run(exportToUnbeatable);
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 }
             }, websocketCheckCancellation.Token);
         }
-        
+
         private async void testAtPracticeTime()
         {
             int startTime = (int)editorClock.CurrentTime;
@@ -161,7 +161,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             }
 
             PassBeatmapConverter passConverter =
-                new PassBeatmapConverter(targetBeatmap, targetBeatmap.BeatmapInfo.Ruleset.CreateInstance(), is4Key, msOffset);
+                new PassBeatmapConverter(targetBeatmap, targetBeatmap.BeatmapInfo.Ruleset.CreateInstance(), is4Key,
+                    msOffset);
 
             var playableBeatmap = passConverter.ConvertBeatmap(targetBeatmap, CancellationToken.None);
 
@@ -214,7 +215,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             string beatmapPath = Path.Combine(tempPath, "temp.osu");
 
             string websocketPath = beatmapPath;
-            
+
             // On linux, add Z:/ in front to emulate a wine path,
             // which points to the root filesystem
             if (UbPlatform.IsLinux())
@@ -308,12 +309,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             return beatmapStream;
         }
 
-        public void ExportToZip(string extension = ".osu") => Task.Run(() => {exportToZip(extension);});
-        
+        public void ExportToZip(string extension = ".osu") => Task.Run(() => { exportToZip(extension); });
+
         private void exportToZip(string extension = ".osu")
         {
-
-            if (string.IsNullOrEmpty(exportFolderSelector.SelectedDirectory.Value) || Beatmap.BeatmapInfo.BeatmapSet == null)
+            if (string.IsNullOrEmpty(exportFolderSelector.SelectedDirectory.Value) ||
+                Beatmap.BeatmapInfo.BeatmapSet == null)
             {
                 showToast("Export failed: Set an export folder", "No export folder selected.");
                 return;
@@ -326,7 +327,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             string audioFilename = Beatmap.Metadata.AudioFile;
 
             var audioFile = beatmapSet.GetFile(audioFilename);
-            
+
             string coverFilename = Beatmap.Metadata.BackgroundFile;
 
             var coverFile = beatmapSet.GetFile(coverFilename);
@@ -357,7 +358,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             {
                 using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
                 {
-
                     var beatmaps = getBeatmapsFromSet(beatmapSet);
 
                     foreach (var beatmap in beatmaps)
@@ -418,7 +418,9 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                         var videoStream = workingBeatmap.GetStream(videoFile.File.GetStoragePath());
                         if (videoStream != null)
                         {
-                            string videoEntryName = videoFilename.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ? "video.webm" : "video.mp4";
+                            string videoEntryName = videoFilename.EndsWith(".webm", StringComparison.OrdinalIgnoreCase)
+                                ? "video.webm"
+                                : "video.mp4";
                             var videoEntry = archive.CreateEntry(videoEntryName, CompressionLevel.Optimal);
 
                             using (var entryStream = videoEntry.Open())
@@ -444,7 +446,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 var savePath = Path.Combine(directory, zipFilename);
 
 
-
                 using (var fs = File.Create(Path.Combine(directory, zipFilename)))
                 {
                     zipStream.Seek(0, SeekOrigin.Begin);
@@ -458,7 +459,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             showToast("Export successful", $"Saved as {zipFilename}");
         }
 
-        public void ExportToFolder(string extension = ".osu") => Task.Run(() => {exportToFolder(extension);});
+        public void ExportToFolder(string extension = ".osu") => Task.Run(() => { exportToFolder(extension); });
 
         private void exportToFolder(string extension = ".osu")
         {
@@ -477,7 +478,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             var audioFile = beatmapSet.GetFile(audioFilename);
 
             var coverFilename = Beatmap.Metadata.BackgroundFile;
-            
+
             var coverFile = beatmapSet.GetFile(coverFilename);
 
             string videoFilename = workingBeatmap.Storyboard.PrimaryVideo?.Path ?? string.Empty;
@@ -514,7 +515,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 {
                     stream.Seek(0, SeekOrigin.Begin);
                     stream.CopyTo(fs);
-
                 }
 
                 stream.Dispose();
@@ -560,7 +560,9 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 var videoStream = workingBeatmap.GetStream(videoFile.File.GetStoragePath());
                 if (videoStream != null)
                 {
-                    string videoEntryName = videoFilename.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ? "video.webm" : "video.mp4";
+                    string videoEntryName = videoFilename.EndsWith(".webm", StringComparison.OrdinalIgnoreCase)
+                        ? "video.webm"
+                        : "video.mp4";
                     var videoPath = Path.Combine(directory, videoEntryName);
 
                     using (var fs = File.Create(videoPath))
@@ -577,15 +579,15 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             showToast("Export successful", $"Saved to folder {baseFolderName}");
         }
-        
+
         public void ExportMap()
         {
-
             var good = editor.Save();
 
             if (!good)
             {
-                showToast("Export failed: Failed to save", "Failed to save beatmap. Please fix any errors and try again.");
+                showToast("Export failed: Failed to save",
+                    "Failed to save beatmap. Please fix any errors and try again.");
                 return;
             }
 
@@ -608,7 +610,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 ExportToZip();
             }
         }
-        
+
         public static string GetDataDirectory()
         {
             if (UbPlatform.IsWindows())
@@ -621,7 +623,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             if (UbPlatform.IsLinux())
             {
-                return Path.Combine(GetWinePrefixRoot(), "users", "steamuser", "AppData", "LocalLow", "D-CELL GAMES", "UNBEATABLE");
+                return Path.Combine(GetWinePrefixRoot(), "users", "steamuser", "AppData", "LocalLow", "D-CELL GAMES",
+                    "UNBEATABLE");
             }
 
             // macOS won't have this for now
@@ -639,7 +642,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             var steamPath = Path.Combine(userProfile, ".local", "share", "Steam");
             return Path.Combine(steamPath, "steamapps", "compatdata", "2240620", "pfx", "drive_c");
         }
-        
+
         public void OpenGameFolder()
         {
             // Open
@@ -683,7 +686,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     Arguments = arguments,
                     UseShellExecute = true
                 });
-
             }
             catch (Exception e)
             {
@@ -730,14 +732,19 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     Caption = "Export as",
                     Current = exportModeBindable,
                 },
-                exportFolderSelector = new UbExportFolderSelector(false, [@".qetiqpuqloekglxmbnmnbfkworitzuokwjfbmvncvmbndf"]) // some extension that is unlikely to be chosen, so only folders are visible
-                {
-                    Caption = "Export folder",
-                    PlaceholderText = "Select folder to export Unbeatable beatmaps to",
-                },
+                exportFolderSelector =
+                    new UbExportFolderSelector(false,
+                        [
+                            @".qetiqpuqloekglxmbnmnbfkworitzuokwjfbmvncvmbndf"
+                        ]) // some extension that is unlikely to be chosen, so only folders are visible
+                        {
+                            Caption = "Export folder",
+                            PlaceholderText = "Select folder to export Unbeatable beatmaps to",
+                        },
                 new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 14))
                 {
-                    Text = "Tip: Select the game's \"CustomSongs\" folder and set \"Export as\" to \"As Folder (.txt)\" to quickly add your custom charts to Unbeatable.",
+                    Text =
+                        "Tip: Select the game's \"CustomSongs\" folder and set \"Export as\" to \"As Folder (.txt)\" to quickly add your custom charts to Unbeatable.",
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Colour = colourProvider.Content1.Opacity(0.7f),
@@ -749,13 +756,9 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     ButtonText = "Open Folder",
                     Action = OpenGameFolder,
                     Alpha = (UbPlatform.IsWindows() || Directory.Exists(GetDataDirectory())) ? 1f : 0f,
-                    Margin = new MarginPadding() {Top = 24},
+                    Margin = new MarginPadding() { Top = 24 },
                 }
-
             };
-            
-        
-            
 
 
             StartWebsocketChecks();
@@ -764,22 +767,18 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            
+
             var exportFolderConfig = config.GetBindable<string>(OsuSetting.EditorExportFolder);
-            
+
             if (!string.IsNullOrEmpty(exportFolderConfig.Value))
             {
                 // Hacky, but works
                 Schedule(() =>
                 {
-                    Schedule(() =>
-                    {
-                        exportFolderSelector.SelectedDirectory.Value = exportFolderConfig.Value;
-                    });
+                    Schedule(() => { exportFolderSelector.SelectedDirectory.Value = exportFolderConfig.Value; });
                 });
-          
             }
-            
+
             Logger.Log($"Export folder set to: {exportFolderSelector.SelectedDirectory.Value}");
 
             exportFolderSelector.SelectedDirectory.BindValueChanged(_ =>
@@ -787,11 +786,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 Logger.Log("Export folder changed to: " + exportFolderSelector.SelectedDirectory.Value);
                 config.SetValue(OsuSetting.EditorExportFolder, exportFolderSelector.SelectedDirectory.Value);
             });
-            
+
             var exportModeConfig = config.GetBindable<int>(OsuSetting.EditorExportMode);
-            
+
             Logger.Log($"Export mode set to: {exportModeConfig.Value}");
-            
+
             if (Enum.IsDefined(typeof(ExportMode), exportModeConfig.Value))
             {
                 exportModeBindable.Value = (ExportMode)exportModeConfig.Value;
@@ -800,13 +799,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             {
                 exportModeBindable.Value = ExportMode.OfficialZip;
             }
-            
+
             exportModeBindable.BindValueChanged(_ =>
             {
                 config.SetValue(OsuSetting.EditorExportMode, (int)exportModeBindable.Value);
             });
-            
-            
         }
 
         protected override void Dispose(bool isDisposing)
@@ -829,10 +826,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             [Description("Legacy Folder (.osu)")]
             Folder,
-
         }
-
     }
-
-
 }
