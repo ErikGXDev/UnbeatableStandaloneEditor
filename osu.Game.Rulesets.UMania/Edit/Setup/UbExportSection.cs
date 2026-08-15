@@ -52,7 +52,19 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         private UbPlaytestButton websocketButton = null!;
         private CancellationTokenSource websocketCheckCancellation = new CancellationTokenSource();
 
-        public void ExportToUnbeatable() => Task.Run(exportToUnbeatable);
+        public void ExportToUnbeatable()
+        {
+            var good = editor.Save();
+            
+            if (!good)
+            {
+                showToast("Export failed: Failed to save",
+                    "Failed to save beatmap. Please fix any errors and try again.");
+                return;
+            }
+            
+            Task.Run(exportToUnbeatable);
+        }
 
         private bool IsWebsocketAvailable()
         {
