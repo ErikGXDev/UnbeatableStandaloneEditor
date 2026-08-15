@@ -6,12 +6,14 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.Handlers.Mouse;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Screens;
+using osu.Game.Screens.Edit;
 using UnbeatableStandaloneEditor.BeatmapPicker;
 
 namespace UnbeatableStandaloneEditor;
@@ -99,6 +101,31 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
 
                 Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
             }
+        }
+    }
+
+
+    private long currentTimestamp = 0;
+
+    protected override void onExpectionThrownHandling(Exception ex)
+    {
+        try
+        {
+            if (screenStack.CurrentScreen is Editor editor)
+            {
+                if (DateTimeOffset.Now.ToUnixTimeSeconds() - currentTimestamp < 10)
+                {
+                    return;
+                }
+
+                currentTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+                Logger.Log("Exception, attempting backup before crash.");
+                editor.MakeBackup();
+            }
+        }
+        catch (Exception backupEx)
+        {
+            Logger.Log($"Backup for exception failed...");
         }
     }
 

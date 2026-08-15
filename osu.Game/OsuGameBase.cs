@@ -715,18 +715,25 @@ namespace osu.Game
         /// <returns>Whether to ignore the exception and continue running.</returns>
         private bool onExceptionThrown(Exception ex)
         {
+            onExpectionThrownHandling(ex);
+            
             if (Interlocked.Decrement(ref allowableExceptions) < 0)
             {
                 Logger.Log("Too many unhandled exceptions, crashing out.");
-                RulesetStore?.TryDisableCustomRulesetsCausing(ex);
+                //RulesetStore?.TryDisableCustomRulesetsCausing(ex);
                 return false;
             }
-
+            
             Logger.Log($"Unhandled exception has been allowed with {allowableExceptions} more allowable exceptions.");
             // restore the stock of allowable exceptions after a short delay.
             Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));
 
             return true;
+        }
+
+        protected virtual void onExpectionThrownHandling(Exception ex)
+        {
+            // Do nothing here, used for games that inherit to have some custom code when an error is thrown.
         }
 
         protected override void Dispose(bool isDisposing)
