@@ -1,8 +1,8 @@
 ﻿## What's new
 
-- Your export folder and export mode is now saved between editor sessions.
-- Changed how UNANIMATED notes are saved and loaded. UNANIMATED notes are now only turned into events when exporting the map. Manually added events using "Edit externally" are turned into UNANIMATED notes.
-- UNANIMATED notes can now be created using key-charting by holding shift when placing notes in the 2nd column. (only when 4-key mode is disabled)
-
+- Testing maps through Websocket will now save the map first, just like the other export methods.
+  - This prevents an issue where unsaved changes would not show up when playtesting.
+- The editor will now attempt to make a backup when it crashes.
+- Backups are now created from the current editor state, instead of just the latest saved state.
 
 **Happy mapping!**
