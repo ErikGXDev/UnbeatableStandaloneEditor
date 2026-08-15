@@ -638,11 +638,11 @@ namespace osu.Game.Screens.Edit
             {
                 return false;
             }
-            
-            
-            var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
 
-            var encoder = new LegacyBeatmapEncoder(playableBeatmap, null, Beatmap.Value.Storyboard);
+
+            var beatmap = editorBeatmap.PlayableBeatmap;
+
+            var encoder = new LegacyBeatmapEncoder(beatmap, null, Beatmap.Value.Storyboard);
 
             using var beatmapStream = new MemoryStream();
             using (var sw = new StreamWriter(beatmapStream, Encoding.UTF8, 1024, true))
@@ -656,10 +656,10 @@ namespace osu.Game.Screens.Edit
             // DD_MM_YY_HH_MM_SS
             var timeFormatted = DateTime.Now.ToString("dd_MM_yy_HH_mm_ss");
             
-            var artist = playableBeatmap.BeatmapInfo.Metadata.Artist;
-            var title = playableBeatmap.BeatmapInfo.Metadata.Title;
-            var author = playableBeatmap.BeatmapInfo.Metadata.Author.Username;
-            var difficulty = playableBeatmap.BeatmapInfo.DifficultyName;
+            var artist = beatmap.BeatmapInfo.Metadata.Artist;
+            var title = beatmap.BeatmapInfo.Metadata.Title;
+            var author = beatmap.BeatmapInfo.Metadata.Author.Username;
+            var difficulty = beatmap.BeatmapInfo.DifficultyName;
             
             var beatmapFilename = $"{artist} - {title} ({author}) [{difficulty}]_{timeFormatted}.backup.osu".GetValidFilename();
             
