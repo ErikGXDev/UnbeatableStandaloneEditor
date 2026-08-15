@@ -110,7 +110,7 @@ public partial class SettingsPopover : OsuPopover
                                 new TooltipCheckbox
                                 {
                                     LabelText = "Enable \"Unanimated\" notes",
-                                    TooltipText = "This setting enables features intended to be used with Stefy's downloadable UNANIMATED mod.\nNotes in the 2nd lane can now be edited in a new menu underneath the inspector.\nThe menu allows you to set and modify camera commands, along with its parameters.\nTo start, select a single note in the 2nd column. The menu will then appear.\nYou will also need to place a note at the start of the 2nd column, and add a whistle, finish and clap sample to it, through the right-click menu.",
+                                    TooltipText = "This setting enables features intended to be used with Stefy's downloadable UNANIMATED mod.\nNew \"Animate\" Notes in the 2nd lane can now be edited in a new menu underneath the inspector.\nThe menu allows you to set and modify camera commands, along with their parameters.\nTo start, select the new \"Animate\" note preset on the left, place it, and select it. The menu will then appear.",
                                     RelativeSizeAxes = Axes.X,
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.EditorUnanimated),
                                     Margin = new MarginPadding { Bottom = 10 },
