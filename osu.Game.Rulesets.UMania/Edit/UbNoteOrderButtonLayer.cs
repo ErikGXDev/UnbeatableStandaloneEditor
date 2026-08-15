@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -182,16 +183,16 @@ namespace osu.Game.Rulesets.UMania.Edit
             // For 3 column pairs
             var relevantTripleObjects = editorBeatmap.HitObjects
                 .OfType<ManiaHitObject>()
-                .Where(h => h.Column == 2 || h.Column == 3 || h.Column == 5)
+                .Where(h => h.Column == 2 || h.Column == 3 || h.Column == 4)
                 .GroupBy(h => h.StartTime);
 
             foreach (var group in relevantTripleObjects)
             {
                 var col2Note = group.FirstOrDefault(h => h.Column == 2);
                 var col3Note = group.FirstOrDefault(h => h.Column == 3);
-                var col5Note = group.FirstOrDefault(h => h.Column == 5);
+                var col4Note = group.FirstOrDefault(h => h.Column == 4);
 
-                if (col5Note == null || (col2Note == null && col3Note == null)) continue;
+                if (col4Note == null || (col2Note == null && col3Note == null)) continue;
 
                 bool hasCol2 = col2Note != null;
                 bool hasCol3 = col3Note != null;
@@ -199,20 +200,20 @@ namespace osu.Game.Rulesets.UMania.Edit
                 
                 
                 // check if the col5 note is inbetween the col2 and col3 note
-                int col5Index = editorBeatmap.FindIndex(col5Note);
+                int col4Index = editorBeatmap.FindIndex(col4Note);
                 int col2Index = hasCol2 ? editorBeatmap.FindIndex(col2Note!) : -1;
                 int col3Index = hasCol3 ? editorBeatmap.FindIndex(col3Note!) : -1;
 
                 
                 bool isMixed =
                     hasCol2 && hasCol3 &&
-                    ((col5Index > col2Index && col5Index < col3Index) ||
-                     (col5Index > col3Index && col5Index < col2Index));
+                    ((col4Index > col2Index && col4Index < col3Index) ||
+                     (col4Index > col3Index && col4Index < col2Index));
                 
                 // check if the col5 note is in front of both 
-                bool isCol5First =
-                    (!hasCol2 || col5Index < col2Index) &&
-                    (!hasCol3 || col5Index < col3Index);
+                bool isCol4First =
+                    (!hasCol2 || col4Index < col2Index) &&
+                    (!hasCol3 || col4Index < col3Index);
                 
 
 
@@ -220,7 +221,7 @@ namespace osu.Game.Rulesets.UMania.Edit
                 {
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
-                    IsTopFirst = isCol5First, // Top refers to Col5 here
+                    IsTopFirst = isCol4First, // Top refers to Col5 here
                     MiddleMode = true,
                     MiddleMixed = isMixed,
                     Alpha = 0, // hidden until Update() positions it
@@ -237,26 +238,33 @@ namespace osu.Game.Rulesets.UMania.Edit
                         if (button.IsTopFirst)
                         {
                             // Col5 is in front, move it to the back
-                            editorBeatmap.Remove(col5Note);
-                            Schedule(() => editorBeatmap.Add(col5Note));
+                            editorBeatmap.Remove(col4Note);
+                            Schedule(() => editorBeatmap.Add(col4Note));
                         }
                         else
                         {
                             // Col5 is in back (or mixed), move it to the front
-                            editorBeatmap.Remove(col5Note);
-                            Schedule(() => editorBeatmap.Insert(0, col5Note));
+                            editorBeatmap.Remove(col4Note);
+                            
+                            // Instead of 0 we have to find the index of the first note in col2/col3 and insert before that
+                            var firstIndex = Math.Min(
+                                hasCol2 ? col2Index : int.MaxValue,
+                                hasCol3 ? col3Index : int.MaxValue
+                            );
+                            
+                            Schedule(() => editorBeatmap.Insert(firstIndex, col4Note));
                         }
                     }
                     else
                     {
                         // Only one of col2/col3 exists: just swap col5 with that note
                         var otherNote = col2Note ?? col3Note!;
-                        swapOrder(col5Note, otherNote);
+                        swapOrder(col4Note, otherNote);
                     }
                 };
                 
                 AddInternal(button);
-                triplePairs.Add((col2Note, col3Note, col5Note, button)!);
+                triplePairs.Add((col2Note, col3Note, col4Note, button)!);
             }
         }
 

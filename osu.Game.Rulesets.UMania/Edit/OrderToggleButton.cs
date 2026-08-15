@@ -192,12 +192,12 @@ namespace osu.Game.Rulesets.UMania.Edit
             {
                 if (middleMixed)
                 {
-                    return "Pink note is in the middle - click to fix";
+                    return "Camera note is in the middle - click to change";
                 }
                 
                 if (isTopFirst)
                 {
-                    return "Pink note is first - click to swap";
+                    return "Camera note is first - click to swap";
                 }
                 else
                 {
