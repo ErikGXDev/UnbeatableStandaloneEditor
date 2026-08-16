@@ -24,6 +24,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Framework.Testing;
+using osu.Game.Rulesets.UMania.Edit.Preview;
 using osuTK;
 using osuTK.Input;
 
@@ -53,11 +54,12 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     {
         base.LoadComplete();
 
+        // Removed for now in favor of the new placement order menu.
         // Add the order-toggle layer correctly so it can receive input
-        PlayfieldContentContainer.Add(new UbNoteOrderButtonLayer(Playfield.Stages[0])
+        /*PlayfieldContentContainer.Add(new UbNoteOrderButtonLayer(Playfield.Stages[0])
         {
             RelativeSizeAxes = Axes.Both,
-        });
+        });*/
 
         previewArea = new UManiaPreviewArea
         {
@@ -116,7 +118,7 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
                         },
                         new SpriteText
                         {
-                            Text = "Go to the Timing tab to add one",
+                            Text = "Go to the timing tab to add one",
                             Font = OsuFont.GetFont(size: 13),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -460,6 +462,7 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
                     {
                         Current = SettingShowPlacementOrder,
                         Description = "Placement order",
+                        Alpha = 0, // Just hide for now
                         CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Circle },
                     },
                     new DrawableTernaryButton
@@ -479,6 +482,8 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
             },
         });
 
+        RightToolbox.Add(new UbPlacementToolbox());
+        
         if (IsUnanimated)
             RightToolbox.Add(new UbAnimateToolbox());
 

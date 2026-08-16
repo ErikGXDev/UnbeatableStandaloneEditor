@@ -84,7 +84,7 @@ namespace osu.Game.Graphics.Containers
                                     Size = new Vector2(12),
                                     Colour = HandleColour,
                                     AlwaysPresent = true,
-                                    Alpha = 0
+                                    Alpha = 0.15f
                                 }
                             },
                             CreateContent()
@@ -136,7 +136,7 @@ namespace osu.Game.Graphics.Containers
 
             public PlaylistItemHandle()
             {
-                Icon = FontAwesome.Solid.Bars;
+                Icon = FontAwesome.Solid.GripVertical;
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)
@@ -164,7 +164,7 @@ namespace osu.Game.Graphics.Containers
                 if (isHovering || HandlingDrag)
                     this.FadeIn(FADE_DURATION);
                 else
-                    this.FadeOut(FADE_DURATION);
+                    this.FadeTo(0.15f, FADE_DURATION);
             }
         }
     }
