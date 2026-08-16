@@ -123,6 +123,14 @@ public partial class SettingsPopover : OsuPopover
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.Editor60msOffset),
                                     Margin = new MarginPadding { Bottom = 10 },
                                 },
+                                /*new TooltipCheckbox
+                                {
+                                    LabelText = "Swap pink notes in placement order",
+                                    TooltipText = "Normally, when you place a camera note and another normal note at the same time, you will have the option to swap them, so either note is in front of the other.\nWhen this setting is enabled, this swap will target pink notes instead of camera notes.",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = osuConfig.GetBindable<bool>(OsuSetting.EditorSwapPinkInsteadOfCamera),
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                },*/
                             },
                         },
                         new SettingsGroup

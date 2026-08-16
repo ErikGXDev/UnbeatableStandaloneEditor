@@ -216,6 +216,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorUnanimated, false); // FIX: Support for the UNANIMATED note feature
             SetDefault(OsuSetting.EditorExportMode, 0); // FIX: Export mode should persist as a config, enum is converted to int
             SetDefault(OsuSetting.EditorExportFolder, string.Empty); // FIX: Export folder should persist as a config
+            //SetDefault(OsuSetting.EditorSwapPinkInsteadOfCamera, false); // FIX: Swap pink instead of camera
             
             SetDefault(OsuSetting.HideCountryFlags, false);
 
@@ -510,6 +511,7 @@ namespace osu.Game.Configuration
         EditorKeyBasedCharting, // FIX: key-based charting mode toggle
         Editor60msOffset, // FIX: 60ms offset when exporting maps for editor parity
         EditorUnanimated, // FIX: Support for the UNANIMATED note feature
+        //EditorSwapPinkInsteadOfCamera,
         
         CreateBackups, // Toggle backup creation on save
         

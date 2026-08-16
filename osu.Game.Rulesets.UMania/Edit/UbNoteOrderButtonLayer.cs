@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UMania.Edit.Blueprints;
@@ -25,6 +26,8 @@ namespace osu.Game.Rulesets.UMania.Edit
         private EditorBeatmap editorBeatmap { get; set; } = null!;
 
         [Resolved] private UnbeatableHitObjectComposer composer { get; set; } = null!;
+        
+        [Resolved] private OsuConfigManager config { get; set; } = null!;
 
         // Column 2 = Top
         // Column 3 = Bottom
@@ -179,18 +182,25 @@ namespace osu.Game.Rulesets.UMania.Edit
                 AddInternal(button);
                 pairs.Add((col2Note, col3Note, button));
             }
+
+            var tripleTargetColumn = 4;
+
+            /*if (config.Get<bool>(OsuSetting.EditorSwapPinkInsteadOfCamera))
+            {
+                tripleTargetColumn = 5;
+            }*/
             
             // For 3 column pairs
             var relevantTripleObjects = editorBeatmap.HitObjects
                 .OfType<ManiaHitObject>()
-                .Where(h => h.Column == 2 || h.Column == 3 || h.Column == 4)
+                .Where(h => h.Column == 2 || h.Column == 3 || h.Column == tripleTargetColumn)
                 .GroupBy(h => h.StartTime);
 
             foreach (var group in relevantTripleObjects)
             {
                 var col2Note = group.FirstOrDefault(h => h.Column == 2);
                 var col3Note = group.FirstOrDefault(h => h.Column == 3);
-                var col4Note = group.FirstOrDefault(h => h.Column == 4);
+                var col4Note = group.FirstOrDefault(h => h.Column == tripleTargetColumn);
 
                 if (col4Note == null || (col2Note == null && col3Note == null)) continue;
 
@@ -224,6 +234,7 @@ namespace osu.Game.Rulesets.UMania.Edit
                     IsTopFirst = isCol4First, // Top refers to Col5 here
                     MiddleMode = true,
                     MiddleMixed = isMixed,
+                    PinkMode = tripleTargetColumn == 5,
                     Alpha = 0, // hidden until Update() positions it
                 };
 
