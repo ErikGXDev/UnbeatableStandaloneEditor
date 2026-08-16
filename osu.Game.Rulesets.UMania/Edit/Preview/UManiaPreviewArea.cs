@@ -6,19 +6,18 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UMania.Edit.Blueprints;
 using osu.Game.Rulesets.UMania.Objects;
 using osu.Game.Screens.Edit;
 using osuTK;
-using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.UMania.Edit
+namespace osu.Game.Rulesets.UMania.Edit.Preview
 {
     public partial class UManiaPreviewArea : CompositeDrawable
     {
@@ -509,7 +508,7 @@ namespace osu.Game.Rulesets.UMania.Edit
 
         private bool shouldCenterForUpcomingFlip(double currentTime)
         {
-            List<double> zoomTimes = new List<double>();
+            List<HitObject> zoomTimes = new List<HitObject>();
             foreach (var obj in editorBeatmap.HitObjects)
             {
                 if (obj is not ManiaHitObject note || note.Column != 4)
@@ -525,7 +524,7 @@ namespace osu.Game.Rulesets.UMania.Edit
                 var ubhelper = new UbNoteBuilder(note);
                 if (ubhelper.InferObjectTypeIcon() == UbIconType.Zoom)
                 {
-                    zoomTimes.Add(note.StartTime);
+                    zoomTimes.Add(note);
                     continue;
                 }
 
@@ -541,10 +540,23 @@ namespace osu.Game.Rulesets.UMania.Edit
 
                 if (probablyCenter)
                 {
-                    // Prevent peeking if a zoom is coming up before the flip
-                    if (zoomTimes.Any(t => t > currentTime && t < note.StartTime))
+              
+                    // Convert above loop to foreach
+                    foreach (var zoom in zoomTimes)
                     {
-                        return false;
+                        if (zoom.StartTime > currentTime && zoom.StartTime <= note.StartTime)
+                        {
+                            var zoomIndex = editorBeatmap.FindIndex(zoom);
+                            var flipIndex = editorBeatmap.FindIndex(note);
+                            
+                            // Only zoom out if the zoom is after the flip in the beatmap order
+                            if (zoomIndex > flipIndex)
+                            {
+                                return true;
+                            }
+                            
+                            return false;
+                        }
                     }
                     
                     return true;
