@@ -123,6 +123,12 @@ public partial class UbPlacementToolbox : EditorToolboxGroup
             }
         }
         
+        if (targetHitObjects.Count <= 1)
+        {
+            Alpha = 0f;
+            return;
+        }
+        
         targetHitObjects.Sort((a, b) => beatmap.FindIndex(a).CompareTo(beatmap.FindIndex(b)));
 
         Alpha = 1f;
