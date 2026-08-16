@@ -13,6 +13,7 @@ using DiffPlex;
 using DiffPlex.Model;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
@@ -150,6 +151,25 @@ namespace osu.Game.Screens.Edit
             var oldObjects = editorBeatmap.HitObjects;
             var newObjects = getNewBeatmap().HitObjects;
 
+
+            if (oldObjects.Count != newObjects.Count)
+            {
+                Logger.Log($"LegacyEditorBeatmapPatcher: HitObject count mismatch between old and new beatmap. Old: {oldObjects.Count}, New: {newObjects.Count}.", LoggingTarget.Runtime, LogLevel.Important);
+                
+                // For debug purposes, find out what hitobjects are missing between the two beatmaps.
+                
+                var oldTimes = oldObjects.Select(o => o.StartTime).ToList();
+                var newTimes = newObjects.Select(o => o.StartTime).ToList();
+                
+                var missingInOld = newTimes.Where(t => !oldTimes.Any(ot => Math.Abs(ot - t) < 1)).ToList();
+                var missingInNew = oldTimes.Where(t => !newTimes.Any(nt => Math.Abs(nt - t) < 1)).ToList();
+                
+                Logger.Log($"LegacyEditorBeatmapPatcher: HitObjects missing in old beatmap: {string.Join(", ", missingInOld)}", LoggingTarget.Runtime, LogLevel.Important);
+                Logger.Log($"LegacyEditorBeatmapPatcher: HitObjects missing in new beatmap: {string.Join(", ", missingInNew)}", LoggingTarget.Runtime, LogLevel.Important);
+
+                // Throw up and crash the editor, in order to make an emergency backup
+                throw new InvalidOperationException("HitObject count mismatch between old and new beatmap. This should not happen.");
+            }
             Debug.Assert(oldObjects.Count == newObjects.Count);
 
             foreach (var (oldObject, newObject) in oldObjects.Zip(newObjects))

@@ -462,6 +462,8 @@ namespace osu.Game.Beatmaps.Formats
                             beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
                             lineSupportedByEncoder = true;
                         }
+                        
+                        lineSupportedByEncoder = true;
 
                         break;
 
@@ -490,6 +492,8 @@ namespace osu.Game.Beatmaps.Formats
             // Only handle line if it was not yet marked as supported
             if (splitLine.Length >= 3 && !lineSupportedByEncoder)
             {
+                Logger.Log("[UNANIMATED] I will try to parse: " + line, LoggingTarget.Runtime, LogLevel.Debug);
+                
                 bool handleFurther = true;
                 
                 var category = splitLine[0];
@@ -515,6 +519,7 @@ namespace osu.Game.Beatmaps.Formats
                 
                 if (parameters != null && handleFurther)
                 {
+                    Logger.Log("  -  Seems to have succeeded", LoggingTarget.Runtime, LogLevel.Debug);
                     ConvertHitObject? obj = null;
                     if (endTime.HasValue)
                     {
