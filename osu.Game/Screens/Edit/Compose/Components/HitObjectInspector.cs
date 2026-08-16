@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     AddHeader("Time");
                     AddValue($"{selected.StartTime:#,0.##}ms");
 
-                    switch (selected)
+                    /*switch (selected)
                     {
                         case IHasPosition pos:
                             AddHeader("Position");
@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                             AddValue($"y:{y.Y:#,0.##}");
                             break;
-                    }
+                    }*/
 
                     if (selected is IHasDistance distance)
                     {
