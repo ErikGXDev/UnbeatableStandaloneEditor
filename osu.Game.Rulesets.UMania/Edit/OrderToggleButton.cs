@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.UMania.Edit
         private bool middleMode;
         private bool middleMixed;
 
+        private bool pinkMode;
+
         public bool IsTopFirst
         {
             get => isTopFirst;
@@ -58,6 +60,18 @@ namespace osu.Game.Rulesets.UMania.Edit
                 if (middleMixed == value) return;
 
                 middleMixed = value;
+                if (IsLoaded) updateVisibility();
+            }
+        }
+        
+        public bool PinkMode
+        {
+            get => pinkMode;
+            set
+            {
+                if (pinkMode == value) return;
+
+                pinkMode = value;
                 if (IsLoaded) updateVisibility();
             }
         }
@@ -102,7 +116,7 @@ namespace osu.Game.Rulesets.UMania.Edit
                 middleFirstSprite = new Sprite
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Texture = textureStore.Get("Textures/order-1-2-middle-first"),
+                    Texture = textureStore.Get("Textures/order-1-2-middle-first" + (pinkMode ? "-p" : "")),
                     FillMode = FillMode.Fit,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -112,7 +126,7 @@ namespace osu.Game.Rulesets.UMania.Edit
                 middleSecondSprite = new Sprite
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Texture = textureStore.Get("Textures/order-1-2-middle-second"),
+                    Texture = textureStore.Get("Textures/order-1-2-middle-second" + (pinkMode ? "-p" : "")),
                     FillMode = FillMode.Fit,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -122,7 +136,7 @@ namespace osu.Game.Rulesets.UMania.Edit
                 middleMixedSprite = new Sprite
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Texture = textureStore.Get("Textures/order-1-2-middle-mixed"),
+                    Texture = textureStore.Get("Textures/order-1-2-middle-mixed" + (pinkMode ? "-p" : "")),
                     FillMode = FillMode.Fit,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -190,14 +204,15 @@ namespace osu.Game.Rulesets.UMania.Edit
         {
             if (middleMode)
             {
+                var verb = pinkMode ? "Pink" : "Camera";
                 if (middleMixed)
                 {
-                    return "Camera note is in the middle - click to change";
+                    return $"{verb} note is in the middle - click to change";
                 }
                 
                 if (isTopFirst)
                 {
-                    return "Camera note is first - click to swap";
+                    return $"{verb} note is first - click to swap";
                 }
                 else
                 {
