@@ -6,5 +6,6 @@
   - There, you can change the placement order of notes by re-arraging them through drag and drop in a list.
 - Made the preview area more accurate (Camera peeking is now also simulated based on placement order, not just the time)
 - Fixed a bug where some osu events were read as UNANIMATED notes
+- Updated the tooltip description of the UNANIMATED option
 
 **Happy mapping!**
