@@ -448,6 +448,8 @@ namespace osu.Game.Beatmaps.Formats
                             beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[3]);
                             lineSupportedByEncoder = true;
                         }
+                        
+                        lineSupportedByEncoder = true;
 
                         break;
 
