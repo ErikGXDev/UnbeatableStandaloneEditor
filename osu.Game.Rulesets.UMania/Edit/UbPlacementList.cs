@@ -123,6 +123,12 @@ public partial class UbPlacementListItem : OsuRearrangeableListItem<UbPlacementH
             if (indexText != null)
                 indexText.Text = $"{index.NewValue + 1}.";
         });
+        
+        hitObjectInfo.HitObject.SamplesBindable.BindCollectionChanged((_, _) =>
+        {
+            if (text != null)
+                text.Text = getNoteVerb();
+        });
     }
 
 
