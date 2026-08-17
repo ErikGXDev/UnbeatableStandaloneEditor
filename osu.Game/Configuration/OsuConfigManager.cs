@@ -207,7 +207,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorScaleOrigin, EditorOrigin.GridCentre);
             SetDefault(OsuSetting.EditorRotationOrigin, EditorOrigin.GridCentre);
             SetDefault(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges, true);
-            SetDefault(OsuSetting.EditorNudgeByMilliseconds, false); // FIX: Add Config over here because it is used in osu code
+            SetDefault(OsuSetting.EditorNudgeByMilliseconds, true); // FIX: Add Config over here because it is used in osu code
             SetDefault(OsuSetting.PlaySamplesInCameraLane, true); // FIX: Camera lane hit sounds on by default
             SetDefault(OsuSetting.Editor4KeyMode, false); // FIX: 4-key mode should persist as a config
             SetDefault(OsuSetting.EditorKeyBasedCharting, false); // FIX: key-based charting mode toggle
