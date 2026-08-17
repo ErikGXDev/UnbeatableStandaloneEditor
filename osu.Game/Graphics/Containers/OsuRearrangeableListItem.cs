@@ -49,7 +49,7 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         protected readonly Bindable<bool> ShowDragHandle = new Bindable<bool>(true);
 
-        private Container handleContainer;
+        private HandleContainer handleContainer;
         private PlaylistItemHandle handle;
 
         protected OsuRearrangeableListItem(TModel item)
@@ -73,12 +73,8 @@ namespace osu.Game.Graphics.Containers
                     {
                         new[]
                         {
-                            handleContainer = new Container
+                            handleContainer = new HandleContainer
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                AutoSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Horizontal = 5 },
                                 Child = handle = new PlaylistItemHandle
                                 {
                                     Size = new Vector2(12),
@@ -117,7 +113,7 @@ namespace osu.Game.Graphics.Containers
             base.OnDragEnd(e);
         }
 
-        protected override bool IsDraggableAt(Vector2 screenSpacePos) => handle.HandlingDrag;
+        protected override bool IsDraggableAt(Vector2 screenSpacePos) => handleContainer.HandlingDrag;
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -128,6 +124,30 @@ namespace osu.Game.Graphics.Containers
         protected override void OnHoverLost(HoverLostEvent e) => handle.UpdateHoverState(false);
 
         protected abstract Drawable CreateContent();
+        
+        public partial class HandleContainer : Container
+        {
+            public HandleContainer()
+            {
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+                AutoSizeAxes = Axes.Both;
+                Padding = new MarginPadding { Horizontal = 5 };
+            }
+            
+            public bool HandlingDrag { get; set; } 
+
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                HandlingDrag = true;
+                return false;
+            }
+            
+            protected override void OnMouseUp(MouseUpEvent e)
+            {
+                HandlingDrag = false;
+            }
+        }
 
         public partial class PlaylistItemHandle : SpriteIcon
         {
