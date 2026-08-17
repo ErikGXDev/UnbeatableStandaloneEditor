@@ -133,6 +133,13 @@ public partial class UbPlacementToolbox : EditorToolboxGroup
 
         Alpha = 1f;
         
+        foreach (var item in targetHitObjects)
+        {
+            // If the item is somehow moved, the menu should just be hidden
+            // because the items, etc, are not in the same time anymore
+            item.StartTimeBindable.BindValueChanged(_ => Alpha = 0f);
+        }
+        
         refreshItems();
 
     }
