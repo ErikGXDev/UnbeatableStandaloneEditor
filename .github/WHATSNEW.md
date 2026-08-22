@@ -1,11 +1,10 @@
 ﻿## What's new
 
-- Reworked the "Placement Order" system
-  - Instead of buttons next to the columns, a new menu has been added to the right side of the editor.
-  - Selecting one or multiple notes that share the same start time with others will make the menu appear.
-  - There, you can change the placement order of notes by re-arraging them through drag and drop in a list.
-- Made the preview area more accurate (Camera peeking is now also simulated based on placement order, not just the time)
-- Fixed a bug where some osu events were read as UNANIMATED notes
-- Updated the tooltip description of the UNANIMATED option
+- The scroll speed of the preview area can now be adjusted by hovering over it and using Alt + Scroll
+  - Toggling "Show speed changes" will reset both the composer and preview scroll speed adjustments to default
+- Added smaller freestyle notes to the preview area, which emulates the behaviour of freestyles in UNBEATABLE
+- Notes can now be selected through the new placement order menu, by clicking on the items in the list.
+- Added new UNANIMATED actions (v0.1.9)
+- Fixed an issue regarding the "last edited" date display.
 
 **Happy mapping!**
