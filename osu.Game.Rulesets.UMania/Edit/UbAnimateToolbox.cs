@@ -54,7 +54,7 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
         RelativeSizeAxes = Axes.X;
         AutoSizeAxes = Axes.Y;
         
-        currentOption = createEnumIntOption("Type", typeof(CameraType)) as UbAnimateToolboxData.BaseOption<BindableInt> ?? throw new InvalidOperationException("Failed to create current option.");
+        currentOption = createEnumIntOption("Type", typeof(CameraAction)) as UbAnimateToolboxData.BaseOption<BindableInt> ?? throw new InvalidOperationException("Failed to create current option.");
 
         var (currentOptionDrawable, currentOptionBindable) = currentOption.CreateDrawableAndBindable();
         currentOptionBindable.BindTo(eventTypeSlider);

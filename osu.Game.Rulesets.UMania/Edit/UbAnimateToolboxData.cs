@@ -18,9 +18,13 @@ public enum CategoryType
 {
     Camera,
     Character,
+    Gameplay,
+    [Description("Stage Switch")]
+    StageScene,
+    UI
 }
 
-public enum CameraType
+public enum CameraAction
 {
     [Description("Reset")]
     Reset = 0,
@@ -62,13 +66,61 @@ public enum CameraType
     FOVOffset = 12
 }
 
-public enum CharacterType
+public enum CharacterAction
 {
     Reset = 0,
     
     [Description("Set Character")]
     SetCharacter
 }
+
+public enum GameplayAction
+{
+    [Description("Screen Shake")]
+    ScreenShake = 0,
+    
+    [Description("Screen Rotation")]
+    ScreenRot = 1,
+    
+    [Description("Screen Zoom")]
+    ScreenZoom = 2
+}
+
+public enum StageSceneAction
+{
+    TrainStationRhythm,
+    StadiumPast,
+    StadiumPresent,
+    DreamReflection,
+    PrisonYard,
+    MovingTrain,
+    LighthouseStage,
+    LoadingDockInterior,
+    RecordingStudio,
+    CityStreet,
+    CityCenter,
+    RichPeopleConcert,
+    AlleywayStage,
+    WarehouseStage,
+    HARMLobby,
+    HARMZeroMomentArray,
+    HARMSforzandoArena,
+    HARMGraveyard,
+    NSR_Stage,
+    GreenscreenRhythm,
+    PlaybackStage,
+    BirdBrainRhythm,
+    WomenWrestlingRhythm,
+    NOISZRhythm,
+    TrainStationRhythmPixel,
+}
+
+public enum UIAction
+{
+    [Description("Force Locked UI")]
+    ForceLockedUI = 0
+}
+
 
 public enum CameraPoint
 {
@@ -141,6 +193,17 @@ public class UbAnimateToolboxData
                                              
                                              Type "Reset" to reset the character.
                                              """;
+
+    public static string StageListText = """
+                                         List of available stages:
+
+                                         TrainStationRhythm, StadiumPast, StadiumPresent, DreamReflection, PrisonYard, MovingTrain, LighthouseStage, LoadingDockInterior, RecordingStudio, CityStreet, CityCenter, RichPeopleConcert, AlleywayStage, WarehouseStage, HARMLobby, HARMZeroMomentArray, HARMSforzandoArena, HARMGraveyard, NSR_Stage, GreenscreenRhythm, PlaybackStage, BirdBrainRhythm, WomenWrestlingRhythm, NOISZRhythm, NSR_Stage, TrainStationRhythmPixel
+                                         
+                                         ---
+                                         
+                                         Stage swapping only works if the "Default" stage is selected in UNBEATABLE.
+                                         """;
+    
     
     public abstract class BaseOption
     {
@@ -332,34 +395,48 @@ public class UbAnimateToolboxData
         {
             CategoryType.Camera, new Dictionary<Enum, List<BaseOption>>
             {
-                { CameraType.Reset, [new IntOption("Position Only?", 0, 0, 1)] },
-                { CameraType.CameraTarget, [new EnumStringOption<CameraPoint>("Camera Point")] },
-                { CameraType.ZoomOffset, [new IntOption("Offset", 0, -100, 100)] },
-                { CameraType.ZoomTarget, [new IntOption("Target", 0, -100, 100)] },
-                { CameraType.RotOffset, [new IntOption("Degrees", 0, -180, 180)] },
-                { CameraType.RotTarget, [new IntOption("Degrees", 0, -180, 180)] },
-                { CameraType.HorizontalOffset, [new IntOption("Offset", 0, -100, 100)] },
-                { CameraType.HorizontalTarget, [new IntOption("Target", 0, -100, 100)] },
+                { CameraAction.Reset, [new IntOption("Position Only?", 0, 0, 1)] },
+                { CameraAction.CameraTarget, [new EnumStringOption<CameraPoint>("Camera Point")] },
+                { CameraAction.ZoomOffset, [new IntOption("Offset", 0, -100, 100)] },
+                { CameraAction.ZoomTarget, [new IntOption("Target", 0, -100, 100)] },
+                { CameraAction.RotOffset, [new IntOption("Degrees", 0, -180, 180)] },
+                { CameraAction.RotTarget, [new IntOption("Degrees", 0, -180, 180)] },
+                { CameraAction.HorizontalOffset, [new IntOption("Offset", 0, -100, 100)] },
+                { CameraAction.HorizontalTarget, [new IntOption("Target", 0, -100, 100)] },
                 {
-                    CameraType.CustomCameraTarget,
+                    CameraAction.CustomCameraTarget,
                     [
                         new IntOption("X", 0, -100, 100, new[] { -55, -19, -10, 0, 10, 19, 55 }),
                         new IntOption("Y", 0, -100, 100, new[] { 20, 35, 5 }),
                         new IntOption("Z", 0, -100, 100, new[] { -60, -80, -85 })
                     ]
                 },
-                { CameraType.EaseTime, [new IntOption("Time (ms)", 0, 0, 5000)] },
-                { CameraType.EaseMode, [new EnumStringOption<CameraEasing>("Easing")] },
-                { CameraType.FOVTarget, [new IntOption("Target (Degrees)", 60, 1, 179)] },
-                { CameraType.FOVOffset, [new IntOption("Offset (Degrees)", 0, -180, 180)] }
+                { CameraAction.EaseTime, [new IntOption("Time (ms)", 0, 0, 5000)] },
+                { CameraAction.EaseMode, [new EnumStringOption<CameraEasing>("Easing")] },
+                { CameraAction.FOVTarget, [new IntOption("Target (Degrees)", 60, 1, 179)] },
+                { CameraAction.FOVOffset, [new IntOption("Offset (Degrees)", 0, -180, 180)] }
             }
            
         },
         {
             CategoryType.Character, new Dictionary<Enum, List<BaseOption>>
             {
-                { CharacterType.Reset, new List<BaseOption>() },
-                { CharacterType.SetCharacter, [new StringOption("Character 1", "Beat", CharacterListText), new StringOption("Character 2", "Quaver", CharacterListText)] }
+                { CharacterAction.Reset, new List<BaseOption>() },
+                { CharacterAction.SetCharacter, [new StringOption("Character 1", "Beat", CharacterListText), new StringOption("Character 2", "Quaver", CharacterListText)] }
+            }
+        },
+        {
+            CategoryType.Gameplay, new Dictionary<Enum, List<BaseOption>>
+            {
+                { GameplayAction.ScreenShake, [new IntOption("Enabled?", 1, 0, 1)] },
+                { GameplayAction.ScreenRot, [new IntOption("Enabled?", 1, 0, 1)] },
+                { GameplayAction.ScreenZoom, [new IntOption("Enabled?", 1, 0, 1)] }
+            }
+        },
+        {
+            CategoryType.UI, new Dictionary<Enum, List<BaseOption>>
+            {
+                { UIAction.ForceLockedUI, [new IntOption("Enabled?", 1, 0, 1)] }
             }
         }
         
@@ -367,8 +444,11 @@ public class UbAnimateToolboxData
 
     public static readonly Dictionary<CategoryType, CategoryInfo> CategoryTypeInfo = new()
     {
-        { CategoryType.Camera, new CategoryInfo(typeof(CameraType), "Type") },
-        { CategoryType.Character, new CategoryInfo(typeof(CharacterType), "Type") }
+        { CategoryType.Camera, new CategoryInfo(typeof(CameraAction), "Type") },
+        { CategoryType.Character, new CategoryInfo(typeof(CharacterAction), "Type") },
+        { CategoryType.Gameplay, new CategoryInfo(typeof(GameplayAction), "Type") },
+        { CategoryType.StageScene, new CategoryInfo(typeof(StageSceneAction), "New Stage") },
+        { CategoryType.UI, new CategoryInfo(typeof(UIAction), "Type") }
     };
     
     
