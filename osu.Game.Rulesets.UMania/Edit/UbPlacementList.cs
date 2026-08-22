@@ -1,10 +1,14 @@
+using System.Collections.Specialized;
+using System.Threading.Tasks;
 using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -12,6 +16,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UMania.Edit.Blueprints;
 using osu.Game.Rulesets.UMania.Objects;
+using osu.Game.Screens.Edit;
 using osuTK;
 using osuTK.Graphics;
 
@@ -24,11 +29,29 @@ public partial class UbPlacementList : OsuRearrangeableListContainer<UbPlacement
         return new UbPlacementListItem(item);
     }
     
-    private Drawable listFillFlowContainer = null!;
+    private FillFlowContainer<RearrangeableListItem<UbPlacementHitObjectInfo>> listFillFlowContainer = null!;
 
     protected override void Update()
     {
         Height = listFillFlowContainer.DrawHeight;
+    }
+    
+    protected override void LoadComplete()
+    {
+        Items.BindCollectionChanged((a, b) =>
+        {
+            if (b.Action == NotifyCollectionChangedAction.Add || b.Action == NotifyCollectionChangedAction.Remove)
+            {
+                listFillFlowContainer.LayoutDuration = 0;
+                
+                Task.Delay(100).ContinueWith(_ =>
+                {
+                    listFillFlowContainer.LayoutDuration = 160;
+                });
+            }
+        }, true);
+        
+        base.LoadComplete();
     }
 
     protected override FillFlowContainer<RearrangeableListItem<UbPlacementHitObjectInfo>> CreateListFillFlowContainer() => new FillFlowContainer<RearrangeableListItem<UbPlacementHitObjectInfo>>().With(d =>
@@ -55,8 +78,17 @@ public partial class UbPlacementListItem : OsuRearrangeableListItem<UbPlacementH
     [Resolved]
     private UnbeatableHitObjectComposer composer { get; set; } = null!;
     
+    
+    
+    [Resolved]
+    private OsuColour colours { get; set; } = null!;
+    
+    [Resolved]
+    private EditorBeatmap editorBeatmap { get; set; } = null!;
+
     private OsuSpriteText? text;
     private OsuSpriteText? indexText;
+    private Box highlightBox;
 
     private string getNoteVerb()
     {
@@ -134,8 +166,13 @@ public partial class UbPlacementListItem : OsuRearrangeableListItem<UbPlacementH
 
     protected override Drawable CreateContent()
     {
-        return new Container
+        return new ClickableContainer
         {
+            Action = () =>
+            {
+                editorBeatmap.SelectedHitObjects.Clear();
+                editorBeatmap.SelectedHitObjects.Add(hitObjectInfo.HitObject);
+            },
             RelativeSizeAxes = Axes.X,
             Height = 30,
             Masking = true,
