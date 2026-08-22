@@ -6,6 +6,8 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -37,8 +39,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
         private const float cam_right_receptor = 0.75f;
         private const float cam_middle_receptor = 0.5f;
 
-        private const double view_field = 800;
-        private const double view_field_tolerance = 400;
+        private double viewField => 800 * viewFieldMultiplier;
+        private double viewFieldTolerance => 400 * viewFieldMultiplier;
+
+        private double viewFieldMultiplier = 1f;
+        public double ViewFieldMultiplier = 1f;
 
 
         private ExpandingToolboxContainer rightToolbox = null!;
@@ -233,8 +238,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
         protected override void Update()
         {
             base.Update();
-
+            
             if (Alpha == 0) return; // Don't update if preview is hidden
+            
+            // Lerp viewFieldMultiplier towards ViewFieldMultiplier
+            viewFieldMultiplier = Interpolation.Lerp(viewFieldMultiplier, ViewFieldMultiplier, 0.05f);
 
             foreach (var note in notePool)
                 note.Hide();
@@ -268,7 +276,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                 // Target camera notes
                 if (column == 4)
                 {
-                    if (note.StartTime > time + view_field + view_field_tolerance)
+                    if (note.StartTime > time + viewField + viewFieldTolerance)
                         continue;
 
                     var ubhelper = new UbNoteBuilder(obj);
@@ -312,7 +320,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                     }
                 }
 
-                if (isHold && endTime > time && startTime < time + view_field + view_field_tolerance)
+                if (isHold && endTime > time && startTime < time + viewField + viewFieldTolerance)
                 {
                     var pos = GetPreviewNotePosition(column, startTime, time, flippedRight, zoomedIn);
 
@@ -336,8 +344,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
 
                         double holdDuration = endTime - startTime;
                         float speedX = holdFlippedRight
-                            ? (float)((1.0 - right_receptor) / view_field)
-                            : -(float)(left_receptor / view_field);
+                            ? (float)((1.0 - right_receptor) / viewField)
+                            : -(float)(left_receptor / viewField);
                         float D = (float)holdDuration * speedX;
 
                         if (Math.Abs(D) > 0.0001f)
@@ -459,7 +467,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                     indicatorLayer.UpdateIndicators(olFlippedRight, !olZoomedIn, centerForUpcomingFlip);
                 }
 
-                if (note.StartTime > time + view_field + view_field_tolerance) break;
+                if (note.StartTime > time + viewField + viewFieldTolerance) break;
 
 
                 if (column == 4)
@@ -492,7 +500,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                 if (note.StartTime < currentTime)
                     continue;
 
-                if (note.StartTime > currentTime + view_field + view_field_tolerance * 2)
+                if (note.StartTime > currentTime + viewField + viewFieldTolerance * 2)
                     break;
 
 
@@ -663,11 +671,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
             
             if (flippedRight)
             {
-                vector.X = (float)Map(hitTime, currentTime, currentTime + view_field, right_receptor, 1);
+                vector.X = (float)Map(hitTime, currentTime, currentTime + viewField, right_receptor, 1);
             }
             else
             {
-                vector.X = (float)Map(hitTime, currentTime, currentTime + view_field, left_receptor, 0);
+                vector.X = (float)Map(hitTime, currentTime, currentTime + viewField, left_receptor, 0);
             }
 
             if (column == 2 || column == 0)
@@ -690,5 +698,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
         {
             return fromTarget + (value - fromSource) * (toTarget - fromTarget) / (toSource - fromSource);
         }
+
+        public override bool HandlePositionalInput { get; } = true;
     }
 }

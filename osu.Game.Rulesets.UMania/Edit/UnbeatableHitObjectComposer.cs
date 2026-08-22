@@ -487,6 +487,15 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
         if (IsUnanimated)
             RightToolbox.Add(new UbAnimateToolbox());
 
+        if (DrawableRuleset is DrawableManiaEditorRuleset mr)
+        {
+            mr.ShowSpeedChanges.BindValueChanged(v =>
+            {
+                if (v.NewValue == false)
+                    previewArea.ViewFieldMultiplier = 1f;
+            });
+        }
+
         // Wire modifier toggles to apply to selected notes
         var modButtons = new[] { ModFlyingButton, ModInvisibleButton, ModSwapImmediateButton, ModCopButton, ModCop1Button, ModCop2Button, ModCop3Button, ModCop4Button, ModCopFinishButton, ModCopHeavyButton };
 
@@ -729,7 +738,11 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
 
         if (e.AltPressed && !e.ControlPressed && !e.ShiftPressed)
         {
-            if (DrawableRuleset is DrawableManiaEditorRuleset maniaRuleset)
+            if (previewArea.IsHovered)
+            {
+                previewArea.ViewFieldMultiplier = Math.Clamp(previewArea.ViewFieldMultiplier + scrollDelta * 0.1, 0.1, 2.5);
+            }
+            else if (DrawableRuleset is DrawableManiaEditorRuleset maniaRuleset)
             {
                 maniaRuleset.TimeRangeMultiplier = Math.Clamp(maniaRuleset.TimeRangeMultiplier + scrollDelta * 0.1, 0.1, 5);
             }
