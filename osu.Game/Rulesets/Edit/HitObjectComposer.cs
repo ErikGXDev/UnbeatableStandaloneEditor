@@ -421,7 +421,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 if (e.ShiftPressed || e.AltPressed)
                 {
-                    if (sampleBankTogglesCollection.ElementAtOrDefault(rightIndex) is SampleBankTernaryButton sampleBankTernaryButton)
+                    /*if (sampleBankTogglesCollection.ElementAtOrDefault(rightIndex) is SampleBankTernaryButton sampleBankTernaryButton)
                     {
                         if (e.ShiftPressed)
                             sampleBankTernaryButton.NormalButton.Toggle();
@@ -430,7 +430,7 @@ namespace osu.Game.Rulesets.Edit
                             sampleBankTernaryButton.AdditionsButton.Toggle();
 
                         return true;
-                    }
+                    }*/
                 }
                 else
                 {
