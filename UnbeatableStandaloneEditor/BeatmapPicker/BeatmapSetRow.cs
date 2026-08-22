@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -89,7 +90,7 @@ public partial class BeatmapSetRow : OsuClickableContainer
                         },
                         new OsuSpriteText
                         {
-                            Text = $"by {set.Metadata.Author.Username}  \u2022  {diffLabel}  \u2022  {set.DateAdded.Humanize()}",
+                            Text = $"by {set.Metadata.Author.Username}  \u2022  {diffLabel}  \u2022  {HumanizerUtils.Humanize(set.DateAdded)}",
                             Font = OsuFont.GetFont(size: 14),
                             Alpha = 0.55f,
                         }
