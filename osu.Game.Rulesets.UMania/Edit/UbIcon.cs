@@ -83,6 +83,7 @@ namespace osu.Game.Rulesets.UMania.Edit
         Dodge,
         Double,
         Freestyle,
+        FreestyleSmall,
         Spam,
         Brawl,
 

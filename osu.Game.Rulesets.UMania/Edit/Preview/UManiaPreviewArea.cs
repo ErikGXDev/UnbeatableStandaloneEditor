@@ -480,32 +480,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                 previewNote.Show();
             }
         }
-
-        private (bool flippedRight, bool zoomedIn) getCameraStateAtTime(double currentTime)
-        {
-            bool flippedRight = true;
-            bool zoomedIn = true;
-
-            foreach (var obj in editorBeatmap.HitObjects)
-            {
-                if (obj is not ManiaHitObject note || note.Column != 4)
-                    continue;
-
-                if (note.StartTime > currentTime)
-                    break;
-
-                var ubhelper = new UbNoteBuilder(note);
-                var iconType = ubhelper.InferObjectTypeIcon();
-
-                if (iconType == UbIconType.Zoom)
-                    zoomedIn = !zoomedIn;
-                else
-                    flippedRight = !flippedRight;
-            }
-
-            return (flippedRight, zoomedIn);
-        }
-
+        
         private bool shouldCenterForUpcomingFlip(double currentTime)
         {
             List<HitObject> zoomTimes = new List<HitObject>();
@@ -617,7 +592,63 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
         {
             var note = getPooledNote();
             var ubiconHelper = new UbNoteBuilder(hitObject);
-            note.SetIconType(ubiconHelper.InferObjectTypeIcon());
+
+            var iconType = ubiconHelper.InferObjectTypeIcon();
+
+            // Extra logic to detect smaller freestyle notes
+            if (iconType == UbIconType.Freestyle)
+            {
+                int index = editorBeatmap.FindIndex(hitObject);
+                if (index > 0)
+                {
+                    var columns = new[] { 2, 3 };
+                    if (composer.Is4Key)
+                        columns = [0, 1, 2, 3];
+                    
+                    var prevUbIconHelper = new UbNoteBuilder(null);
+                    
+                    for (int i = index - 1; i >= 0; i--)
+                    {
+                        var prevObj = editorBeatmap.HitObjects[i];
+                        if (prevObj is ManiaHitObject prevNote)
+                        {
+                            
+                            prevUbIconHelper.ChangeHitObject(prevNote);
+                            
+                            var prevIconType = prevUbIconHelper.InferObjectTypeIcon();
+                            
+                            if (columns.Contains(prevNote.Column))
+                            {
+                                if (prevIconType == UbIconType.Animated || prevIconType == UbIconType.AnimatedHold)
+                                {
+                                    continue; // Skip Animated notes, even though they're in columns that should usually interrupt small freestyles
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+
+                            if (prevIconType == UbIconType.Flip)
+                            {
+                                break;
+                            }
+                            
+                            if (prevIconType == UbIconType.Freestyle)
+                            {
+                                iconType = UbIconType.FreestyleSmall;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            
+            note.SetIconType(iconType);
+            
+            
+            
             return note;
         }
 

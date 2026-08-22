@@ -45,6 +45,13 @@ namespace osu.Game.Rulesets.UMania.Edit
             shape.Colour = colourFor(type);
             shape.Scale = type == UbIconType.Spam ? new Vector2(1, 1.5f) : Vector2.One;
             shape.Y = type == UbIconType.Spam ? -5 : 0;
+            
+            if (type == UbIconType.FreestyleSmall)
+            {
+                shape.Scale = new Vector2(0.8f);
+                shape.Y = 2f;
+            }
+            
             iconType = type;
         }
 
@@ -69,7 +76,10 @@ namespace osu.Game.Rulesets.UMania.Edit
             UbIconType.Hold => Color4.Snow,
             UbIconType.Double => Color4.CornflowerBlue,
             UbIconType.Dodge => Color4.Orange,
+            UbIconType.Animated => Color4.DarkOliveGreen.Opacity(0f),
+            UbIconType.AnimatedHold => Color4.DarkOliveGreen.Opacity(0f),
             UbIconType.Freestyle => Color4.Purple.Lighten(0.3f),
+            UbIconType.FreestyleSmall => Color4.Purple.Lighten(0.3f),
             UbIconType.Spam => Color4.DeepPink,
             UbIconType.Flip => Color4.Blue,
             UbIconType.Zoom => Color4.Orange,
