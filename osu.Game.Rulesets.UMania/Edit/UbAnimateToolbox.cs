@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
@@ -155,9 +156,20 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
         markerHintText.Colour = colour.YellowLight;
         
         this.beatmap = beatmap;
-        beatmap.SelectedHitObjects.CollectionChanged += (_, _) => updateActiveState();
+        beatmap.SelectedHitObjects.CollectionChanged += selectedCollectionChanged;
         updateActiveState();
+    }
+
+    protected override void Dispose(bool isDisposing)
+    {
+        beatmap.SelectedHitObjects.CollectionChanged -= selectedCollectionChanged;
         
+        base.Dispose(isDisposing);
+    }
+
+    private void selectedCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        updateActiveState();
     }
 
     private void refreshCategory()

@@ -19,6 +19,7 @@ namespace osu.Game.IO.Serialization
 
         public static JsonSerializerSettings CreateGlobalSettings() => new JsonSerializerSettings
         {
+            TypeNameHandling = TypeNameHandling.Auto,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             Formatting = Formatting.Indented,
             ObjectCreationHandling = ObjectCreationHandling.Replace,
