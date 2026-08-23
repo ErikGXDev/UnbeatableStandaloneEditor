@@ -399,8 +399,8 @@ public class UbAnimateToolboxData
                 { CameraAction.CameraTarget, [new EnumStringOption<CameraPoint>("Camera Point")] },
                 { CameraAction.ZoomOffset, [new IntOption("Offset", 0, -100, 100)] },
                 { CameraAction.ZoomTarget, [new IntOption("Target", 0, -100, 100)] },
-                { CameraAction.RotOffset, [new IntOption("Degrees", 0, -180, 180)] },
-                { CameraAction.RotTarget, [new IntOption("Degrees", 0, -180, 180)] },
+                { CameraAction.RotOffset, [new IntOption("Degrees", 0, -720, 720)] },
+                { CameraAction.RotTarget, [new IntOption("Degrees", 0, -720, 720)] },
                 { CameraAction.HorizontalOffset, [new IntOption("Offset", 0, -100, 100)] },
                 { CameraAction.HorizontalTarget, [new IntOption("Target", 0, -100, 100)] },
                 {
