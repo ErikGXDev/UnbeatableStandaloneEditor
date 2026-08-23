@@ -242,6 +242,7 @@ public class UbAnimateToolboxData
 
             var slider = new FormSliderBar<int>()
             {
+                LabelFormat = i => i.ToString(),
                 Caption = Label,
                 Current = bindable,
                 KeyboardStep = 1

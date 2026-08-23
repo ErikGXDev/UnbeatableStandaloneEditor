@@ -398,8 +398,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                             SelectAllOnFocus = true,
                                             OnInputError = () =>
                                             {
-                                                flashLayer.Colour = ColourInfo.GradientVertical(colours.Red3.Opacity(0), colours.Red3);
-                                                flashLayer.FadeOutFromOne(200, Easing.OutQuint);
+                                                /*flashLayer.Colour = ColourInfo.GradientVertical(colours.Red3.Opacity(0), colours.Red3);
+                                                flashLayer.FadeOutFromOne(200, Easing.OutQuint);*/
                                             },
                                             TabbableContentContainer = tabbableContentContainer,
                                         },

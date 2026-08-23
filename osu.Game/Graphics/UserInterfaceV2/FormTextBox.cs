@@ -234,7 +234,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected override void NotifyInputError()
             {
-                PlayFeedbackSample(FeedbackSampleType.TextInvalid);
+                // FIX: Thing breaks on higher numbers
+                //PlayFeedbackSample(FeedbackSampleType.TextInvalid);
                 // base call intentionally suppressed
                 OnInputError?.Invoke();
             }
