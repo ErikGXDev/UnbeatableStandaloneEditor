@@ -95,6 +95,7 @@ public enum StageSceneAction
     RecordingStudio,
     CityStreet,
     CityCenter,
+    TutorialRhythm,
     RichPeopleConcert,
     AlleywayStage,
     WarehouseStage,
