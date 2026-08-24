@@ -2,15 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Numerics;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Logging;
-using osu.Framework.Threading;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Tests;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Rulesets.UMania.Edit;
 
@@ -181,7 +177,7 @@ public enum CameraEasing
 
 
 
-public class UbAnimateToolboxData
+public partial class UbAnimateToolboxData
 {
 
     public static string CharacterListText = """
@@ -219,6 +215,9 @@ public class UbAnimateToolboxData
 
     public class IntOption : BaseOption<BindableInt>
     {
+        
+        public static Bindable<bool> UseTextBox = new Bindable<bool>(false);
+        
         public int DefaultValue { get; set; }
         public int Min { get; set; }
         public int Max { get; set; }
@@ -236,17 +235,91 @@ public class UbAnimateToolboxData
 
         public override (Drawable, IBindable) CreateDrawableAndBindable(Action? onValueChanged)
         {
-            var bindable = new BindableInt() { MinValue = Min, MaxValue = Max, Default = DefaultValue };
+            var finalIntBindable = new BindableInt() { Default = DefaultValue };
+            finalIntBindable.BindValueChanged(v => onValueChanged?.Invoke());
             
-            bindable.BindValueChanged(v => onValueChanged?.Invoke());
-
+            var sliderBindable = new BindableInt() { MinValue = Min, MaxValue = Max, Default = DefaultValue };
+            var boxBindable = new Bindable<string>() { Default = DefaultValue.ToString() };
+            
             var slider = new FormSliderBar<int>()
             {
                 LabelFormat = i => i.ToString(),
                 Caption = Label,
-                Current = bindable,
+                Current = sliderBindable,
                 KeyboardStep = 1
             };
+            
+            boxBindable.BindValueChanged(v =>
+            {
+                var newInt = int.TryParse(v.NewValue, out var parsed) ? parsed : sliderBindable.Value;
+                
+                if (sliderBindable.Value != newInt)
+                    sliderBindable.Value = newInt;
+                
+                if (finalIntBindable.Value != newInt)
+                    finalIntBindable.Value = newInt;
+            }, true);
+            
+            sliderBindable.BindValueChanged(v =>
+            {
+                if (boxBindable.Value != v.NewValue.ToString())
+                    boxBindable.Value = v.NewValue.ToString();
+                
+                if (finalIntBindable.Value != v.NewValue)
+                    finalIntBindable.Value = v.NewValue;
+            }, true);
+            
+            finalIntBindable.BindValueChanged(v =>
+            {
+                if (sliderBindable.Value != v.NewValue)
+                    sliderBindable.Value = v.NewValue;
+                
+                if (boxBindable.Value != v.NewValue.ToString())
+                    boxBindable.Value = v.NewValue.ToString();
+            });
+            
+            var numberBox = new FormNumberBox()
+            {
+                Alpha = 0,
+                Caption = Label,
+                Current = boxBindable
+            };
+            
+            var container = new Container()
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Children = new Drawable[]
+                {
+                    slider,
+                    numberBox
+                }
+            };
+            
+            UseTextBox.BindValueChanged(v =>
+            {
+                if (v.NewValue)
+                {
+                    slider.Alpha = 0;
+                    numberBox.Alpha = 1;
+                }
+                else
+                {
+                    numberBox.Alpha = 0;
+                    slider.Alpha = 1;
+                    
+                    // Clamp the slider value to the min/max if the textbox value is out of bounds
+                    var numberBoxValue = int.TryParse(boxBindable.Value, out var parsed) ? parsed : sliderBindable.Value;
+                    if (numberBoxValue < Min || numberBoxValue > Max)
+                    {
+                        var clampedValue = Math.Clamp(numberBoxValue, Min, Max);
+                        sliderBindable.Value = clampedValue;
+                        boxBindable.Value = clampedValue.ToString();
+                    }
+                    
+                }
+            }, true);
+            
             
             if (Markers != null)
             {
@@ -254,7 +327,7 @@ public class UbAnimateToolboxData
                 Logger.Log("Markers set for slider: " + string.Join(", ", Markers));
             }
             
-            return (slider, bindable);
+            return (container, finalIntBindable);
         }
     }
     
@@ -414,7 +487,7 @@ public class UbAnimateToolboxData
                 },
                 { CameraAction.EaseTime, [new IntOption("Time (ms)", 0, 0, 5000)] },
                 { CameraAction.EaseMode, [new EnumStringOption<CameraEasing>("Easing")] },
-                { CameraAction.FOVTarget, [new IntOption("Target (Degrees)", 60, 1, 179)] },
+                { CameraAction.FOVTarget, [new IntOption("Target (Degrees)", 60, 1, 180)] },
                 { CameraAction.FOVOffset, [new IntOption("Offset (Degrees)", 0, -180, 180)] }
             }
            

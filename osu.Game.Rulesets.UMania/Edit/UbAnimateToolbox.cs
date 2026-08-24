@@ -216,6 +216,7 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
         
         if (UbAnimateToolboxData.CategoryOptions.TryGetValue(category, out var typeOptions) && typeOptions.TryGetValue(eventType, out var options))
         {
+            var hasIntOption = false;
             for (var i = 0; i < options.Count; i++)
             {
                 var option = options[i];
@@ -225,6 +226,8 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
                     {
                         markerHintText.Alpha = 1;
                     }
+
+                    hasIntOption = true;
                 }
 
                 var (drawable, bindable) = option.CreateDrawableAndBindable(writeEventData);
@@ -248,6 +251,15 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
                         }
                     }
                 }
+            }
+
+            if (hasIntOption)
+            {
+                parameterContainer.Add(new FormCheckBox()
+                {
+                    Current = UbAnimateToolboxData.IntOption.UseTextBox,
+                    Caption = "Disable number limits"
+                });
             }
         }
         
