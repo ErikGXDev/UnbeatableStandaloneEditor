@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Logging;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -151,11 +152,12 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
 
 
     [BackgroundDependencyLoader]
-    private void load(EditorBeatmap beatmap, OsuColour colour)
+    private void load(EditorBeatmap beatmap, OsuColour colour, OsuConfigManager config)
     {
         markerHintText.Colour = colour.YellowLight;
         
         this.beatmap = beatmap;
+        this.config = config;
         beatmap.SelectedHitObjects.CollectionChanged += selectedCollectionChanged;
         updateActiveState();
     }
@@ -255,17 +257,35 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
 
             if (hasIntOption)
             {
-                parameterContainer.Add(new FormCheckBox()
+
+
+                FormCheckBox checkbox;
+                
+                parameterContainer.Add(checkbox = new FormCheckBox()
                 {
                     Current = UbAnimateToolboxData.IntOption.UseTextBox,
                     Caption = "Disable number limits"
                 });
+                
+                if (config != null)
+                {
+                    var configBindable = config.GetBindable<bool>(OsuSetting.EditorUnanimatedNoLimit);
+                    checkbox.Current = configBindable;
+                    UbAnimateToolboxData.IntOption.UseTextBox.Value = configBindable.Value;
+                    
+                    configBindable.BindValueChanged(v =>
+                    {
+                        UbAnimateToolboxData.IntOption.UseTextBox.Value = v.NewValue;
+                    });
+                }
             }
         }
         
         writeEventData();
     }
-    
+
+    private OsuConfigManager config = null!;
+   
 
     private EditorBeatmap beatmap = null!;
 

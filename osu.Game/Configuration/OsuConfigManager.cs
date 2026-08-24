@@ -214,6 +214,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.Editor60msOffset, false); // FIX: 60ms offset when exporting maps for editor parity
             SetDefault(OsuSetting.CreateBackups, true); // FIX: Toggle backup creation on save
             SetDefault(OsuSetting.EditorUnanimated, false); // FIX: Support for the UNANIMATED note feature
+            SetDefault(OsuSetting.EditorUnanimatedNoLimit, false); // FIX: Support for the UNANIMATED note feature without limit
             SetDefault(OsuSetting.EditorExportMode, 0); // FIX: Export mode should persist as a config, enum is converted to int
             SetDefault(OsuSetting.EditorExportFolder, string.Empty); // FIX: Export folder should persist as a config
             //SetDefault(OsuSetting.EditorSwapPinkInsteadOfCamera, false); // FIX: Swap pink instead of camera
@@ -511,6 +512,7 @@ namespace osu.Game.Configuration
         EditorKeyBasedCharting, // FIX: key-based charting mode toggle
         Editor60msOffset, // FIX: 60ms offset when exporting maps for editor parity
         EditorUnanimated, // FIX: Support for the UNANIMATED note feature
+        EditorUnanimatedNoLimit,
         //EditorSwapPinkInsteadOfCamera,
         
         CreateBackups, // Toggle backup creation on save
