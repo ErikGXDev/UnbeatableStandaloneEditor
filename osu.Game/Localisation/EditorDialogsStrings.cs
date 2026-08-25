@@ -69,6 +69,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString SnapAllNotesConfirmationBody => new TranslatableString(getKey(@"snap_all_notes_confirmation_body"), @"Every hit object in this difficulty will move to the nearest tick for your current snap divisor. Hold durations may change. You can undo this from the editor history.");
 
+        /// <summary>
+        /// "Remove effects from all timing points?"
+        /// </summary>
+        public static LocalisableString RemoveEffectsConfirmationHeader => new TranslatableString(getKey(@"remove_effects_confirmation_header"), @"Remove effects from all timing points?");
+
+        /// <summary>
+        /// "The effect settings (kiai time and scroll speed) will be removed from every timing point in this difficulty."
+        /// </summary>
+        public static LocalisableString RemoveEffectsConfirmationBody => new TranslatableString(getKey(@"remove_effects_confirmation_body"), @"The effect settings (kiai time and scroll speed) will be removed from every timing point in this difficulty.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

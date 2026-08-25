@@ -50,6 +50,11 @@ namespace osu.Game.Localisation
         public static LocalisableString SnapAllNotesToCurrentSnapDivisor => new TranslatableString(getKey(@"snap_all_notes_to_current_snap_divisor"), @"Snap all notes to current snap divisor");
 
         /// <summary>
+        /// "Remove effects from all timing points"
+        /// </summary>
+        public static LocalisableString RemoveAllEffectsFromTimingPoints => new TranslatableString(getKey(@"remove_all_effects_from_timing_points"), @"Remove effects from all timing points");
+
+        /// <summary>
         /// "Move already placed objects when changing timing"
         /// </summary>
         public static LocalisableString AdjustExistingObjectsOnTimingChanges => new TranslatableString(getKey(@"adjust_existing_objects_on_timing_changes"), @"Move already placed objects when changing timing");

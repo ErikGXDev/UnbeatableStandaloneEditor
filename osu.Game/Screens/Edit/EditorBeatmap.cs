@@ -568,6 +568,27 @@ namespace osu.Game.Screens.Edit
             EndChange();
         }
 
+        public void RemoveEffectsFromAllControlPoints()
+        {
+            if (ControlPointInfo.Groups.All(g => !g.ControlPoints.OfType<EffectControlPoint>().Any()))
+                return;
+
+            BeginChange();
+
+            foreach (var group in ControlPointInfo.Groups.ToArray())
+            {
+                foreach (var effectPoint in group.ControlPoints.OfType<EffectControlPoint>().ToArray())
+                    group.Remove(effectPoint);
+
+                if (group.ControlPoints.Count == 0)
+                    ControlPointInfo.RemoveGroup(group);
+            }
+
+            UpdateAllHitObjects();
+
+            EndChange();
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             BeatmapSkin?.Dispose();

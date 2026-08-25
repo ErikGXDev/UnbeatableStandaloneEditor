@@ -16,4 +16,14 @@ namespace osu.Game.Screens.Edit
             DangerousAction = snapAction;
         }
     }
+    
+    public partial class RemoveEffectsConfirmationDialog : DangerousActionDialog
+    {
+        public RemoveEffectsConfirmationDialog(Action removeEffectsAction)
+        {
+            HeaderText = EditorDialogsStrings.RemoveEffectsConfirmationHeader;
+            BodyText = EditorDialogsStrings.RemoveEffectsConfirmationBody;
+            DangerousAction = removeEffectsAction;
+        }
+    }
 }

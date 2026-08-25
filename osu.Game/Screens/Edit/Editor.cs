@@ -576,6 +576,7 @@ namespace osu.Game.Screens.Edit
                                         {
                                             new EditorMenuItem(EditorStrings.SetPreviewPointToCurrent, MenuItemType.Standard, SetPreviewPointToCurrentTime),
                                             new EditorMenuItem(EditorStrings.SnapAllNotesToCurrentSnapDivisor, MenuItemType.Destructive, confirmSnapAllHitObjectsToCurrentDivisor),
+                                            new EditorMenuItem(EditorStrings.RemoveAllEffectsFromTimingPoints, MenuItemType.Destructive, confirmRemoveEffectsFromTimingPoints),
                                             bookmarkController.Menu,
                                         }
                                     },
@@ -1250,6 +1251,20 @@ namespace osu.Game.Screens.Edit
         }
 
         protected void SnapAllHitObjectsToCurrentDivisor() => editorBeatmap.SnapAllHitObjectsToCurrentDivisor();
+
+        private void confirmRemoveEffectsFromTimingPoints()
+        {
+            dialogOverlay.Push(new RemoveEffectsConfirmationDialog(removeEffectsFromAllTimingPoints));
+        }
+
+        private void removeEffectsFromAllTimingPoints()
+        {
+            if (currentScreen is TimingScreen timingScreen)
+                timingScreen.SelectedGroup.Value = null;
+            
+            editorBeatmap.RemoveEffectsFromAllControlPoints();
+
+        }
 
         private void setUpTrack(bool seekToStart = false)
         {
