@@ -1,6 +1,6 @@
 ﻿## What's new
 
-- Added "Timing > Remove effect from all timing points" option
+- Added "Timing > Remove effects from all timing points" option
 - Improved UNANIMATED integration
   - Notes and their parameters can now be copied and pasted correctly
   - Made slider inputs on parameters better
