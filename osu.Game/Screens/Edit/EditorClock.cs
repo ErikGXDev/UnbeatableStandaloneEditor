@@ -53,6 +53,12 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public bool IsSeeking { get; private set; }
 
+        // FIX: Seeking while the track is playing can jump time past many hit objects at once.
+        // Each of them gets judged as a miss and (with the editor's "missed notes play samples" fix)
+        private double lastSeekGameTime = double.MinValue;
+        
+        public bool ShouldSuppressMissSamples => Time.Current - lastSeekGameTime <= 200;
+
         public EditorClock(IBeatmap beatmap = null, BindableBeatDivisor beatDivisor = null)
         {
             Beatmap = beatmap ?? new Beatmap();
@@ -201,6 +207,9 @@ namespace osu.Game.Screens.Edit
         {
             seekingOrStopped.Value = IsSeeking = true;
 
+            // FIX: record seek time so miss samples caused by this seek can be suppressed (see ShouldSuppressMissSamples).
+            lastSeekGameTime = Time.Current;
+
             ClearTransforms();
 
             // Ensure the sought point is within the boundaries
@@ -216,6 +225,9 @@ namespace osu.Game.Screens.Edit
         public void SeekSmoothlyTo(double seekDestination)
         {
             seekingOrStopped.Value = true;
+
+            // FIX: record seek time so miss samples caused by this seek can be suppressed (see ShouldSuppressMissSamples).
+            lastSeekGameTime = Time.Current;
 
             // The whole point of seeking smoothly is to maintain continuity for the user.
             // Above a certain proximity, there's little reason to do this as the jump is already huge.

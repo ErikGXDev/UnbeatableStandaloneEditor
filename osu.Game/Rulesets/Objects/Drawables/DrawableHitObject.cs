@@ -24,6 +24,7 @@ using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK.Graphics;
@@ -116,6 +117,18 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Note: This does NOT include nested hitobjects.
         /// </summary>
         public bool Judged => Entry?.Judged ?? false;
+        
+        private bool isSeekCausedMiss()
+        {
+            if (editorClock == null)
+                return false;
+
+            if (editorClock.ShouldSuppressMissSamples)
+                return true;
+
+            double lateBy = Time.Current - HitStateUpdateTime;
+            return lateBy > 100;
+        }
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
@@ -155,6 +168,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         [Resolved(CanBeNull = true)]
         private IPooledHitObjectProvider pooledObjectProvider { get; set; }
+
+        // FIX: only injected in the editor context (EditorClock is cached there); null during normal gameplay.
+        [Resolved(CanBeNull = true)]
+        private EditorClock editorClock { get; set; }
 
         /// <summary>
         /// Whether the initialization logic in <see cref="Playfield" /> has applied.
@@ -491,9 +508,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             ApplyCustomUpdateState?.Invoke(this, newState);
 
             // FIX: Make playsounds inside holds also play sounds (they are "missed" notes)
+            // but suppress miss samples that were caused by an editor seek
             if (!force && (newState == ArmedState.Hit || newState == ArmedState.Miss))
             {
-                PlaySamples();
+                if (newState == ArmedState.Hit || !isSeekCausedMiss())
+                    PlaySamples();
             }
         }
         private void clearExistingStateTransforms()
