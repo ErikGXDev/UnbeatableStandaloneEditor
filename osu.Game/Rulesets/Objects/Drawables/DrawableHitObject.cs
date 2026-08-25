@@ -168,8 +168,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         [Resolved(CanBeNull = true)]
         private IPooledHitObjectProvider pooledObjectProvider { get; set; }
-
-        // FIX: only injected in the editor context (EditorClock is cached there); null during normal gameplay.
+        
         [Resolved(CanBeNull = true)]
         private EditorClock editorClock { get; set; }
 
