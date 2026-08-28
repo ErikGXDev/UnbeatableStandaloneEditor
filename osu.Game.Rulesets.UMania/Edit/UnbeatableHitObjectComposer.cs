@@ -293,11 +293,11 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
             ModCop3Button = makeButton("Cop 3", FontAwesome.Solid.UserShield),
             ModCop4Button = makeButton("Cop 4", FontAwesome.Solid.UserShield),
             ModCopFinishButton = makeButton("Knock-out", FontAwesome.Solid.UserShield),
-            ModCopHeavyButton = makeButton("Heavy Brawl", FontAwesome.Solid.UserShield),
+            ModCopHeavyButton = makeButton("Heavy Brawl", FontAwesome.Solid.UserShield, "If this is a cop hold note, the note is changed from a spam to a hold. Otherwise only the sprite changes."),
         };
     }
 
-    private DrawableTernaryButton makeButton(string description, IconUsage icon)
+    private DrawableTernaryButton makeButton(string description, IconUsage icon, string tooltip = "")
     {
         return new DrawableTernaryButton
         {
@@ -306,6 +306,7 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
             
             Current = new Bindable<TernaryState>(),
             Description = description,
+            TooltipText = tooltip,
             CreateIcon = () => new SpriteIcon { Icon = icon },
         };
     }
