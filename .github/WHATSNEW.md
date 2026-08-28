@@ -1,11 +1,6 @@
 ﻿## What's new
 
-- Added "Timing > Remove effects from all timing points" option
-- Improved UNANIMATED integration
-  - Notes and their parameters can now be copied and pasted correctly
-  - Made slider inputs on parameters better
-  - Added an option to input numbers without limits instead of using the slider
-  - Added "TutorialRhythm" to the scene switch selector
-- Fixed a bug with lots of sounds playing at once when seeking while the song is playing
+- Added a hint to the Heavy Brawl modifers.
+- Cop 1 Heavy Brawls work correctly now.
 
 **Happy mapping!**
