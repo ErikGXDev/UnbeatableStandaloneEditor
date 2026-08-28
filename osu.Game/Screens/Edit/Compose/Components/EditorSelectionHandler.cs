@@ -577,6 +577,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 State = { BindTarget = clap },
                 //Hotkey = new Hotkey(new KeyCombination(InputKey.R))
             };
+            
+            // FIX: Add flourish.
+            var flourish = SelectionSampleStates[HitSampleInfo.HIT_FLOURISH];
+            yield return new TernaryStateToggleMenuItem(flourish.Description)
+            {
+                State = { BindTarget = flourish },
+                //Hotkey = new Hotkey(new KeyCombination(InputKey.T))
+            };
         }
 
         private IEnumerable<MenuItem> getBankSubmenuItems()
@@ -585,28 +593,28 @@ namespace osu.Game.Screens.Edit.Compose.Components
             yield return new TernaryStateToggleMenuItem(auto.Description)
             {
                 State = { BindTarget = auto },
-                Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.Q))
+                //Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.Q))
             };
 
             var normal = SelectionBankStates[HitSampleInfo.BANK_NORMAL];
             yield return new TernaryStateToggleMenuItem(normal.Description)
             {
                 State = { BindTarget = normal },
-                Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.W))
+                //Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.W))
             };
 
             var soft = SelectionBankStates[HitSampleInfo.BANK_SOFT];
             yield return new TernaryStateToggleMenuItem(soft.Description)
             {
                 State = { BindTarget = soft },
-                Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.E))
+                //Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.E))
             };
 
             var drum = SelectionBankStates[HitSampleInfo.BANK_DRUM];
             yield return new TernaryStateToggleMenuItem(drum.Description)
             {
                 State = { BindTarget = drum },
-                Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.R))
+                //Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.R))
             };
             
             // FIX: Add strong as another sample type as it is used in the UMania ruleset.
@@ -614,7 +622,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             yield return new TernaryStateToggleMenuItem(strong.Description)
             {
                 State = { BindTarget = strong },
-                Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.T))
+                //Hotkey = new Hotkey(new KeyCombination(InputKey.Shift, InputKey.T))
             };
 
             yield return new OsuMenuItem("Addition bank")

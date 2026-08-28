@@ -692,6 +692,10 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     case HitSampleInfo.HIT_CLAP:
                         type |= LegacyHitSoundType.Clap;
                         break;
+                    
+                    case HitSampleInfo.HIT_FLOURISH:
+                        type |= LegacyHitSoundType.Flourish;
+                        break;
                 }
             }
 

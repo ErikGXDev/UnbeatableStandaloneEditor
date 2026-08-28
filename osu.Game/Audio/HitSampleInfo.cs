@@ -33,7 +33,7 @@ namespace osu.Game.Audio
         /// <summary>
         /// All valid sample addition constants.
         /// </summary>
-        public static readonly string[] ALL_ADDITIONS = [HIT_WHISTLE, HIT_FINISH, HIT_CLAP];
+        public static readonly string[] ALL_ADDITIONS = [HIT_WHISTLE, HIT_FINISH, HIT_CLAP, HIT_FLOURISH];
 
         /// <summary>
         /// All valid bank constants.

@@ -562,6 +562,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
             if (type.HasFlag(LegacyHitSoundType.Clap))
                 soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_CLAP, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.EditorAutoBank, bankInfo.CustomSampleBank));
 
+            if (type.HasFlag(LegacyHitSoundType.Flourish)) 
+                soundTypes.Add(new LegacyHitSampleInfo(HitSampleInfo.HIT_FLOURISH, bankInfo.BankForAdditions, bankInfo.Volume, bankInfo.EditorAutoBank, bankInfo.CustomSampleBank));
+            
             return soundTypes;
         }
 

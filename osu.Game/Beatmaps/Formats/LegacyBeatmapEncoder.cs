@@ -619,6 +619,10 @@ namespace osu.Game.Beatmaps.Formats
                     case HitSampleInfo.HIT_CLAP:
                         type |= LegacyHitSoundType.Clap;
                         break;
+                    
+                    case HitSampleInfo.HIT_FLOURISH:
+                        type |= LegacyHitSoundType.Flourish;
+                        break;
                 }
             }
 
