@@ -23,6 +23,7 @@ using osuTK;
 using osuTK.Graphics;
 using UnbeatableStandaloneEditor.Import;
 using UnbeatableStandaloneEditor.Settings;
+using UnbeatableStandaloneEditor.Update;
 using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace UnbeatableStandaloneEditor.BeatmapPicker;
@@ -33,6 +34,7 @@ public partial class BeatmapPickerScreen : OsuScreen
     [Resolved] private IAPIProvider api { get; set; } = null!;
     [Resolved] private RealmAccess realm { get; set; } = null!;
     [Resolved] private IDialogOverlay? dialogOverlay { get; set; }
+    [Resolved] private EditorConfigManager config { get; set; } = null!;
 
     private readonly Bindable<BeatmapSetInfo?> selectedSet = new();
 
@@ -44,6 +46,8 @@ public partial class BeatmapPickerScreen : OsuScreen
 
     private OsuClickableContainer versionText = null!;
     private Container? updateButtonContainer;
+
+    private UpdatePopup updatePopup = null!;
 
 
     [Cached] private OverlayColourProvider colours = new(OverlayColourScheme.Aquamarine);
@@ -196,6 +200,7 @@ public partial class BeatmapPickerScreen : OsuScreen
                     }
                 ]
             },
+            updatePopup = new UpdatePopup(),
             new ImportDropper()
         ];
     }
@@ -228,17 +233,8 @@ public partial class BeatmapPickerScreen : OsuScreen
             {
                 Schedule(() =>
                 {
-                    updateButton = new RoundedButton
+                    updateButton = new UpdateButton()
                     {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Width = 180,
-                        Height = 28,
-                        Scale = new Vector2(0f),
-                        Y = 30,
-                        Colour = colours.Colour1,
-                        BackgroundColour = colours.Background3,
-                        Text = "New version available!",
                         Action = () => openUpdateRelease(update),
                     };
                     versionText.Y = -36;
@@ -246,7 +242,6 @@ public partial class BeatmapPickerScreen : OsuScreen
                     Schedule(() =>
                     {
                         updateButton.ScaleTo(1f, 800, Easing.OutElastic);
-
                     });
                 });
             }
@@ -265,7 +260,6 @@ public partial class BeatmapPickerScreen : OsuScreen
         {
             rebuildBeatmapList();
         });
-
     }
 
     private void rebuildBeatmapList()
@@ -357,6 +351,13 @@ public partial class BeatmapPickerScreen : OsuScreen
 
     private void openUpdateRelease(VersionCheckService.ReleaseInfo update)
     {
+        if (config.Get<bool>(EditorSetting.UseAutoUpdater))
+        {
+            updatePopup.SetReleaseInfo(update);
+            updatePopup.Show();
+            return;
+        }
+
         BrowserUtil.OpenUrl(update.ReleaseUrl);
     }
 

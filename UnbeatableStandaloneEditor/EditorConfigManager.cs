@@ -15,6 +15,7 @@ public class EditorConfigManager : IniConfigManager<EditorSetting>
         SetDefault(EditorSetting.FirstLaunch, true);
         SetDefault(EditorSetting.ShowSystemCursor, true);
         SetDefault(EditorSetting.SortMode, SortMode.Artist);
+        SetDefault(EditorSetting.UseAutoUpdater, false);
     }
 }
 
@@ -22,5 +23,6 @@ public enum EditorSetting
 {
     FirstLaunch,
     ShowSystemCursor,
-    SortMode
+    SortMode,
+    UseAutoUpdater
 }

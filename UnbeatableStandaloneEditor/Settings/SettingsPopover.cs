@@ -123,6 +123,14 @@ public partial class SettingsPopover : OsuPopover
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.Editor60msOffset),
                                     Margin = new MarginPadding { Bottom = 10 },
                                 },
+                                /*new TooltipCheckbox()
+                                {
+                                    LabelText = "Use new auto-updater",
+                                    TooltipText = "This setting will change the behaviour of the \"New version available\" button on the main menu.\nPressing it will now show a popup with a changelog. The new version will be downloaded automatically in the background.",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = editorConfig.GetBindable<bool>(EditorSetting.UseAutoUpdater),
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                }*/
                                 /*new TooltipCheckbox
                                 {
                                     LabelText = "Swap pink notes in placement order",

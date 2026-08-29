@@ -21,6 +21,8 @@ public class VersionCheckService
         HttpClient.DefaultRequestHeaders.Add("User-Agent", "UnbeatableStandaloneEditor");
     }
 
+    public static ReleaseInfo? CachedReleaseInfo { get; private set; } = null;
+
     public static async Task<ReleaseInfo?> CheckForUpdateAsync()
     {
         // Fake update when in debug mode for testing
@@ -28,7 +30,8 @@ public class VersionCheckService
         await Task.Delay(1000); // Simulate network delay
         return new ReleaseInfo
         {
-            Version = "999.0.0",
+            Version = "1.5.0",
+            Changelog = "\ufeff## What's new\n\n- Added \"Timing > Remove effects from all timing points\" option\n- Improved UNANIMATED integration\n  - Notes and their parameters can now be copied and pasted correctly\n  - Made slider inputs on parameters better\n  - Added an option to input numbers without limits instead of using the slider\n  - Added \"TutorialRhythm\" to the scene switch selector\n- Fixed a bug with lots of sounds playing at once when seeking while the song is playing\n\n**Happy mapping!**",
             ReleaseUrl = "https://github.com/ErikGXDev/UnbeatableStandaloneEditor/releases",
         };
 #endif
@@ -52,6 +55,8 @@ public class VersionCheckService
             var tagName = root.GetProperty("tag_name").GetString();
             var htmlUrl = root.GetProperty("html_url").GetString();
 
+            string body = root.TryGetProperty("body", out var bodyElement) ? bodyElement.GetString() ?? string.Empty : string.Empty;
+
             if (tagName == null)
                 return null;
 
@@ -64,12 +69,15 @@ public class VersionCheckService
             {
                 Logger.Log($"Update available: {currentVersion} -> {latestVersion}", LoggingTarget.Network);
 
-                return new ReleaseInfo
+                var releaseInfo = new ReleaseInfo
                 {
                     Version = latestVersion,
-                    // htmlUrl wouldve been in here but perhaps we want to list all releases
+                    Changelog = body,
                     ReleaseUrl = "https://github.com/ErikGXDev/UnbeatableStandaloneEditor/releases"
                 };
+
+                CachedReleaseInfo = releaseInfo;
+                return releaseInfo;
             }
 
             Logger.Log($"Already on latest version: {currentVersion}", LoggingTarget.Network);
@@ -96,6 +104,7 @@ public class VersionCheckService
     {
         public string Version { get; set; } = "";
         public string ReleaseUrl { get; set; } = "";
+        public string Changelog { get; set; } = "";
     }
 }
 
