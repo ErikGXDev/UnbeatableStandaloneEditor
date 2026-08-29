@@ -34,6 +34,10 @@ class Program
         try
         {
 
+            #if DEBUG
+            File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "args.txt"), string.Join(" ", args));
+            #endif
+
             if (args.Contains("--updated1"))
             {
                 Thread.Sleep(1000);
