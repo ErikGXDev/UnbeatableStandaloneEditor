@@ -12,7 +12,7 @@ public class Updater
 
 
     // Download the new release, start it and close the current application
-    public static async Task<bool> FullDownload(IProgress<double>? progress = null)
+    public static async Task<bool> FullDownload(Action exitGame, IProgress<double>? progress = null)
     {
         bool downloadSuccess = await DownloadLatestRelease(progress);
 
@@ -34,7 +34,13 @@ public class Updater
                 UseShellExecute = true
             });
 
-            Environment.Exit(0);
+            try
+            {
+                exitGame.Invoke();
+            } catch (Exception ex)
+            {
+                Environment.Exit(0);
+            }
         }
 
         return downloadSuccess;

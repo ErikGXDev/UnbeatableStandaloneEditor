@@ -4,6 +4,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
+using osu.Game;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Containers.Markdown;
@@ -141,15 +142,26 @@ public partial class UpdatePopup : OsuFocusedOverlayContainer
             {
                 try
                 {
-                    await Updater.FullDownload(progress);
+                    await Updater.FullDownload(exitGame, progress);
                 }
                 catch (Exception ex)
                 {
                     Logger.Log($"Error downloading update: {ex.Message}", LoggingTarget.Runtime, LogLevel.Error);
-                    Schedule(() => updateStatusText.Text = $"Error downloading update: {ex.Message}");
+                    Schedule(() => updateStatusText.Text = $"Error downloading update (This error has been logged): {ex.Message}");
+                    await Task.Delay(5000).ContinueWith(_ =>
+                    {
+                        Hide();
+                    });
                 }
             });
         }
+
+    [Resolved] OsuGameBase game { get; set; } = null!;
+
+    private void exitGame()
+    {
+        game.AttemptExit();
+    }
 
     protected override void PopIn()
     {
