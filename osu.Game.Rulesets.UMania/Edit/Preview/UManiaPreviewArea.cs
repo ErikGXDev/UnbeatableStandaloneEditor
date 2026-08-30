@@ -521,9 +521,9 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                 if (ubhelper.InferObjectModifierIcons().Contains(UbIconType.ModSwapImmediate))
                     continue;
                 
-                //double twoBeats = editorBeatmap.ControlPointInfo.TimingPointAt(note.StartTime).BeatLength * 2.0D;
+                double twoBeats2 = editorBeatmap.ControlPointInfo.TimingPointAt(note.StartTime).BeatLength * 2.0D;
                 
-                var probablyCenter = note.StartTime - currentTime <= twoBeats;
+                var probablyCenter = note.StartTime - currentTime <= twoBeats || note.StartTime - currentTime <= twoBeats2;
 
                 if (probablyCenter)
                 {
