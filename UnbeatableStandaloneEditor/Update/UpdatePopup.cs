@@ -166,7 +166,7 @@ public partial class UpdatePopup : OsuFocusedOverlayContainer
     protected override void PopIn()
     {
         this.FadeIn(200, Easing.OutQuint);
-        contentContainer.ScaleTo(0.9f).Then().ScaleTo(1f, 500, Easing.OutBounce);
+        contentContainer.ScaleTo(0.9f).Then().ScaleTo(1f, 300, Easing.OutBounce);
     }
 
     protected override void PopOut()
