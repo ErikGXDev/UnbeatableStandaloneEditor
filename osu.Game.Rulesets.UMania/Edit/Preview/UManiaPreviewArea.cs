@@ -491,6 +491,10 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
         
         private bool shouldCenterForUpcomingFlip(double currentTime)
         {
+            
+            var timingPoint = editorBeatmap.ControlPointInfo.TimingPointAt(currentTime);
+            var twoBeats = timingPoint.BeatLength * 2.0D;
+            
             List<HitObject> zoomTimes = new List<HitObject>();
             foreach (var obj in editorBeatmap.HitObjects)
             {
@@ -500,7 +504,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                 if (note.StartTime < currentTime)
                     continue;
 
-                if (note.StartTime > currentTime + viewField + viewFieldTolerance * 2)
+                if (note.StartTime > currentTime + viewField + viewFieldTolerance * 2 + twoBeats)
                     break;
 
 
@@ -517,8 +521,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                 if (ubhelper.InferObjectModifierIcons().Contains(UbIconType.ModSwapImmediate))
                     continue;
                 
-                double twoBeats = editorBeatmap.ControlPointInfo.TimingPointAt(note.StartTime).BeatLength * 2.0D;
-
+                //double twoBeats = editorBeatmap.ControlPointInfo.TimingPointAt(note.StartTime).BeatLength * 2.0D;
+                
                 var probablyCenter = note.StartTime - currentTime <= twoBeats;
 
                 if (probablyCenter)
