@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
@@ -82,10 +83,20 @@ namespace osu.Game.Screens.Edit.Setup
             }
         }
 
+
+        public double UpdatedTime = -1;
+        
+        protected override void PopOut()
+        {
+            base.PopOut();
+
+            UpdatedTime = -1;
+        }
+
         public override void OnExiting(ScreenExitEvent e)
         {
             base.OnExiting(e);
-
+            
             // Before exiting, trigger a focus loss.
             //
             // This is important to ensure that if the user is still editing a textbox, it will commit

@@ -5,6 +5,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,9 +23,12 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Rulesets.UMania.Beatmaps;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
+using osu.Game.Screens.Edit.Verify;
 using WebSocketSharp;
 using Container = osu.Framework.Graphics.Containers.Container;
 using Logger = osu.Framework.Logging.Logger;
@@ -35,6 +39,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
     {
         public override LocalisableString Title => "Unbeatable";
 
+        [Resolved] private SetupScreen setupScreen { get; set; } = null!;
+        
         [Resolved] private Editor editor { get; set; } = null!;
 
         [Resolved] private BeatmapManager beatmapManager { get; set; } = null!;
@@ -721,9 +727,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
         private Bindable<ExportMode> exportModeBindable = new Bindable<ExportMode>(ExportMode.OfficialZip);
         private UbExportFolderSelector exportFolderSelector;
+        private OsuTextFlowContainer warningText;
+        private IssueList issueList;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
             Children = new Drawable[]
             {
@@ -753,6 +761,15 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                             Caption = "Export folder",
                             PlaceholderText = "Select folder to export Unbeatable beatmaps to",
                         },
+                warningText = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14))
+                {
+                    Text = "",
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Colour = colours.Yellow,
+                    Alpha = 0f,
+                    Padding = new MarginPadding { Top = 2 },
+                },
                 new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 14))
                 {
                     Text =
@@ -771,9 +788,67 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     Margin = new MarginPadding() { Top = 24 },
                 }
             };
-
-
+            
             StartWebsocketChecks();
+        }
+        
+        [Resolved]
+        private IBindable<WorkingBeatmap> workingBeatmap { get; set; }
+
+        [Resolved]
+        private EditorBeatmap beatmap { get; set; }
+
+        private void checkIssues()
+        {
+            var generalVerifier = new BeatmapVerifier();
+            var rulesetVerifier = beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateBeatmapVerifier();
+
+            var context = BeatmapVerifierContext.Create(
+                beatmap,
+                workingBeatmap.Value,
+                DifficultyRating.Hard,
+                beatmapManager
+            );
+            
+            var issues = generalVerifier.Run(context);
+
+            if (rulesetVerifier != null)
+                issues = issues.Concat(rulesetVerifier.Run(context));
+
+            var issuesList = issues.ToList();
+
+            var importantIssueCount = issuesList.Count(issue => issue.Template.Type == IssueType.Problem);
+            
+            if (importantIssueCount > 0)
+            {
+                var text = "Warning! You have " + importantIssueCount + " important issue";
+                
+                if (issuesList.Count > 1)
+                {
+                    text += "s";
+                }
+                
+                text += " in your beatmap. Check the Verify tab for details.";
+                
+                warningText.FadeIn(200);
+                warningText.Text = text;
+            }
+            else
+            {
+                warningText.Alpha = 0f;
+            }
+        }
+        
+
+        
+        protected override void Update()
+        {
+            if (setupScreen.UpdatedTime == -1) // Check every 5 seconds
+            {
+                Logger.Log("Checking for issues in beatmap...");
+                checkIssues();
+                setupScreen.UpdatedTime = Time.Current;
+            }
         }
 
         protected override void LoadComplete()
