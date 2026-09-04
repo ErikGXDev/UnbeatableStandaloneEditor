@@ -17,16 +17,16 @@ namespace osu.Game.Rulesets.Edit
         {
             // Resources
             new CheckBackgroundPresence(),
-            new CheckBackgroundQuality(),
-            new CheckVideoResolution(),
-            new CheckVideoUsage(),
+            //new CheckBackgroundQuality(),
+            //new CheckVideoResolution(),
+            //new CheckVideoUsage(),
 
             // Audio
             new CheckAudioPresence(),
             //new CheckAudioQuality(),
-            new CheckMutedObjects(),
-            new CheckFewHitsounds(),
-            new CheckTooShortAudioFiles(),
+            //new CheckMutedObjects(),
+            //new CheckFewHitsounds(),
+            //new CheckTooShortAudioFiles(),
             new CheckAudioInVideo(),
             new CheckDelayedHitsounds(),
             //new CheckSongFormat(),
@@ -43,15 +43,15 @@ namespace osu.Game.Rulesets.Edit
             new CheckUnusedAudioAtEnd(),
 
             // Timing
-            new CheckPreviewTime(),
+            //new CheckPreviewTime(),
             new CheckInconsistentTimingControlPoints(),
 
             // Events
             new CheckBreaks(),
 
             // Metadata
-            new CheckTitleMarkers(),
-            new CheckInconsistentMetadata(),
+            //new CheckTitleMarkers(),
+            //new CheckInconsistentMetadata(),
             //new CheckMissingGenreLanguage(),
 
             // Settings
