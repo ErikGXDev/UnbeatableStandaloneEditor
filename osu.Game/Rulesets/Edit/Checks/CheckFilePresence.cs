@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateNoneSet : IssueTemplate
         {
             public IssueTemplateNoneSet(ICheck check)
-                : base(check, IssueType.Problem, "No {0} has been set.")
+                : base(check, IssueType.Warning, "No {0} has been set.")
             {
             }
 

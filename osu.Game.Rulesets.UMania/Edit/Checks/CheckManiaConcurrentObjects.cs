@@ -62,7 +62,15 @@ namespace osu.Game.Rulesets.UMania.Edit.Checks
                                 continue;
                             }
                         }
+                        else if (Math.Abs(hitobject.StartTime - nextHitobject.StartTime) < 10)
+                        {
+                            if (column1 == column2)
+                            {
+                                yield return new IssueTemplateConcurrent(this).Create(hitobject, nextHitobject);
+                            }
+                        }
                         
+                        continue;
                     }
                     
                     // Mania hitobjects are only considered concurrent if they also share the same column.
