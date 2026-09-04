@@ -57,10 +57,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Checks
                             {
                                 yield return new IssueTemplateConcurrent(this).Create(hitobject, nextHitobject);
                             }
-                            else
-                            {
-                                continue;
-                            }
                         }
                         else if (Math.Abs(hitobject.StartTime - nextHitobject.StartTime) < 10)
                         {
