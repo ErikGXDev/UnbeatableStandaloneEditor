@@ -29,6 +29,7 @@ using osu.Game.Rulesets.UMania.Beatmaps;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Verify;
+using osuTK.Graphics;
 using WebSocketSharp;
 using Container = osu.Framework.Graphics.Containers.Container;
 using Logger = osu.Framework.Logging.Logger;
@@ -611,6 +612,9 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             showToast("Exporting...", "Please wait...");
 
+            warningText.FlashColour(Color4.LightYellow, 500);
+            
+
             if (exportModeBindable.Value == ExportMode.Folder)
             {
                 ExportToFolder();
@@ -828,7 +832,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     text += "s";
                 }
                 
-                text += " in your beatmap. Check the Verify tab for details.";
+                text += " in your beatmap. Please check the Verify tab for details.";
                 
                 warningText.FadeIn(200);
                 warningText.Text = text;
