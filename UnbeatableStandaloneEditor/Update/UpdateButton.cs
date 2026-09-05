@@ -20,7 +20,7 @@ public partial class UpdateButton : RoundedButton
     [BackgroundDependencyLoader]
     private void load()
     {
-        var useUpdater = config.Get<bool>(EditorSetting.UseAutoUpdater);
+        var useUpdater = !config.Get<bool>(EditorSetting.NewDisableUpdater);
 
         Anchor = Anchor.TopRight;
         Origin = Anchor.TopRight;
@@ -44,8 +44,7 @@ public partial class UpdateButton : RoundedButton
         {
             lastUpdateCheck = Time.Current;
 
-            var configBindable = config.Get<bool>(EditorSetting.UseAutoUpdater);
-            bool useUpdater = configBindable;
+            var useUpdater = !config.Get<bool>(EditorSetting.NewDisableUpdater);
 
             BackgroundColour = useUpdater ? colours.Colour4 : colours.Background3;
             Text = useUpdater ? "Download new version!" : "New version available!";

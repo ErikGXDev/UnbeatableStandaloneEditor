@@ -351,7 +351,7 @@ public partial class BeatmapPickerScreen : OsuScreen
 
     private void openUpdateRelease(VersionCheckService.ReleaseInfo update)
     {
-        if (config.Get<bool>(EditorSetting.UseAutoUpdater))
+        if (!config.Get<bool>(EditorSetting.NewDisableUpdater))
         {
             updatePopup.SetReleaseInfo(update);
             updatePopup.Show();
