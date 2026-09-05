@@ -1,9 +1,10 @@
 ﻿## What's new
 
-- Attempted to make the chart preview better, primarily camera peeking at different BPMs.
-- Added a usage hint to the Heavy Brawl modifers.
-- "Cop 1" notes can now have the Heavy Brawl modifier.
-- Custom hitsounds only play once on notes with multiple samples now.
-- Added a foundation for an auto-updater (feature not enabled yet).
+- Enabled the new "auto updater" feature
+  - The "New version available!" button is now replaced with a new button that when clicked, will download and install the newest version for you automatically.
+  - (You still get to decide if you want to update or not.)
+- Added a hint to the setup screen when your current beatmap has any potential issues.
+- Removed more unimportant checks from the "verify" tab.
+- Improved the verify check for concurrent notes, specifically double notes.
 
 **Happy mapping!**
