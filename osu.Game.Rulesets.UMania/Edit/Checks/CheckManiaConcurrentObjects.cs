@@ -41,6 +41,9 @@ namespace osu.Game.Rulesets.UMania.Edit.Checks
                     var ubIconType1 = ubHelper1.InferObjectTypeIcon();
                     var ubIconType2 = ubHelper2.InferObjectTypeIcon();
                     
+                    if (ubIconType1 == UbIconType.Animated || ubIconType2 == UbIconType.Animated || ubIconType1 == UbIconType.AnimatedHold || ubIconType2 == UbIconType.AnimatedHold)
+                        continue;
+                    
                     var column1 = (hitobject as IHasColumn)?.Column;
                     var column2 = (nextHitobject as IHasColumn)?.Column;
                     
