@@ -2,19 +2,30 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.IO;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit.Setup;
 using osuTK;
+using FileInfo = System.IO.FileInfo;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -38,6 +49,8 @@ namespace osu.Game.Screens.Edit.Timing
 
         [Resolved]
         private IEditorChangeHandler? editorChangeHandler { get; set; }
+        
+        private ResourcesSection resourcesSection = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, OverlayColourProvider colourProvider)
@@ -47,6 +60,8 @@ namespace osu.Game.Screens.Edit.Timing
             const float margins = 10;
             InternalChildren = new Drawable[]
             {
+                createDebugMenu(),
+                
                 table = new ControlPointTable
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -123,6 +138,10 @@ namespace osu.Game.Screens.Edit.Timing
                                 },
                             },
                         },
+                        resourcesSection = new ResourcesSection
+                        {
+                            Alpha = 0f,
+                        },
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
@@ -171,6 +190,8 @@ namespace osu.Game.Screens.Edit.Timing
                     ? "+ Clone to current time"
                     : "+ Add at current time";
             }, true);
+            
+            LoadableBeatmaps = GetAllLoadableBeatmaps();
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -185,6 +206,23 @@ namespace osu.Game.Screens.Edit.Timing
 
             addButton.Enabled.Value = clock.CurrentTimeAccurate != selectedGroup.Value?.Time;
             table.Padding = new MarginPadding { Bottom = controls.DrawHeight };
+            
+            // Continually update debug text with current beatmap title and timing point deltas
+            if (currentBeatmap != null && TimingPointOriginalTimes.Count > 0)
+            {
+                string debugTextContent = currentBeatmap.Metadata.Title + " (" + (CurrentMapIndex + 1) + "/" + LoadableBeatmaps.Count + ")";
+
+                for (int i = 0; i < TimingPointOriginalTimes.Count; i++)
+                {
+                    var originalTime = TimingPointOriginalTimes[i];
+                    var currentTime = currentBeatmap.ControlPointInfo.TimingPoints[i].Time;
+                    var delta = currentTime - originalTime;
+
+                    debugTextContent += " | " + delta.ToString("F0");
+                }
+
+                debugText.Text = debugTextContent;
+            }
         }
 
         private void delete()
@@ -237,5 +275,211 @@ namespace osu.Game.Screens.Edit.Timing
             if (editorChangeHandler != null)
                 editorChangeHandler.OnStateChange -= onUndoRedo;
         }
+        
+        
+        #region Offset fixing code
+
+        private string source_directory => File.ReadAllText(AppContext.BaseDirectory + "/source_directory.txt").Trim();
+
+        private string report_file => AppContext.BaseDirectory + "/timing_point_report.txt";
+            
+
+        public record LoadableBeatmap (string txtFile, string oggFile, int hash = 0);
+
+        public record PrettyBeatmap(string title, string difficultyName);
+
+        public int CurrentMapIndex = -1;
+        
+        public List<double> TimingPointOriginalTimes = new List<double>();
+        
+        public Dictionary<int, List<PrettyBeatmap>> SatisfiedBeatmaps = new Dictionary<int, List<PrettyBeatmap>>();
+        
+        public List<LoadableBeatmap> LoadableBeatmaps = new List<LoadableBeatmap>();
+
+        public Beatmap currentBeatmap;
+        public LoadableBeatmap currentLoadableBeatmap;
+        
+        private List<LoadableBeatmap> GetAllLoadableBeatmaps()
+        {
+            // Find the first .txt files in all sub-folders of the source_directory, IF the folder also contains an ogg file
+            // (sub-directories can also contain sub-directories)
+            var beatmaps = new List<LoadableBeatmap>();
+            foreach (var dir in Directory.GetDirectories(source_directory, "*", SearchOption.AllDirectories))
+            {
+                var txtFiles = Directory.GetFiles(dir, "*.txt", SearchOption.TopDirectoryOnly);
+                var oggFiles = Directory.GetFiles(dir, "*.ogg", SearchOption.TopDirectoryOnly);
+
+                if (txtFiles.Length > 0 && oggFiles.Length > 0)
+                {
+                    foreach (var txtFile in txtFiles)
+                    {
+                        LegacyBeatmapDecoder decoder = new LegacyBeatmapDecoder();
+                
+                        var lineBufferedStream = new LineBufferedReader(new FileStream(txtFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+
+                        Beatmap b = decoder.Decode(lineBufferedStream);
+                        
+                        // ogg file makes sure we only have same hashes per audio as well
+                        int hash = GetBeatmapTimingPointHash(b, oggFiles[0]);
+
+                        if (beatmaps.All(bm => bm.hash != hash))
+                        {
+                            beatmaps.Add(new LoadableBeatmap(txtFile, oggFiles[0], hash));
+                        }
+                        
+                        SatisfiedBeatmaps.TryAdd(hash, new List<PrettyBeatmap>());
+                        SatisfiedBeatmaps[hash].Add(new PrettyBeatmap(b.Metadata.Title, b.BeatmapInfo.DifficultyName));
+                    }
+                }
+            }
+            
+            return beatmaps;
+        }
+        
+        private int GetBeatmapTimingPointHash(Beatmap beatmap, string additionalData = "")
+        {
+            int hash = 17;
+
+            foreach (var timingPoint in beatmap.ControlPointInfo.TimingPoints)
+            {
+                hash = hash * 31 + timingPoint.Time.GetHashCode();
+                hash = hash * 31 + timingPoint.BeatLength.GetHashCode();
+            }
+            
+            if (!string.IsNullOrEmpty(additionalData))
+                hash = hash * 31 + additionalData.GetHashCode();
+            
+            return hash;
+        }
+        
+        public void SaveAndLoadNextBeatmap()
+        {
+            // Save current changes
+            if (CurrentMapIndex > -1 && TimingPointOriginalTimes.Count > 0)
+            {
+                var hash = currentLoadableBeatmap.hash;
+                
+                foreach (var satisfiedBeatmap in SatisfiedBeatmaps[hash])
+                {
+                    var result = satisfiedBeatmap.title + "/" + satisfiedBeatmap.difficultyName;
+                    
+                    for (int i = 0; i < TimingPointOriginalTimes.Count; i++)
+                    {
+                        var originalTime = TimingPointOriginalTimes[i];
+                        var currentTime = currentBeatmap.ControlPointInfo.TimingPoints[i].Time;
+                        var delta = currentTime - originalTime;
+
+                        result += ";" + delta.ToString("F0");
+                    }
+                    File.AppendAllText(report_file, result + "\n");
+                }
+                
+            }
+            
+            SwitchNextBeatmap();
+        }
+
+        // Above, but without saving the current changes
+        public void SwitchNextBeatmap()
+        {
+            // Load new
+            CurrentMapIndex++;
+            if (CurrentMapIndex >= LoadableBeatmaps.Count)
+            {
+                CurrentMapIndex = 0;
+            }
+            
+            TimingPointOriginalTimes.Clear();
+
+            currentLoadableBeatmap = LoadableBeatmaps[CurrentMapIndex];
+            Console.WriteLine($"Loading beatmap: {currentLoadableBeatmap.oggFile} and {currentLoadableBeatmap.oggFile}");
+            
+            
+            // Load the beatmap
+            
+            FileInfo txtFile = new FileInfo(currentLoadableBeatmap.txtFile);
+            FileInfo oggFile = new FileInfo(currentLoadableBeatmap.oggFile);
+
+            resourcesSection.ChangeAudioTrack(oggFile, true);
+            
+            // Loading twice but dont care
+            LegacyBeatmapDecoder decoder = new LegacyBeatmapDecoder();
+            
+            var lineBufferedStream = new LineBufferedReader(new FileStream(txtFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+
+            Beatmap b = decoder.Decode(lineBufferedStream);
+            
+            currentBeatmap = b;
+            
+            Beatmap.ControlPointInfo.Clear();
+            
+            foreach (var group in b.ControlPointInfo.Groups)
+            {
+                TimingPointOriginalTimes.Add(group.Time);
+                
+                foreach (var controlPoint in group.ControlPoints)
+                {
+                    Beatmap.ControlPointInfo.Add(controlPoint.Time, controlPoint);
+                }
+            }
+
+            debugText.Text = b.Metadata.Title + " (" + CurrentMapIndex + 1 + "/" + LoadableBeatmaps.Count + ")";
+        }
+        
+        private OsuSpriteText debugText = null!;
+
+        private Drawable createDebugMenu()
+        {
+            var container = new Container
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                Width = 300,
+                AutoSizeAxes = Axes.Y,
+                Padding = new MarginPadding { Left = 10, Top = 10, },
+                Depth = -10,
+                Children = new Drawable[]
+                {
+                    new Box()
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.Black,
+                        Alpha = 0.5f,
+                    },
+                    new FillFlowContainer()
+                    {
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(6),
+                        Padding = new MarginPadding(4),
+                        Children = new Drawable[] {
+                           
+                            debugText = new OsuSpriteText()
+                            {
+                                Text = "No beatmap selected yet",
+                                Font = OsuFont.Default.With(size: 16, weight: FontWeight.Bold),
+                            },
+                            new RoundedButton
+                            {
+                                Text = "Save + Load next beatmap",
+                                Size = new Vector2(200, 30),
+                                Action = SaveAndLoadNextBeatmap,
+                            },
+                            new RoundedButton()
+                            {
+                                Text = "Skip this beatmap",
+                                Size = new Vector2(200, 30),
+                                BackgroundColour = Colour4.Orange,
+                                Action = SwitchNextBeatmap,
+                            },
+                        }
+                    }
+                 }
+            };
+
+            return container;
+        }
+        
+        #endregion
     }
 }

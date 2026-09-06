@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private Editor? editor { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private SetupScreen setupScreen { get; set; } = null!;
         
         [Resolved]
@@ -256,7 +256,7 @@ namespace osu.Game.Screens.Edit.Setup
                 });
 
             music.ReloadCurrentTrack();
-            setupScreen.MetadataChanged?.Invoke();
+            setupScreen?.MetadataChanged?.Invoke();
             return true;
         }
 
