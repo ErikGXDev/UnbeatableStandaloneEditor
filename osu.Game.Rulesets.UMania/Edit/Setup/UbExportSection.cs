@@ -770,7 +770,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     Text = "",
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Colour = colours.Yellow,
+                    Colour = colourProvider.Content1.Opacity(0.7f),
                     Alpha = 0f,
                     Padding = new MarginPadding { Top = 2 },
                 },
@@ -825,14 +825,17 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             
             if (importantIssueCount > 0)
             {
-                var text = "Warning! You have " + importantIssueCount + " important issue";
+                
+                var text = "You may have issues in your chart. Check the Verify tab for details.";
+                
+                /*var text = "Warning! You have " + importantIssueCount + " important issue";
                 
                 if (issuesList.Count > 1)
                 {
                     text += "s";
                 }
                 
-                text += " in your beatmap. Please check the Verify tab for details.";
+                text += " in your beatmap. Please check the Verify tab for details.";*/
                 
                 warningText.FadeIn(200);
                 warningText.Text = text;
