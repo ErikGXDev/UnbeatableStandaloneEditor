@@ -612,7 +612,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             showToast("Exporting...", "Please wait...");
 
-            warningText.FlashColour(Color4.LightYellow, 500);
+            //warningText.FlashColour(Color4.LightYellow, 500);
             
 
             if (exportModeBindable.Value == ExportMode.Folder)
