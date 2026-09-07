@@ -118,9 +118,10 @@ public partial class SettingsPopover : OsuPopover
                                 new TooltipCheckbox
                                 {
                                     LabelText = "Add a 60ms offset on export",
-                                    TooltipText = "When enabled, all notes and timings will have a 60ms offset added to them when exporting maps.\nThis is here because the official editor also has this delay, with no way of removing it.\nWhen importing a map that has this offset, you can use the \"Offset all points\" input in the timing tab to move all points back again.\nNote that this only affects maps that are EXPORTED, your charts will not change in the editor.",
+                                    TooltipText = "Feature disabled for now.",
+                                    //TooltipText = "When enabled, all notes and timings will have a 60ms offset added to them when exporting maps.\nThis is here because the official editor also has this delay, with no way of removing it.\nWhen importing a map that has this offset, you can use the \"Offset all points\" input in the timing tab to move all points back again.\nNote that this only affects maps that are EXPORTED, your charts will not change in the editor.",
                                     RelativeSizeAxes = Axes.X,
-                                    Current = osuConfig.GetBindable<bool>(OsuSetting.Editor60msOffset),
+                                    Current = { Value = false, Disabled = true },
                                     Margin = new MarginPadding { Bottom = 10 },
                                 },
                                 new TooltipCheckbox()
