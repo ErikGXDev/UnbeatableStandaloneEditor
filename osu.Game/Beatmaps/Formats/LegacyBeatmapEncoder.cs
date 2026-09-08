@@ -100,7 +100,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"PreviewTime: {beatmap.Metadata.PreviewTime}"));
             writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.Countdown}"));
             writer.WriteLine(FormattableString.Invariant(
-                $"SampleSet: {toLegacySampleBank(((beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePoints.FirstOrDefault() ?? SampleControlPoint.DEFAULT).SampleBank)}"));
+                $"SampleSet: {(SampleControlPoint.DEFAULT).SampleBank}"));
             writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.StackLeniency}"));
 
             // FIX: UMania keeps its mode as 5 to still make it different from
@@ -232,7 +232,7 @@ namespace osu.Game.Beatmaps.Formats
             foreach (var group in legacyControlPoints.Groups)
             {
                 var groupTimingPoint = group.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
-                var controlPointProperties = getLegacyControlPointProperties(group, groupTimingPoint != null);
+                var controlPointProperties = getLegacyControlPointProperties(group, false);
 
                 // If the group contains a timing control point, it needs to be output separately.
                 if (groupTimingPoint != null)
@@ -345,8 +345,8 @@ namespace osu.Game.Beatmaps.Formats
                         yield return createSampleControlPointFor(hitObject.GetEndTime(), hitObject.Samples);
                     }
 
-                    foreach (var nested in collectSampleControlPoints(hitObject.NestedHitObjects))
-                        yield return nested;
+                    /*foreach (var nested in collectSampleControlPoints(hitObject.NestedHitObjects))
+                        yield return nested;*/
                 }
 
                 SampleControlPoint createSampleControlPointFor(double time, IList<HitSampleInfo> samples)
@@ -376,14 +376,14 @@ namespace osu.Game.Beatmaps.Formats
 
             void extractSampleControlPoints(IEnumerable<HitObject> hitObject)
             {
-                foreach (var hSamplePoint in collectSampleControlPoints(hitObject).OrderBy(sp => sp.Time))
+                /*foreach (var hSamplePoint in collectSampleControlPoints(hitObject).OrderBy(sp => sp.Time))
                 {
                     if (!hSamplePoint.IsRedundant(lastRelevantSamplePoint))
                     {
                         legacyControlPoints.Add(hSamplePoint.Time, hSamplePoint);
                         lastRelevantSamplePoint = hSamplePoint;
                     }
-                }
+                }*/
             }
         }
 
