@@ -205,7 +205,7 @@ namespace osu.Game.Beatmaps.Formats
 
             // In osu!taiko and osu!mania, a scroll speed is stored as "slider velocity" in legacy formats.
             // In that case, a scrolling speed change is a global effect and per-hit object difficulty control points are ignored.
-            bool scrollSpeedEncodedAsSliderVelocity = onlineRulesetID == 1 || onlineRulesetID == 3;
+            bool scrollSpeedEncodedAsSliderVelocity = onlineRulesetID == 1 || onlineRulesetID == 3 || onlineRulesetID == 5;
 
             // iterate over hitobjects and pull out all required sample and difficulty changes
             extractDifficultyControlPoints(beatmap.HitObjects);
@@ -250,9 +250,9 @@ namespace osu.Game.Beatmaps.Formats
                 
                 // Output any remaining effects as secondary non-timing control point.
                 // Commented out because this behaviour is not wanted
-                /*writer.Write(FormattableString.Invariant($"{group.Time},"));
+                writer.Write(FormattableString.Invariant($"{group.Time},"));
                 writer.Write(FormattableString.Invariant($"{-100 / controlPointProperties.SliderVelocity},"));
-                outputControlPointAt(controlPointProperties, false);*/
+                outputControlPointAt(controlPointProperties, false);
                 lastControlPointProperties = controlPointProperties;
             }
 
