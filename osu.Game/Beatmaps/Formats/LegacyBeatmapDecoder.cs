@@ -107,7 +107,7 @@ namespace osu.Game.Beatmaps.Formats
             foreach (var hitObject in this.beatmap.HitObjects)
             {
                 applyDefaults(hitObject);
-                applySamples(hitObject);
+                //applySamples(hitObject);
             }
         }
 
