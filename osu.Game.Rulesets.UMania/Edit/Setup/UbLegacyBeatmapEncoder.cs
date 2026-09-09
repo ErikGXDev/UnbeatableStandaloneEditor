@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             writer.WriteLine(FormattableString.Invariant($"PreviewTime: {(int)Math.Floor(beatmap.Metadata.PreviewTime / 1000f)}"));
             writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.Countdown}"));
             writer.WriteLine(FormattableString.Invariant(
-                $"SampleSet: {toLegacySampleBank(((beatmap.ControlPointInfo as LegacyControlPointInfo)?.SamplePoints.FirstOrDefault() ?? SampleControlPoint.DEFAULT).SampleBank)}"));
+                $"SampleSet: {(SampleControlPoint.DEFAULT).SampleBank}"));
             writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.StackLeniency}"));
 
             // FIX: UMania keeps its mode as 5 to still make it different from
@@ -266,7 +266,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             // In osu!taiko and osu!mania, a scroll speed is stored as "slider velocity" in legacy formats.
             // In that case, a scrolling speed change is a global effect and per-hit object difficulty control points are ignored.
-            bool scrollSpeedEncodedAsSliderVelocity = onlineRulesetID == 1 || onlineRulesetID == 3;
+            bool scrollSpeedEncodedAsSliderVelocity = onlineRulesetID == 1 || onlineRulesetID == 3 || onlineRulesetID == 5;
 
             // iterate over hitobjects and pull out all required sample and difficulty changes
             extractDifficultyControlPoints(beatmap.HitObjects);
@@ -293,7 +293,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             foreach (var group in legacyControlPoints.Groups)
             {
                 var groupTimingPoint = group.ControlPoints.OfType<TimingControlPoint>().FirstOrDefault();
-                var controlPointProperties = getLegacyControlPointProperties(group, groupTimingPoint != null);
+                var controlPointProperties = getLegacyControlPointProperties(group, false);
 
                 // If the group contains a timing control point, it needs to be output separately.
                 if (groupTimingPoint != null)
@@ -309,12 +309,10 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     continue;
 
                 // FIX: Don't write these -100 beat length timing points
-                /*
                 // Output any remaining effects as secondary non-timing control point.
                 writer.Write(FormattableString.Invariant($"{group.Time},"));
                 writer.Write(FormattableString.Invariant($"{-100 / controlPointProperties.SliderVelocity},"));
                 outputControlPointAt(controlPointProperties, false);
-                */
                 lastControlPointProperties = controlPointProperties;
             }
 
@@ -407,8 +405,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                         yield return createSampleControlPointFor(hitObject.GetEndTime(), hitObject.Samples);
                     }
 
-                    foreach (var nested in collectSampleControlPoints(hitObject.NestedHitObjects))
-                        yield return nested;
+                    /*foreach (var nested in collectSampleControlPoints(hitObject.NestedHitObjects))
+                        yield return nested;*/
                 }
 
                 SampleControlPoint createSampleControlPointFor(double time, IList<HitSampleInfo> samples)
@@ -438,14 +436,14 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             void extractSampleControlPoints(IEnumerable<HitObject> hitObject)
             {
-                foreach (var hSamplePoint in collectSampleControlPoints(hitObject).OrderBy(sp => sp.Time))
+                /*foreach (var hSamplePoint in collectSampleControlPoints(hitObject).OrderBy(sp => sp.Time))
                 {
                     if (!hSamplePoint.IsRedundant(lastRelevantSamplePoint))
                     {
                         legacyControlPoints.Add(hSamplePoint.Time, hSamplePoint);
                         lastRelevantSamplePoint = hSamplePoint;
                     }
-                }
+                }*/
             }
         }
 
