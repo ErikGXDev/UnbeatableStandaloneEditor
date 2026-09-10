@@ -100,7 +100,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"PreviewTime: {beatmap.Metadata.PreviewTime}"));
             writer.WriteLine(FormattableString.Invariant($"Countdown: {(int)beatmap.Countdown}"));
             writer.WriteLine(FormattableString.Invariant(
-                $"SampleSet: {(SampleControlPoint.DEFAULT).SampleBank}"));
+                $"SampleSet: Normal"));
             writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.StackLeniency}"));
 
             // FIX: UMania keeps its mode as 5 to still make it different from

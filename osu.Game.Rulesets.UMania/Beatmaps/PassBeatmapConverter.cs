@@ -138,15 +138,19 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
         
         var controlPointInfo = new ControlPointInfo();
 
-        foreach (var timingPoint in convertBeatmap.ControlPointInfo.TimingPoints)
+        foreach (var timingPoint in convertBeatmap.ControlPointInfo.AllControlPoints)
         {
-            var clonedTimingPoint = timingPoint.DeepClone();
             
-            clonedTimingPoint.Time += msOffset;
-            
-            controlPointInfo.Add(clonedTimingPoint.Time, clonedTimingPoint);
-        }
+            if (timingPoint is TimingControlPoint or EffectControlPoint)
+            {
+                var clonedTimingPoint = timingPoint.DeepClone();
 
+                clonedTimingPoint.Time += msOffset;
+
+                controlPointInfo.Add(clonedTimingPoint.Time, clonedTimingPoint);
+            }
+        }
+        
         convertBeatmap.HitObjects = clonedHitObjects;
         convertBeatmap.ControlPointInfo = controlPointInfo;
         
