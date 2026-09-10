@@ -7,6 +7,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UMania.Objects.Drawables;
 using osu.Game.Rulesets.UMania.Skinning.Default;
@@ -30,12 +31,12 @@ namespace osu.Game.Rulesets.UMania.Skinning.Argon
 
             // Without this, the width of the body will be slightly larger than the head/tail.
             Masking = true;
-            Alpha = 0.75f;
+            Alpha = 0.70f;
             CornerRadius = ArgonNotePiece.CORNER_RADIUS;
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(DrawableHitObject? drawableObject)
+        private void load(DrawableHitObject? drawableObject, OsuConfigManager config)
         {
             InternalChildren = new[]
             {
@@ -56,6 +57,11 @@ namespace osu.Game.Rulesets.UMania.Skinning.Argon
             {
                 background.Colour = colour.NewValue.Darken(0.6f);
             }, true);
+
+            if (config.Get<bool>(OsuSetting.EditorMoreTransparency))
+            {
+                Alpha = 0.25f;
+            }
         }
 
         public void Recycle()

@@ -115,13 +115,21 @@ public partial class SettingsPopover : OsuPopover
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.EditorUnanimated),
                                     Margin = new MarginPadding { Bottom = 10 },
                                 },
-                                new TooltipCheckbox
+                                /*new TooltipCheckbox
                                 {
                                     LabelText = "Add a 60ms offset on export",
                                     TooltipText = "Feature disabled for now.",
                                     //TooltipText = "When enabled, all notes and timings will have a 60ms offset added to them when exporting maps.\nThis is here because the official editor also has this delay, with no way of removing it.\nWhen importing a map that has this offset, you can use the \"Offset all points\" input in the timing tab to move all points back again.\nNote that this only affects maps that are EXPORTED, your charts will not change in the editor.",
                                     RelativeSizeAxes = Axes.X,
                                     Current = { Value = false, Disabled = true },
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                },*/
+                                new TooltipCheckbox
+                                {
+                                    LabelText = "More hold transparency",
+                                    TooltipText = "Hold notes are slightly transparent so you can place notes behind them.\nThis setting makes them even more transparent, in case you have many hold notes at once.",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = osuConfig.GetBindable<bool>(OsuSetting.EditorMoreTransparency),
                                     Margin = new MarginPadding { Bottom = 10 },
                                 },
                                 new TooltipCheckbox()
@@ -131,7 +139,7 @@ public partial class SettingsPopover : OsuPopover
                                     RelativeSizeAxes = Axes.X,
                                     Current = editorConfig.GetBindable<bool>(EditorSetting.NewDisableUpdater),
                                     Margin = new MarginPadding { Bottom = 10 },
-                                }
+                                },
                                 /*new TooltipCheckbox
                                 {
                                     LabelText = "Swap pink notes in placement order",
