@@ -18,6 +18,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -66,6 +67,7 @@ namespace osu.Game.Screens.Edit.Timing
             InternalChildren = new Drawable[]
             {
                 createDebugMenu(),
+                createExplanation(),
                 
                 table = new ControlPointTable
                 {
@@ -91,7 +93,7 @@ namespace osu.Game.Screens.Edit.Timing
                             Direction = FillDirection.Horizontal,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Padding = new MarginPadding { Left = margins, Vertical = margins, },
+                            Padding = new MarginPadding { Left = margins, Vertical = margins * 2, },
                             Children = new Drawable[]
                             {
                                 new RoundedButton
@@ -101,6 +103,7 @@ namespace osu.Game.Screens.Edit.Timing
                                     Size = new Vector2(220, 30),
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
+                                    Enabled = { Value = false }
                                 },
                             }
                         },
@@ -121,10 +124,11 @@ namespace osu.Game.Screens.Edit.Timing
                                 new Container
                                 {
                                     AutoSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding(2),
+                                    Padding = new MarginPadding(4),
                                     Child = new TimingAdjustButton(1)
                                     {
                                         Text = "Offset all points",
+                                        Scale = new Vector2(1.75f),
                                         Action = offset =>
                                         {
                                             var selected = selectedGroup.Value;
@@ -165,6 +169,7 @@ namespace osu.Game.Screens.Edit.Timing
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     BackgroundColour = colours.Red3,
+                                    Enabled = { Value = false }
                                 },
                                 addButton = new RoundedButton
                                 {
@@ -172,6 +177,7 @@ namespace osu.Game.Screens.Edit.Timing
                                     Size = new Vector2(160, 30),
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
+                                    Enabled = { Value = false }
                                 },
                             }
                         },
@@ -209,7 +215,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.Update();
 
-            addButton.Enabled.Value = clock.CurrentTimeAccurate != selectedGroup.Value?.Time;
+            addButton.Enabled.Value = false/*clock.CurrentTimeAccurate != selectedGroup.Value?.Time*/;
             table.Padding = new MarginPadding { Bottom = controls.DrawHeight };
             
             // Continually update debug text with current beatmap title and timing point deltas
@@ -217,13 +223,22 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 string debugTextContent = currentBeatmap.Metadata.Title + " (" + (CurrentMapIndex + 1) + "/" + LoadableBeatmaps.Count + ")";
 
-                for (int i = 0; i < TimingPointOriginalTimes.Count; i++)
+                /*for (int i = 0; i < TimingPointOriginalTimes.Count; i++)
                 {
                     var originalTime = TimingPointOriginalTimes[i];
                     var currentTime = currentBeatmap.ControlPointInfo.TimingPoints[i].Time;
                     var delta = currentTime - originalTime;
 
                     debugTextContent += " | " + delta.ToString("F0");
+                }*/
+
+                if (TimingPointOriginalTimes.Count > 0)
+                {
+                    var originalTime = TimingPointOriginalTimes[0];
+                    var currentTime = currentBeatmap.ControlPointInfo.TimingPoints[0].Time;
+                    var delta = currentTime - originalTime;
+
+                    debugTextContent += " | Offset: " + delta.ToString("F0");
                 }
 
                 debugText.Text = debugTextContent;
@@ -286,7 +301,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         private string source_directory => File.ReadAllText(AppContext.BaseDirectory + "/source_directory.txt").Trim();
 
-        private string report_file => AppContext.BaseDirectory + "/timing_point_report.txt";
+        private string report_file => AppContext.BaseDirectory + "/report.csv";
             
 
         public record LoadableBeatmap (string txtFile, string oggFile, int hash = 0);
@@ -371,18 +386,33 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     var result = satisfiedBeatmap.title + "/" + satisfiedBeatmap.difficultyName;
                     
-                    for (int i = 0; i < TimingPointOriginalTimes.Count; i++)
+                    /*for (int i = 0; i < TimingPointOriginalTimes.Count; i++)
                     {
                         var originalTime = TimingPointOriginalTimes[i];
                         var currentTime = currentBeatmap.ControlPointInfo.TimingPoints[i].Time;
                         var delta = currentTime - originalTime;
 
                         result += ";" + delta.ToString("F0");
+                    }*/
+                    
+                    if (TimingPointOriginalTimes.Count > 0)
+                    {
+                        var originalTime = TimingPointOriginalTimes[0];
+                        var currentTime = currentBeatmap.ControlPointInfo.TimingPoints[0].Time;
+                        var delta = currentTime - originalTime;
+
+                        result += ";" + delta.ToString("F0");
                     }
+                    
                     File.AppendAllText(report_file, result + "\n");
                 }
                 
             }
+
+            saveAndLoadNextButton.Text = "Save timing and load next";
+            skipCurrentButton.Enabled.Value = true;
+            reloadCurrentButton.Enabled.Value = true;
+            swapVersionButton.Enabled.Value = true;
             
             SwitchNextBeatmap();
         }
@@ -395,6 +425,17 @@ namespace osu.Game.Screens.Edit.Timing
             if (CurrentMapIndex >= LoadableBeatmaps.Count)
             {
                 CurrentMapIndex = 0;
+            }
+            
+            LoadCurrentBeatmap();
+        }
+
+        public void LoadCurrentBeatmap()
+        {
+
+            if (CurrentMapIndex == -1)
+            {
+                return;
             }
             
             TimingPointOriginalTimes.Clear();
@@ -465,6 +506,20 @@ namespace osu.Game.Screens.Edit.Timing
 
             updateVersionText();
         }
+        
+        public void StartFromZero()
+        {
+            File.WriteAllText(report_file, "");
+            CurrentMapIndex = -1;
+            CurrentVersionIndex = 0;
+            TimingPointOriginalTimes.Clear();
+            debugText.Text = "No beatmap selected yet";
+            versionText.Text = "...";
+            saveAndLoadNextButton.Text = "Load first beatmap";
+            reloadCurrentButton.Enabled.Value = false;
+            skipCurrentButton.Enabled.Value = false;
+            swapVersionButton.Enabled.Value = false;
+        }
 
         private void applyHitObjectsFromBeatmap(IBeatmap beatmap)
         {
@@ -488,7 +543,6 @@ namespace osu.Game.Screens.Edit.Timing
                 Beatmap.UpdateAllHitObjects();
                 
                 editor.ReloadComposeScreen();
-
             });
             
             
@@ -511,9 +565,10 @@ namespace osu.Game.Screens.Edit.Timing
         {
             var container = new Container
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                Width = 300,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                X = -80,
+                Width = 350,
                 AutoSizeAxes = Axes.Y,
                 Padding = new MarginPadding { Left = 10, Top = 10, },
                 Depth = -10,
@@ -543,25 +598,49 @@ namespace osu.Game.Screens.Edit.Timing
                                 Text = "...",
                                 Font = OsuFont.Default.With(size: 14, weight: FontWeight.Bold),
                             },
-                            new RoundedButton
+                            saveAndLoadNextButton = new RoundedButton
                             {
-                                Text = "Save + Load next beatmap",
+                                Text = "Load first beatmap",
+                                TooltipText = "Loads the next beatmap so you can edit its timing points. Saves the timing point changes in a report file.",
                                 Size = new Vector2(200, 30),
                                 Action = SaveAndLoadNextBeatmap,
+                                Enabled = { Value = true }
                             },
-                            new RoundedButton()
+                            reloadCurrentButton = new RoundedButton()
                             {
-                                Text = "Skip this beatmap",
+                                Text = "Reload current beatmap",
+                                TooltipText = "For when you want to reset your timing changes.",
                                 Size = new Vector2(200, 30),
                                 BackgroundColour = Colour4.Orange,
-                                Action = SwitchNextBeatmap,
+                                Action = LoadCurrentBeatmap,
+                                Enabled = { Value = false }
                             },
-                            new RoundedButton()
+                            swapVersionButton = new RoundedButton()
                             {
                                 Text = "Swap beatmap version",
+                                TooltipText = "Change the beatmap difficulty, if there are multiple versions that all have the same timing points. Changes the hitobjects in the compose tab.\nWARNING: The hitobjects will probably be unsnapped if you already moved the timing points.",
                                 Size = new Vector2(200, 30),
                                 BackgroundColour = Colour4.Orange,
                                 Action = SwitchNextBeatmapInsideLoadable,
+                                Enabled = { Value = false }
+                            },
+                            skipCurrentButton = new RoundedButton()
+                            {
+                                Text = "Skip this beatmap",
+                                TooltipText = "Skip this beatmap without saving changes to the report file.",
+                                Size = new Vector2(200, 30),
+                                BackgroundColour = Colour4.Orange,
+                                Action = SwitchNextBeatmap,
+                                Enabled = { Value = false }
+                            },
+                            startNewButton = new RoundedButton()
+                            {
+                                Text = "Start from zero",
+                                TooltipText = "Clears the report file and starts the timing point editing from scratch. Use this if you want to start a new report file.",
+                                Size = new Vector2(200, 30),
+                                BackgroundColour = Colour4.Red,
+                                Action = StartFromZero,
+                                Enabled = { Value = true }
                             },
                         }
                     }
@@ -570,6 +649,49 @@ namespace osu.Game.Screens.Edit.Timing
 
             return container;
         }
+
+        private Drawable createExplanation()
+        {
+            var container = new Container()
+            {
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+                Width = 300,
+                AutoSizeAxes = Axes.Y,
+                Padding = new MarginPadding { Right = 10 },
+                Depth = -10,
+                Children = new Drawable[]
+                {
+                    new Box()
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Colour4.Black,
+                        Alpha = 0.5f,
+                    },
+                   
+                    new OsuTextFlowContainer(t =>
+                    {
+                        t.Font = OsuFont.Default.With(size: 16);
+                        t.AllowMultiline = true;
+                    })
+                    {
+                        Text = "Usage instructions\n\n1. Press the green button to load your first beatmap.\n2. Adjust the timing points, so they fit as close as possible to the waveform you see at the top. Use the \"Offset all points\" input at the bottom to adjust. You can also check out the compose tab, to see the notes as well.\n(Optional) Press \"Swap beatmap version\" button to switch between chart difficulties.\n3. When you are done adjusting the timing points, press the green button again to save your timing point changes and load the next one.\n4. Repeat until you are done with all beatmaps.\n5. Find your report of all your offset changes in a \"report.csv\" file in the directory of where you opened the editor from.\n6. If you want to try again, first move or rename the report file, to prevent adding duplicate entries to it.",
+                        Width = 300,
+                        Padding = new MarginPadding(4),
+                        AutoSizeAxes = Axes.Y,
+                    }
+                }
+                    
+            };
+            
+            return container;
+        }
+        
+        private RoundedButton saveAndLoadNextButton = null!;
+        private RoundedButton reloadCurrentButton = null!;
+        private RoundedButton skipCurrentButton = null!;
+        private RoundedButton swapVersionButton = null!;
+        private RoundedButton startNewButton = null!;
         
         #endregion
     }
