@@ -2,11 +2,13 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -329,13 +331,19 @@ public partial class BeatmapPickerScreen : OsuScreen
         selectedSet.Value = newSelection ?? firstSet;
     }
 
+    [Resolved]
+    private AudioManager audio { get; set; } = null!;
+    [Resolved]
+    private TextureStore textures { get; set; } = null!;
+
     private void createNewBeatmap()
     {
         var ruleset = UbRuleset.GetRulesetInfo();
-        var working = beatmapManager.CreateNew(ruleset, api.LocalUser.Value);
+        var working = new DummyWorkingBeatmap(audio, textures);
 
         Beatmap.Value = working;
         Ruleset.Value = ruleset;
+        working.BeatmapInfo.Ruleset = ruleset;
         this.Push(new EditorLoader(true));
     }
 
