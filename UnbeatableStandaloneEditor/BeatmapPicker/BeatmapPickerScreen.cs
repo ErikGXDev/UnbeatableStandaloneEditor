@@ -289,7 +289,7 @@ public partial class BeatmapPickerScreen : OsuScreen
             })
             {
                 Margin = new MarginPadding() { Top = 16, Left = 16 },
-                Text = "This is a special editor build to find chart offsets.\nIn order to prevent overwriting existing charts, please create a new beatmap.\nYou can delete it later in an actual editor build.",
+                Text = "This is a special editor build to find chart offsets.\nIn order to prevent overwriting existing charts, please create a new beatmap.\nSaving is disabled.",
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
             });

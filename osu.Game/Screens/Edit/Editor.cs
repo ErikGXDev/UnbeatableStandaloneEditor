@@ -618,7 +618,7 @@ namespace osu.Game.Screens.Edit
             base.LoadComplete();
             setUpClipboardActionAvailability();
 
-            Mode.Value = IsActuallyNewBeatmap ? EditorScreenMode.SongSetup : EditorScreenMode.Compose;
+            Mode.Value = EditorScreenMode.Timing;
             Mode.BindValueChanged(onModeChanged, true);
 
             MutationTracker.InProgress.BindValueChanged(_ =>
@@ -784,6 +784,8 @@ namespace osu.Game.Screens.Edit
                 notifications?.Post(new SimpleErrorNotification { Text = "Saving is not supported for this ruleset yet, sorry!" });
                 return false;
             }
+
+            return false;
 
             // Make a backup before saving the beatmap.
             // Can be a task here because surely the Beatmap will always be defined here.
@@ -1317,9 +1319,9 @@ namespace osu.Game.Screens.Edit
 
                 switch (e.NewValue)
                 {
-                    case EditorScreenMode.SongSetup:
+                    /*case EditorScreenMode.SongSetup:
                         currentScreen = new SetupScreen();
-                        break;
+                        break;*/
 
                     case EditorScreenMode.Compose:
                         currentScreen = new ComposeScreen();
@@ -1333,9 +1335,9 @@ namespace osu.Game.Screens.Edit
                         currentScreen = new TimingScreen();
                         break;
 
-                    case EditorScreenMode.Verify:
+                    /*case EditorScreenMode.Verify:
                         currentScreen = new VerifyScreen();
-                        break;
+                        break;*/
 
                     default:
                         throw new InvalidOperationException("Editor menu bar switched to an unsupported mode");

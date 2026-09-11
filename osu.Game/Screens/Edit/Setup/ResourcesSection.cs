@@ -327,7 +327,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             // editor change handler cannot be aware of any file changes or other difficulties having their metadata modified.
             // for simplicity's sake, trigger a save when changing any resource to ensure the change is correctly saved.
-            editor?.Save();
+            //editor?.Save();
         }
 
         // to avoid scaring users, both background & audio choosers use fake `FileInfo`s with user-friendly filenames
