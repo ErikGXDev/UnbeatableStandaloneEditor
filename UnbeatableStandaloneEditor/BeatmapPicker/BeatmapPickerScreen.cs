@@ -264,6 +264,7 @@ public partial class BeatmapPickerScreen : OsuScreen
 
     private void rebuildBeatmapList()
     {
+
         realm.Run(r =>
         {
             var sets = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending);
@@ -277,13 +278,36 @@ public partial class BeatmapPickerScreen : OsuScreen
         var prevId = selectedSet.Value?.ID;
         setsFlow.Clear();
 
-        if (!sets.Any())
-        {
+        /*if (!sets.Any())
+        {*/
             sortByButton.Alpha = 0;
-            setsFlow.Add(new EmptyState());
+            //setsFlow.Add(new EmptyState());
+            setsFlow.Add(new OsuTextFlowContainer(t =>
+            {
+                t.Font = OsuFont.GetFont(size: 24, weight: FontWeight.SemiBold);
+                t.Colour = colours.Content1;
+            })
+            {
+                Margin = new MarginPadding() { Top = 16, Left = 16 },
+                Text = "This is a special editor build to find chart offsets.\nIn order to prevent overwriting existing charts, please create a new beatmap.\nYou can delete it later in an actual editor build.",
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+            });
+
+            setsFlow.Add(
+            new RoundedButton
+            {
+                Margin = new MarginPadding() { Top = 16, Left = 16 },
+                Width = 148,
+                Height = 32,
+                Scale = new Vector2(1.5f),
+                Text = "+ New Beatmap",
+                Action = createNewBeatmap,
+            });
+
             selectedSet.Value = null;
             return;
-        }
+        /*}*/
 
         sortByButton.Alpha = 1;
 
