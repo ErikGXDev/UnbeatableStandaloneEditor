@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Edit.Timing
             foreach (var cp in currentGroupItems)
             {
                 // Only adjust hit object offsets if the group contains a timing control point
-                if (cp is TimingControlPoint tp && configManager.Get<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges))
+                if (cp is TimingControlPoint tp && true)
                 {
                     TimingSectionAdjustments.AdjustHitObjectOffset(Beatmap, tp, time - SelectedGroup.Value.Time);
                     Beatmap.UpdateAllHitObjects();

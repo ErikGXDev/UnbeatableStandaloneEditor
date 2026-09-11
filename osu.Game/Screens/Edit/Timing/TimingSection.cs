@@ -30,10 +30,10 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     Label = EditorStrings.AdjustExistingObjectsOnTimingChanges,
                     FixedLabelWidth = 220,
-                    Current = configManager.GetBindable<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges),
+                    Current = { Value = true, Disabled = true},
                 },
                 new TapTimingControl(),
-                bpmTextEntry = new BPMTextBox(),
+                bpmTextEntry = new BPMTextBox() { Alpha = 0 },
                 timeSignature = new LabelledTimeSignature
                 {
                     Label = "Time Signature"

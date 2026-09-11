@@ -106,6 +106,7 @@ namespace osu.Game.Screens.Edit.Timing
                                         RelativeSizeAxes = Axes.Both,
                                         Size = new Vector2(0.48f, 1),
                                         Action = adjustOffset,
+                                        Alpha = 0f,
                                     },
                                     new TimingAdjustButton(0.1)
                                     {
@@ -115,6 +116,7 @@ namespace osu.Game.Screens.Edit.Timing
                                         RelativeSizeAxes = Axes.Both,
                                         Size = new Vector2(0.48f, 1),
                                         Action = adjustBpm,
+                                        Alpha = 0f,
                                     }
                                 }
                             },
@@ -160,7 +162,8 @@ namespace osu.Game.Screens.Edit.Timing
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        IsHandlingTapping = { BindTarget = isHandlingTapping }
+                                        IsHandlingTapping = { BindTarget = isHandlingTapping },
+                                        Alpha = 0
                                     }
                                 }
                             },

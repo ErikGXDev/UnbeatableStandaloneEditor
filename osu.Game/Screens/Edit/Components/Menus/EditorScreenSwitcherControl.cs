@@ -30,10 +30,10 @@ namespace osu.Game.Screens.Edit.Components.Menus
         private void load(OverlayColourProvider colourProvider)
         {
             
-            AddItem(EditorScreenMode.SongSetup);
+            //AddItem(EditorScreenMode.SongSetup);
             AddItem(EditorScreenMode.Compose);
             AddItem(EditorScreenMode.Timing);
-            AddItem(EditorScreenMode.Verify);
+            //AddItem(EditorScreenMode.Verify);
             AccentColour = colourProvider.Light3;
 
             AddInternal(new Box
