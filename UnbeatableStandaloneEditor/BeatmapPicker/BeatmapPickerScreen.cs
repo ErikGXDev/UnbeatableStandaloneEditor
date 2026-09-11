@@ -228,6 +228,7 @@ public partial class BeatmapPickerScreen : OsuScreen
         // Check for updates asynchronously
         Task.Run(async () =>
         {
+            return;
             var update = await VersionCheckService.CheckForUpdateAsync();
             if (update != null)
             {
