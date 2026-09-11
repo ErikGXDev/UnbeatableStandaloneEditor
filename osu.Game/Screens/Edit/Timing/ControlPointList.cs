@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
@@ -22,6 +23,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.IO;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Setup;
 using osuTK;
@@ -43,6 +45,9 @@ namespace osu.Game.Screens.Edit.Timing
 
         [Resolved]
         protected EditorBeatmap Beatmap { get; private set; } = null!;
+        
+        [Resolved]
+        protected Editor editor { get; private set; } = null!;
 
         [Resolved]
         private Bindable<ControlPointGroup?> selectedGroup { get; set; } = null!;
@@ -286,9 +291,11 @@ namespace osu.Game.Screens.Edit.Timing
 
         public record LoadableBeatmap (string txtFile, string oggFile, int hash = 0);
 
-        public record PrettyBeatmap(string title, string difficultyName);
+        public record PrettyBeatmap(string title, string difficultyName, string txtFile);
 
         public int CurrentMapIndex = -1;
+
+        public int CurrentVersionIndex = 0;
         
         public List<double> TimingPointOriginalTimes = new List<double>();
         
@@ -328,10 +335,11 @@ namespace osu.Game.Screens.Edit.Timing
                         }
                         
                         SatisfiedBeatmaps.TryAdd(hash, new List<PrettyBeatmap>());
-                        SatisfiedBeatmaps[hash].Add(new PrettyBeatmap(b.Metadata.Title, b.BeatmapInfo.DifficultyName));
+                        SatisfiedBeatmaps[hash].Add(new PrettyBeatmap(b.Metadata.Title, b.BeatmapInfo.DifficultyName, txtFile));
                     }
                 }
             }
+            
             
             return beatmaps;
         }
@@ -390,8 +398,12 @@ namespace osu.Game.Screens.Edit.Timing
             }
             
             TimingPointOriginalTimes.Clear();
+            CurrentVersionIndex = 0;
 
             currentLoadableBeatmap = LoadableBeatmaps[CurrentMapIndex];
+            
+            updateVersionText();
+            
             Console.WriteLine($"Loading beatmap: {currentLoadableBeatmap.oggFile} and {currentLoadableBeatmap.oggFile}");
             
             
@@ -423,10 +435,77 @@ namespace osu.Game.Screens.Edit.Timing
                 }
             }
 
+            applyHitObjectsFromBeatmap(b);
+
             debugText.Text = b.Metadata.Title + " (" + CurrentMapIndex + 1 + "/" + LoadableBeatmaps.Count + ")";
+        }
+
+        // Switch hitobjects between satisfied beatmaps to check out multiple versions
+        public void SwitchNextBeatmapInsideLoadable()
+        {
+            var hash = currentLoadableBeatmap.hash;
+            
+            var satisfiedBeatmaps = SatisfiedBeatmaps[hash];
+            
+            CurrentVersionIndex++;
+            if (CurrentVersionIndex >= satisfiedBeatmaps.Count)
+            {
+                CurrentVersionIndex = 0;
+            }
+            
+            var current = satisfiedBeatmaps[CurrentVersionIndex];
+            
+            var decoder = new LegacyBeatmapDecoder();
+            
+            var lineBufferedStream = new LineBufferedReader(new FileStream(current.txtFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+            
+            Beatmap b = decoder.Decode(lineBufferedStream);
+            
+            applyHitObjectsFromBeatmap(b);
+
+            updateVersionText();
+        }
+
+        private void applyHitObjectsFromBeatmap(IBeatmap beatmap)
+        {
+            beatmap.BeatmapInfo.Ruleset = Beatmap.BeatmapInfo.Ruleset;
+            
+            var maniaConverter = Beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateBeatmapConverter(beatmap);
+            
+            var maniaBeatmap = maniaConverter.Convert();
+            
+            ((IList)Beatmap.HitObjects).Clear();
+            
+            Beatmap.UpdateAllHitObjects();
+
+            Schedule(() =>
+            {
+                foreach (var hitObject in maniaBeatmap.HitObjects)
+                {
+                    ((IList)Beatmap.HitObjects).Add(hitObject);
+                }
+            
+                Beatmap.UpdateAllHitObjects();
+                
+                editor.ReloadComposeScreen();
+
+            });
+            
+            
+        }
+
+        private void updateVersionText()
+        {
+            var hash = currentLoadableBeatmap.hash;
+            
+            var satisfiedBeatmaps = SatisfiedBeatmaps[hash];
+            var current = satisfiedBeatmaps[CurrentVersionIndex];
+            
+            versionText.Text = "Version: " + (CurrentVersionIndex + 1) + "/" + satisfiedBeatmaps.Count + " (" + current.difficultyName + ")";
         }
         
         private OsuSpriteText debugText = null!;
+        private OsuSpriteText versionText = null!;
 
         private Drawable createDebugMenu()
         {
@@ -459,6 +538,11 @@ namespace osu.Game.Screens.Edit.Timing
                                 Text = "No beatmap selected yet",
                                 Font = OsuFont.Default.With(size: 16, weight: FontWeight.Bold),
                             },
+                            versionText = new OsuSpriteText()
+                            {
+                                Text = "...",
+                                Font = OsuFont.Default.With(size: 14, weight: FontWeight.Bold),
+                            },
                             new RoundedButton
                             {
                                 Text = "Save + Load next beatmap",
@@ -471,6 +555,13 @@ namespace osu.Game.Screens.Edit.Timing
                                 Size = new Vector2(200, 30),
                                 BackgroundColour = Colour4.Orange,
                                 Action = SwitchNextBeatmap,
+                            },
+                            new RoundedButton()
+                            {
+                                Text = "Swap beatmap version",
+                                Size = new Vector2(200, 30),
+                                BackgroundColour = Colour4.Orange,
+                                Action = SwitchNextBeatmapInsideLoadable,
                             },
                         }
                     }
