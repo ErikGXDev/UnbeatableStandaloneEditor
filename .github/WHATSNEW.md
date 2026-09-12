@@ -1,6 +1,6 @@
 ﻿## What's new
 
-- Scroll speed effects on timing points are now saved and exported correctly.
-- Added the option "More hold transparency", which makes hold notes even more transparent.
+- Re-added an option to add a 40ms offset to exported maps
+- Re-added a verify tab check for adding a preview point.
 
 **Happy mapping!**
