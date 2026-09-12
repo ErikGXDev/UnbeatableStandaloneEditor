@@ -115,21 +115,21 @@ public partial class SettingsPopover : OsuPopover
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.EditorUnanimated),
                                     Margin = new MarginPadding { Bottom = 10 },
                                 },
-                                /*new TooltipCheckbox
-                                {
-                                    LabelText = "Add a 60ms offset on export",
-                                    TooltipText = "Feature disabled for now.",
-                                    //TooltipText = "When enabled, all notes and timings will have a 60ms offset added to them when exporting maps.\nThis is here because the official editor also has this delay, with no way of removing it.\nWhen importing a map that has this offset, you can use the \"Offset all points\" input in the timing tab to move all points back again.\nNote that this only affects maps that are EXPORTED, your charts will not change in the editor.",
-                                    RelativeSizeAxes = Axes.X,
-                                    Current = { Value = false, Disabled = true },
-                                    Margin = new MarginPadding { Bottom = 10 },
-                                },*/
                                 new TooltipCheckbox
                                 {
                                     LabelText = "More hold transparency",
                                     TooltipText = "Hold notes are slightly transparent so you can place notes behind them.\nThis setting makes them even more transparent, in case you have many hold notes at once.",
                                     RelativeSizeAxes = Axes.X,
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.EditorMoreTransparency),
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                },
+                                new TooltipCheckbox
+                                {
+                                    LabelText = "Add a 40ms offset on export",
+                                    //TooltipText = "Feature disabled for now.",
+                                    TooltipText = "When enabled, all notes and timings will have a 40ms offset added to them when exporting maps.\nIt is supposed to close the gap between this editor's waveform offset (20ms) and the offset of the offical editor (60ms).\nWhen importing a map that has this offset, you can use the \"Offset all points\" input in the timing tab to move all points back again.\nNote that this only affects maps that are EXPORTED, your charts will not change in the editor.\n(Be aware that offsets may feel different depending on the song or player, so be sure to test your map with and without this offset.)",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = osuConfig.GetBindable<bool>(OsuSetting.Editor60msOffset),
                                     Margin = new MarginPadding { Bottom = 10 },
                                 },
                                 new TooltipCheckbox()
