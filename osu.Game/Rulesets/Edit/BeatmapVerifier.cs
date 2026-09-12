@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Edit
             new CheckUnusedAudioAtEnd(),
 
             // Timing
-            //new CheckPreviewTime(),
+            new CheckPreviewTime(),
             new CheckInconsistentTimingControlPoints(),
 
             // Events
