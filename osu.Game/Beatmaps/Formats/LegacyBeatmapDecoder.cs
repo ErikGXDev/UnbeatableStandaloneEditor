@@ -500,14 +500,14 @@ namespace osu.Game.Beatmaps.Formats
                 
                 var category = splitLine[0];
 
-                int? endTime = null;
+                float? endTime = null;
                 
                 string[]? parameters = null;
                 
-                int? startTime = Parsing.ParseInt(splitLine[1]);
+                float? startTime = Parsing.ParseFloat(splitLine[1]);
                 if (splitLine.Length == 4) // 3-element events do not have an endtime
                 {
-                    endTime = Parsing.ParseInt(splitLine[2]);
+                    endTime = Parsing.ParseFloat(splitLine[2]);
                     parameters = splitLine[3].Split(":"); // Params come later here
                 }
                 else if (splitLine.Length == 3)

@@ -214,51 +214,52 @@ public partial class UbAnimateToolboxData
     {
     }
 
-    public class IntOption : BaseOption<BindableInt>
+    public class FloatOption : BaseOption<BindableFloat>
     {
         
         public static Bindable<bool> UseTextBox = new Bindable<bool>(false);
         
-        public int DefaultValue { get; set; }
-        public int Min { get; set; }
-        public int Max { get; set; }
-        public int[]? Markers { get; set; }
-        
+        public float DefaultValue { get; set; }
+        public float Min { get; set; }
+        public float Max { get; set; }
+        public float[]? Markers { get; set; }
+        public float Precision { get; set; }
 
-        public IntOption(string label, int defaultValue, int min, int max, int[]? markers = null)
+        public FloatOption(string label, float defaultValue, float min, float max, float precision, float[]? markers = null)
         {
             Label = label;
             DefaultValue = defaultValue;
             Min = min;
             Max = max;
+            Precision = precision;
             Markers = markers;
         }
 
         public override (Drawable, IBindable) CreateDrawableAndBindable(Action? onValueChanged)
         {
-            var finalIntBindable = new BindableInt() { Default = DefaultValue };
-            finalIntBindable.BindValueChanged(v => onValueChanged?.Invoke());
+            var finalFloatBindable = new BindableFloat() { Default = DefaultValue, Precision = Precision };
+            finalFloatBindable.BindValueChanged(v => onValueChanged?.Invoke());
             
-            var sliderBindable = new BindableInt() { MinValue = Min, MaxValue = Max, Default = DefaultValue };
+            var sliderBindable = new BindableFloat() { MinValue = Min, MaxValue = Max, Default = DefaultValue, Precision = Precision };
             var boxBindable = new Bindable<string>() { Default = DefaultValue.ToString() };
             
-            var slider = new FormSliderBar<int>()
+            var slider = new FormSliderBar<float>()
             {
                 LabelFormat = i => i.ToString(),
                 Caption = Label,
                 Current = sliderBindable,
-                KeyboardStep = 1
+                KeyboardStep = 1,
             };
             
             boxBindable.BindValueChanged(v =>
             {
-                var newInt = int.TryParse(v.NewValue, out var parsed) ? parsed : sliderBindable.Value;
+                var newFloat = float.TryParse(v.NewValue, out var parsed) ? parsed : sliderBindable.Value;
                 
-                if (sliderBindable.Value != newInt)
-                    sliderBindable.Value = newInt;
+                if (sliderBindable.Value != newFloat)
+                    sliderBindable.Value = newFloat;
                 
-                if (finalIntBindable.Value != newInt)
-                    finalIntBindable.Value = newInt;
+                if (finalFloatBindable.Value != newFloat)
+                    finalFloatBindable.Value = newFloat;
             }, true);
             
             sliderBindable.BindValueChanged(v =>
@@ -266,11 +267,11 @@ public partial class UbAnimateToolboxData
                 if (boxBindable.Value != v.NewValue.ToString())
                     boxBindable.Value = v.NewValue.ToString();
                 
-                if (finalIntBindable.Value != v.NewValue)
-                    finalIntBindable.Value = v.NewValue;
+                if (finalFloatBindable.Value != v.NewValue)
+                    finalFloatBindable.Value = v.NewValue;
             }, true);
             
-            finalIntBindable.BindValueChanged(v =>
+            finalFloatBindable.BindValueChanged(v =>
             {
                 if (sliderBindable.Value != v.NewValue)
                     sliderBindable.Value = v.NewValue;
@@ -279,7 +280,7 @@ public partial class UbAnimateToolboxData
                     boxBindable.Value = v.NewValue.ToString();
             });
             
-            var numberBox = new FormNumberBox()
+            var numberBox = new FormNumberBox(allowDecimals: Precision < 1)
             {
                 Alpha = 0,
                 Caption = Label,
@@ -310,7 +311,11 @@ public partial class UbAnimateToolboxData
                     slider.Alpha = 1;
                     
                     // Clamp the slider value to the min/max if the textbox value is out of bounds
-                    var numberBoxValue = int.TryParse(boxBindable.Value, out var parsed) ? parsed : sliderBindable.Value;
+                    var numberBoxValue = float.TryParse(boxBindable.Value, out var parsed) ? parsed : sliderBindable.Value;
+                    
+                    // Clamp the value to precision
+                    numberBoxValue = (float)Math.Round(numberBoxValue / Precision) * Precision;
+                    
                     if (numberBoxValue < Min || numberBoxValue > Max)
                     {
                         var clampedValue = Math.Clamp(numberBoxValue, Min, Max);
@@ -328,7 +333,7 @@ public partial class UbAnimateToolboxData
                 Logger.Log("Markers set for slider: " + string.Join(", ", Markers));
             }
             
-            return (container, finalIntBindable);
+            return (container, finalFloatBindable);
         }
     }
     
@@ -470,26 +475,26 @@ public partial class UbAnimateToolboxData
         {
             CategoryType.Camera, new Dictionary<Enum, List<BaseOption>>
             {
-                { CameraAction.Reset, [new IntOption("Position Only?", 0, 0, 1)] },
+                { CameraAction.Reset, [new FloatOption("Position Only?", 0, 0, 1, 1)] },
                 { CameraAction.CameraTarget, [new EnumStringOption<CameraPoint>("Camera Point")] },
-                { CameraAction.ZoomOffset, [new IntOption("Offset", 0, -100, 100)] },
-                { CameraAction.ZoomTarget, [new IntOption("Target", 0, -100, 100)] },
-                { CameraAction.RotOffset, [new IntOption("Degrees", 0, -720, 720)] },
-                { CameraAction.RotTarget, [new IntOption("Degrees", 0, -720, 720)] },
-                { CameraAction.HorizontalOffset, [new IntOption("Offset", 0, -100, 100)] },
-                { CameraAction.HorizontalTarget, [new IntOption("Target", 0, -100, 100)] },
+                { CameraAction.ZoomOffset, [new FloatOption("Offset", 0, -100, 100, 0.1f)] },
+                { CameraAction.ZoomTarget, [new FloatOption("Target", 0, -100, 100, 0.1f)] },
+                { CameraAction.RotOffset, [new FloatOption("Degrees", 0, -720, 720, 0.1f)] },
+                { CameraAction.RotTarget, [new FloatOption("Degrees", 0, -720, 720, 0.1f)] },
+                { CameraAction.HorizontalOffset, [new FloatOption("Offset", 0, -100, 100, 0.1f)] },
+                { CameraAction.HorizontalTarget, [new FloatOption("Target", 0, -100, 100, 0.1f)] },
                 {
                     CameraAction.CustomCameraTarget,
                     [
-                        new IntOption("X", 0, -100, 100, new[] { -55, -19, -10, 0, 10, 19, 55 }),
-                        new IntOption("Y", 0, -100, 100, new[] { 20, 35, 5 }),
-                        new IntOption("Z", 0, -100, 100, new[] { -60, -80, -85 })
+                        new FloatOption("X", 0, -10, 10, 0.1f, new float[] { -5.5f, -1.9f, -1.0f, 0, 1.0f, 1.9f, 5.5f }),
+                        new FloatOption("Y", 0, -10, 10, 0.1f, new float[] { 2.0f, 3.5f, 5 }),
+                        new FloatOption("Z", 0, -10, 10, 0.1f, new float[] { -6.0f, -8.0f, -8.5f })
                     ]
                 },
-                { CameraAction.EaseTime, [new IntOption("Time (ms)", 0, 0, 5000)] },
+                { CameraAction.EaseTime, [new FloatOption("Time (ms)", 0, 0, 5000, 1f)] },
                 { CameraAction.EaseMode, [new EnumStringOption<CameraEasing>("Easing")] },
-                { CameraAction.FOVTarget, [new IntOption("Target (Degrees)", 60, 1, 180)] },
-                { CameraAction.FOVOffset, [new IntOption("Offset (Degrees)", 0, -180, 180)] }
+                { CameraAction.FOVTarget, [new FloatOption("Target (Degrees)", 60, 1, 180, 0.1f)] },
+                { CameraAction.FOVOffset, [new FloatOption("Offset (Degrees)", 0, -180, 180, 0.1f)] }
             }
            
         },
@@ -503,15 +508,15 @@ public partial class UbAnimateToolboxData
         {
             CategoryType.Gameplay, new Dictionary<Enum, List<BaseOption>>
             {
-                { GameplayAction.ScreenShake, [new IntOption("Enabled?", 1, 0, 1)] },
-                { GameplayAction.ScreenRot, [new IntOption("Enabled?", 1, 0, 1)] },
-                { GameplayAction.ScreenZoom, [new IntOption("Enabled?", 1, 0, 1)] }
+                { GameplayAction.ScreenShake, [new FloatOption("Enabled?", 1, 0, 1, 1f)] },
+                { GameplayAction.ScreenRot, [new FloatOption("Enabled?", 1, 0, 1, 1f)] },
+                { GameplayAction.ScreenZoom, [new FloatOption("Enabled?", 1, 0, 1, 1f)] }
             }
         },
         {
             CategoryType.UI, new Dictionary<Enum, List<BaseOption>>
             {
-                { UIAction.ForceLockedUI, [new IntOption("Enabled?", 1, 0, 1)] }
+                { UIAction.ForceLockedUI, [new FloatOption("Enabled?", 1, 0, 1, 1f)] }
             }
         }
         

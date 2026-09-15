@@ -222,7 +222,7 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
             for (var i = 0; i < options.Count; i++)
             {
                 var option = options[i];
-                if (option is UbAnimateToolboxData.IntOption intOption)
+                if (option is UbAnimateToolboxData.FloatOption intOption)
                 {
                     if (intOption.Markers != null)
                     {
@@ -263,7 +263,7 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
                 
                 parameterContainer.Add(checkbox = new FormCheckBox()
                 {
-                    Current = UbAnimateToolboxData.IntOption.UseTextBox,
+                    Current = UbAnimateToolboxData.FloatOption.UseTextBox,
                     Caption = "Disable number limits"
                 });
                 
@@ -271,11 +271,11 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
                 {
                     var configBindable = config.GetBindable<bool>(OsuSetting.EditorUnanimatedNoLimit);
                     checkbox.Current = configBindable;
-                    UbAnimateToolboxData.IntOption.UseTextBox.Value = configBindable.Value;
+                    UbAnimateToolboxData.FloatOption.UseTextBox.Value = configBindable.Value;
                     
                     configBindable.BindValueChanged(v =>
                     {
-                        UbAnimateToolboxData.IntOption.UseTextBox.Value = v.NewValue;
+                        UbAnimateToolboxData.FloatOption.UseTextBox.Value = v.NewValue;
                     });
                 }
             }
@@ -351,7 +351,7 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
                 var parameters = parts.Skip(2).ToArray();
                 
                 // Parse some params as numbers if possible
-                var parsedParameters = parameters.Select(p => int.TryParse(p, out int intValue) ? (object)intValue : p).ToArray();
+                var parsedParameters = parameters.Select(p => float.TryParse(p, out float floatValue) ? (object)floatValue : p).ToArray();
                 
                 refreshParameters(parsedParameters);
             }
