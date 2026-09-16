@@ -477,12 +477,12 @@ public partial class UbAnimateToolboxData
             {
                 { CameraAction.Reset, [new FloatOption("Position Only?", 0, 0, 1, 1)] },
                 { CameraAction.CameraTarget, [new EnumStringOption<CameraPoint>("Camera Point")] },
-                { CameraAction.ZoomOffset, [new FloatOption("Offset", 0, -100, 100, 0.1f)] },
-                { CameraAction.ZoomTarget, [new FloatOption("Target", 0, -100, 100, 0.1f)] },
+                { CameraAction.ZoomOffset, [new FloatOption("Offset", 0, -10, 10, 0.1f)] },
+                { CameraAction.ZoomTarget, [new FloatOption("Target", 0, -10, 10, 0.1f)] },
                 { CameraAction.RotOffset, [new FloatOption("Degrees", 0, -720, 720, 0.1f)] },
                 { CameraAction.RotTarget, [new FloatOption("Degrees", 0, -720, 720, 0.1f)] },
-                { CameraAction.HorizontalOffset, [new FloatOption("Offset", 0, -100, 100, 0.1f)] },
-                { CameraAction.HorizontalTarget, [new FloatOption("Target", 0, -100, 100, 0.1f)] },
+                { CameraAction.HorizontalOffset, [new FloatOption("Offset", 0, -10, 10, 0.1f)] },
+                { CameraAction.HorizontalTarget, [new FloatOption("Target", 0, -10, 10, 0.1f)] },
                 {
                     CameraAction.CustomCameraTarget,
                     [
