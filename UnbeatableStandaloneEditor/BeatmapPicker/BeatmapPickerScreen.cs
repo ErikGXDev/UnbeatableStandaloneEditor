@@ -351,14 +351,14 @@ public partial class BeatmapPickerScreen : OsuScreen
 
     private void openUpdateRelease(VersionCheckService.ReleaseInfo update)
     {
-        if (!config.Get<bool>(EditorSetting.NewDisableUpdater))
-        {
+        /*if (!config.Get<bool>(EditorSetting.NewDisableUpdater))
+        {*/
             updatePopup.SetReleaseInfo(update);
             updatePopup.Show();
-            return;
-        }
+            /*return;
+        }*/
 
-        BrowserUtil.OpenUrl(update.ReleaseUrl);
+        /*BrowserUtil.OpenUrl(update.ReleaseUrl);*/
     }
 
     // For when there are no beatmaps

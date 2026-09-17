@@ -140,14 +140,14 @@ public partial class SettingsPopover : OsuPopover
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.Editor60msOffset),
                                     Margin = new MarginPadding { Bottom = 10 },
                                 },
-                                new TooltipCheckbox()
+                                /*new TooltipCheckbox()
                                 {
                                     LabelText = "Use old update button",
                                     TooltipText = "Replaces the new automatic updater button with the old \"New version available!\" button, which opens the newest release page in your browser.\nYou can enable this if you prefer to download the editor manually, or if your antivirus is causing issues.",
                                     RelativeSizeAxes = Axes.X,
                                     Current = editorConfig.GetBindable<bool>(EditorSetting.NewDisableUpdater),
                                     Margin = new MarginPadding { Bottom = 10 },
-                                },
+                                },*/
                                 /*new TooltipCheckbox
                                 {
                                     LabelText = "Swap pink notes in placement order",
