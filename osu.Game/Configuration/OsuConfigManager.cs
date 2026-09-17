@@ -218,6 +218,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorExportMode, 0); // FIX: Export mode should persist as a config, enum is converted to int
             SetDefault(OsuSetting.EditorExportFolder, string.Empty); // FIX: Export folder should persist as a config
             SetDefault(OsuSetting.EditorMoreTransparency, false); // FIX: More transparency for editor
+            SetDefault(OsuSetting.EditorReverseScroll, false); // FIX: Reverse scroll for editor
             //SetDefault(OsuSetting.EditorSwapPinkInsteadOfCamera, false); // FIX: Swap pink instead of camera
             
             SetDefault(OsuSetting.HideCountryFlags, false);
@@ -515,6 +516,7 @@ namespace osu.Game.Configuration
         EditorUnanimated, // FIX: Support for the UNANIMATED note feature
         EditorUnanimatedNoLimit,
         EditorMoreTransparency,
+        EditorReverseScroll,
         //EditorSwapPinkInsteadOfCamera,
         
         CreateBackups, // Toggle backup creation on save

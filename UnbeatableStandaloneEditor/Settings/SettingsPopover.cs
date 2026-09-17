@@ -80,6 +80,14 @@ public partial class SettingsPopover : OsuPopover
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.EditorNudgeByMilliseconds),
                                     Margin = new MarginPadding { Bottom = 10 },
                                 },
+                                new TooltipCheckbox()
+                                {
+                                    LabelText = "Reverse scroll in editor",
+                                    TooltipText = "Reverses scrolling for the editor timeline.",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = osuConfig.GetBindable<bool>(OsuSetting.EditorReverseScroll),
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                },
                                 new TooltipCheckbox
                                 {
                                     LabelText = "Play hitsounds in camera lane",

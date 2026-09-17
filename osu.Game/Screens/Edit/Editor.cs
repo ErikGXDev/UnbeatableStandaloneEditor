@@ -252,6 +252,8 @@ namespace osu.Game.Screens.Edit
             this.loader = loader;
         }
 
+        private bool scrollReversed = false;
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, OverlayColourProvider colourProvider)
         {
@@ -349,6 +351,8 @@ namespace osu.Game.Screens.Edit
             editorTimelineShowTicks = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
             editorContractSidebars = config.GetBindable<bool>(OsuSetting.EditorContractSidebars);
 
+            scrollReversed = config.Get<bool>(OsuSetting.EditorReverseScroll);
+            
             // These two settings don't work together. Make them mutually exclusive to let the user know.
             editorAutoSeekOnPlacement.BindValueChanged(enabled =>
             {
@@ -959,10 +963,12 @@ namespace osu.Game.Screens.Edit
             // because we are doing snapped seeking, we need to add up precise scrolls until they accumulate to an arbitrary cut-off.
             while (Math.Abs(scrollAccumulation) >= precision)
             {
+                var inverse = scrollReversed ? -1 : 1;
+                
                 if (scrollAccumulation > 0)
-                    seek(e, -1);
+                    seek(e, -1 * inverse);
                 else
-                    seek(e, 1);
+                    seek(e, 1 * inverse);
 
                 scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
             }
