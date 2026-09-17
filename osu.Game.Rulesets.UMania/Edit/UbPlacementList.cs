@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
 using Humanizer;
@@ -97,6 +98,50 @@ public partial class UbPlacementListItem : OsuRearrangeableListItem<UbPlacementH
         var ubNoteBuilder = new UbNoteBuilder(hitObjectInfo.HitObject);
 
         var icon = ubNoteBuilder.InferObjectTypeIcon();
+
+        if (icon == UbIconType.Animated || icon == UbIconType.AnimatedHold)
+        {
+            var data = ubNoteBuilder.GetFileHitSampleData();
+
+            if (data == "") data = "Camera|Reset|0";
+            
+            var parts = data.Split("|");
+
+            CategoryType eventCategory;
+            
+            if (Enum.TryParse(parts[0], out CategoryType category))
+            {
+                eventCategory = category;
+            }
+            else
+            {
+                return icon.Humanize();
+            }
+            
+            Type enumType = UbAnimateToolboxData.CategoryTypeInfo[eventCategory].TypeEnum;
+
+            if (Enum.TryParse(enumType, parts[1], out object? eventType) && eventType != null)
+            {
+                var actionInt = Convert.ToInt32(eventType);
+                
+                if (Enum.IsDefined(enumType, actionInt))
+                {
+                    string action = Enum.ToObject(enumType, actionInt).ToString().Humanize(LetterCasing.Title);
+                    var res =  $"Un. {action}";
+                    
+                    if (res.Length > 16)
+                    {
+                        res = res.Substring(0, 16) + "...";
+                    }
+                    
+                    return res;
+                }
+                else
+                {
+                    return icon.Humanize();
+                }
+            }
+        }
 
         var verb = icon.Humanize();
 
