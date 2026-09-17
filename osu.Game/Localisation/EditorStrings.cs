@@ -175,6 +175,11 @@ namespace osu.Game.Localisation
         public static LocalisableString TimelineShowTimingChanges => new TranslatableString(getKey(@"timeline_show_timing_changes"), @"Show timing changes");
 
         /// <summary>
+        /// "Show notes"
+        /// </summary>
+        public static LocalisableString TimelineShowNotes => new TranslatableString(getKey(@"timeline_show_notes"), @"Show notes");
+
+        /// <summary>
         /// "Finish editing and import changes"
         /// </summary>
         public static LocalisableString FinishEditingExternally => new TranslatableString(getKey(@"Finish editing and import changes"), @"Finish editing and import changes");

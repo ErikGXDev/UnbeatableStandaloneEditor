@@ -86,6 +86,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Bindable<float> waveformOpacity = null!;
         private Bindable<bool> controlPointsVisible = null!;
         private Bindable<bool> ticksVisible = null!;
+        private Bindable<bool> notesVisible = null!;
 
         private double trackLengthForZoom;
 
@@ -157,7 +158,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
             controlPointsVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
             ticksVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
-
+            notesVisible = config.GetBindable<bool>(OsuSetting.EditorTimelineShowNotes);
             editorClock.TrackChanged += updateWaveform;
             updateWaveform();
 
@@ -198,6 +199,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     controlPoints.FadeIn(400, Easing.OutQuint);
                 else
                     controlPoints.FadeOut(200, Easing.OutQuint);
+            }, true);
+            
+            notesVisible.BindValueChanged(visible =>
+            {
+                if (visible.NewValue)
+                    userContent.FadeIn(400, Easing.OutQuint);
+                else
+                    userContent.FadeOut(200, Easing.OutQuint);
             }, true);
         }
 

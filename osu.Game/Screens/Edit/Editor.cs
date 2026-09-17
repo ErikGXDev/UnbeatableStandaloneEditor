@@ -230,6 +230,7 @@ namespace osu.Game.Screens.Edit
         private Bindable<bool> editorHitMarkers;
         private Bindable<bool> editorAutoSeekOnPlacement;
         private Bindable<bool> editorLimitedDistanceSnap;
+        private Bindable<bool> editorTimelineShowNotes;
         private Bindable<bool> editorTimelineShowTimingChanges;
         private Bindable<bool> editorTimelineShowBreaks;
         private Bindable<bool> editorTimelineShowTicks;
@@ -346,6 +347,7 @@ namespace osu.Game.Screens.Edit
             editorHitMarkers = config.GetBindable<bool>(OsuSetting.EditorShowHitMarkers);
             editorAutoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
             editorLimitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
+            editorTimelineShowNotes = config.GetBindable<bool>(OsuSetting.EditorTimelineShowNotes);
             editorTimelineShowTimingChanges = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTimingChanges);
             editorTimelineShowBreaks = config.GetBindable<bool>(OsuSetting.EditorTimelineShowBreaks);
             editorTimelineShowTicks = config.GetBindable<bool>(OsuSetting.EditorTimelineShowTicks);
@@ -546,6 +548,10 @@ namespace osu.Game.Screens.Edit
                                                     new ToggleMenuItem(EditorStrings.TimelineShowBreaks)
                                                     {
                                                         State = { BindTarget = editorTimelineShowBreaks }
+                                                    },
+                                                    new ToggleMenuItem(EditorStrings.TimelineShowNotes)
+                                                    {
+                                                        State = { BindTarget = editorTimelineShowNotes }
                                                     },
                                                 ]
                                             },
