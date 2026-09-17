@@ -556,18 +556,18 @@ namespace osu.Game.Screens.Edit
                                                 State = { BindTarget = editorShowStoryboard },
                                             },
                                             new OsuMenuItemSpacer(),
-                                            new ToggleMenuItem(EditorStrings.ShowHitMarkers)
+                                            /*new ToggleMenuItem(EditorStrings.ShowHitMarkers)
                                             {
                                                 State = { BindTarget = editorHitMarkers },
-                                            },
+                                            },*/
                                             new ToggleMenuItem(EditorStrings.AutoSeekOnPlacement)
                                             {
                                                 State = { BindTarget = editorAutoSeekOnPlacement },
                                             },
-                                            new ToggleMenuItem(EditorStrings.LimitedDistanceSnap)
+                                            /*new ToggleMenuItem(EditorStrings.LimitedDistanceSnap)
                                             {
                                                 State = { BindTarget = editorLimitedDistanceSnap },
-                                            },
+                                            },*/
                                             new ToggleMenuItem(EditorStrings.ContractSidebars)
                                             {
                                                 State = { BindTarget = editorContractSidebars }
