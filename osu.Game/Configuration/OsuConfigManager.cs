@@ -220,6 +220,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorMoreTransparency, false); // FIX: More transparency for editor
             SetDefault(OsuSetting.EditorReverseScroll, false); // FIX: Reverse scroll for editor
             SetDefault(OsuSetting.EditorTimelineShowNotes, true); // FIX: Show notes in timeline for editor
+            SetDefault(OsuSetting.EditorShortNames, false);
             //SetDefault(OsuSetting.EditorSwapPinkInsteadOfCamera, false); // FIX: Swap pink instead of camera
             
             SetDefault(OsuSetting.HideCountryFlags, false);
@@ -519,6 +520,7 @@ namespace osu.Game.Configuration
         EditorMoreTransparency,
         EditorReverseScroll,
         EditorTimelineShowNotes,
+        EditorShortNames,
         //EditorSwapPinkInsteadOfCamera,
         
         CreateBackups, // Toggle backup creation on save

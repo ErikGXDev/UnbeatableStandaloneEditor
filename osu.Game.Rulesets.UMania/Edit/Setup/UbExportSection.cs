@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -150,6 +151,49 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             ExportToUnbeatable();
         }
 
+
+        private string getBaseFilename(string artist, string title, string author)
+        {
+            if (string.IsNullOrWhiteSpace(artist))
+                artist = "Unknown";
+
+            if (string.IsNullOrWhiteSpace(title))
+                title = "Song";
+
+            if (string.IsNullOrWhiteSpace(author))
+                author = "Unknown";
+            
+            if (config.Get<bool>(OsuSetting.EditorShortNames))
+            {
+                author = author.Truncate(20, "...");
+            }
+
+            return $"{artist} - {title} ({author})".GetValidFilename();
+        }
+        
+        private string getBaseFilenameWithDiff(string artist, string title, string author, string difficulty)
+        {
+            if (string.IsNullOrWhiteSpace(artist))
+                artist = "Unknown";
+
+            if (string.IsNullOrWhiteSpace(title))
+                title = "Song";
+
+            if (string.IsNullOrWhiteSpace(author))
+                author = "Unknown";
+
+            if (string.IsNullOrWhiteSpace(difficulty))
+                difficulty = "Easy";
+
+            if (config.Get<bool>(OsuSetting.EditorShortNames))
+            {
+                return $"[{difficulty}]".GetValidFilename();
+            }
+
+            return $"{artist} - {title} ({author}) [{difficulty}]".GetValidFilename();
+        }
+        
+        
         private void exportToUnbeatable()
         {
             Logger.Log("Exporting to Unbeatable...");
@@ -359,17 +403,9 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             string artist = Beatmap.Metadata.Artist ?? "Unknown";
             string title = Beatmap.Metadata.Title ?? "Song";
             string author = Beatmap.Metadata.Author.Username ?? "Unknown";
-            string difficulty = Beatmap.Metadata.Source ?? "Easy";
-
-            if (beatmapSet.Beatmaps.Count > 1)
-            {
-                baseFilename = $"{artist} - {title} ({author})".GetValidFilename();
-            }
-            else
-            {
-                baseFilename = $"{artist} - {title} ({author}) [{difficulty}]".GetValidFilename();
-            }
-
+            
+            baseFilename = getBaseFilename(artist, title, author);
+            
             // Create the .zip file
             string zipFilename = baseFilename + ".zip";
 
@@ -385,7 +421,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
                         var newDifficulty = beatmap.Metadata.Source ?? "Easy";
 
-                        var beatmapName = $"{artist} - {title} ({author}) [{newDifficulty}]".GetValidFilename();
+                        var beatmapName = getBaseFilenameWithDiff(artist, title, author, newDifficulty);
                         var beatmapEntry = archive.CreateEntry(beatmapName + extension, CompressionLevel.Optimal);
 
                         using (var entryStream = beatmapEntry.Open())
@@ -506,11 +542,10 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             string artist = Beatmap.Metadata.Artist ?? "Unknown";
             string title = Beatmap.Metadata.Title ?? "Song";
             string author = Beatmap.Metadata.Author.Username ?? "Unknown";
-            string difficulty = Beatmap.BeatmapInfo.DifficultyName ?? "Easy";
 
             var directory = exportFolderSelector.SelectedDirectory.Value;
 
-            var baseFolderName = $"{artist} - {title} ({author})".GetValidFilename();
+            var baseFolderName = getBaseFilename(artist, title, author);
 
             directory = Path.Combine(directory, baseFolderName);
 
@@ -527,7 +562,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
                 var newDifficulty = beatmap.Metadata.Source ?? "Easy";
 
-                var beatmapName = $"{artist} - {title} ({author}) [{newDifficulty}]".GetValidFilename();
+                var beatmapName = getBaseFilenameWithDiff(artist, title, author, newDifficulty);
                 var beatmapPath = Path.Combine(directory, beatmapName + extension);
 
                 using (var fs = File.Create(beatmapPath))

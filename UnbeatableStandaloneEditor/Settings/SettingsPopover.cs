@@ -49,7 +49,7 @@ public partial class SettingsPopover : OsuPopover
                     Width = 320,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 5),
+                    Spacing = new Vector2(0, 3),
                     Children = new Drawable[]
                     {
 
@@ -97,49 +97,7 @@ public partial class SettingsPopover : OsuPopover
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.PlaySamplesInCameraLane),
                                     Margin = new MarginPadding { Bottom = 10 },
                                 },
-                                new TooltipCheckbox
-                                {
-                                    LabelText = "Enable 4-key mode in editor",
-                                    TooltipText =
-                                        "The first two columns turn into another set of top and bottom lanes.\nThe columns will also be re-arranged slightly.\nWhen zoomed out, notes in the new columns will automatically be flipped.\nWhen zoomed in, the columns simply act as another set of top and bottom lanes.\n(Experimental!)",
-                                    RelativeSizeAxes = Axes.X,
-                                    Current = osuConfig.GetBindable<bool>(OsuSetting.Editor4KeyMode),
-                                    Margin = new MarginPadding { Bottom = 10 },
-                                },
-                                new TooltipCheckbox
-                                {
-                                    LabelText = "Enable key-based charting",
-                                    TooltipText =
-                                        "Press 1-6 to place notes in the corresponding column, similar to the official editor.\nHold a key and scroll to create hold notes.\nUse Shift to place a Dodge, Double or Zoom note (depending on the column).\nModifier buttons (Q-P) still apply to placed notes.\n(Experimental!)",
-                                    RelativeSizeAxes = Axes.X,
-                                    Current = osuConfig.GetBindable<bool>(OsuSetting.EditorKeyBasedCharting),
-                                    Margin = new MarginPadding { Bottom = 10 },
-                                },
-                                new TooltipCheckbox
-                                {
-                                    LabelText = "Enable \"Unanimated\" notes",
-                                    TooltipText = "This setting enables features intended to be used with Stefy's downloadable UNANIMATED mod.\nNew \"Animate\" Notes in the 2nd lane can now be edited in a new menu underneath the inspector.\nThe menu allows you to set and modify camera commands, along with their parameters.\nTo start, select the new \"Animate\" note preset on the left, place it, and select it. The menu will then appear.",
-                                    RelativeSizeAxes = Axes.X,
-                                    Current = osuConfig.GetBindable<bool>(OsuSetting.EditorUnanimated),
-                                    Margin = new MarginPadding { Bottom = 10 },
-                                },
-                                new TooltipCheckbox
-                                {
-                                    LabelText = "More hold transparency",
-                                    TooltipText = "Hold notes are slightly transparent so you can place notes behind them.\nThis setting makes them even more transparent, in case you have many hold notes at once.",
-                                    RelativeSizeAxes = Axes.X,
-                                    Current = osuConfig.GetBindable<bool>(OsuSetting.EditorMoreTransparency),
-                                    Margin = new MarginPadding { Bottom = 10 },
-                                },
-                                new TooltipCheckbox
-                                {
-                                    LabelText = "Add a 40ms offset on export",
-                                    //TooltipText = "Feature disabled for now.",
-                                    TooltipText = "When enabled, all notes and timings will have a 40ms offset added to them when exporting maps.\nIt is supposed to close the gap between this editor's waveform offset (20ms) and the offset of the offical editor (60ms).\nWhen importing a map that has this offset, you can use the \"Offset all points\" input in the timing tab to move all points back again.\nNote that this only affects maps that are EXPORTED, your charts will not change in the editor.\n(Be aware that offsets may feel different depending on the song or player, so be sure to test your map with and without this offset.)",
-                                    RelativeSizeAxes = Axes.X,
-                                    Current = osuConfig.GetBindable<bool>(OsuSetting.Editor60msOffset),
-                                    Margin = new MarginPadding { Bottom = 10 },
-                                },
+
                                 /*new TooltipCheckbox()
                                 {
                                     LabelText = "Use old update button",
@@ -157,6 +115,64 @@ public partial class SettingsPopover : OsuPopover
                                     Margin = new MarginPadding { Bottom = 10 },
                                 },*/
                             },
+                        },
+                        new SettingsGroup()
+                        {
+                            Label = "Advanced",
+                            Controls = new Drawable[]
+                            {
+                                new TooltipCheckbox
+                                {
+                                    LabelText = "4-Key mode in editor",
+                                    TooltipText =
+                                        "The first two columns turn into another set of top and bottom lanes.\nThe columns will also be re-arranged slightly.\nWhen zoomed out, notes in the new columns will automatically be flipped.\nWhen zoomed in, the columns simply act as another set of top and bottom lanes.\n(Experimental!)",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = osuConfig.GetBindable<bool>(OsuSetting.Editor4KeyMode),
+                                    Margin = new MarginPadding { Bottom = 10, Top = 5 },
+                                },
+                                new TooltipCheckbox
+                                {
+                                    LabelText = "Key-based charting",
+                                    TooltipText =
+                                        "Press 1-6 to place notes in the corresponding column, similar to the official editor.\nHold a key and scroll to create hold notes.\nUse Shift to place a Dodge, Double or Zoom note (depending on the column).\nModifier buttons (Q-P) still apply to placed notes.\n(Experimental!)",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = osuConfig.GetBindable<bool>(OsuSetting.EditorKeyBasedCharting),
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                },
+                                new TooltipCheckbox
+                                {
+                                    LabelText = "\"Unanimated\" notes",
+                                    TooltipText = "This setting enables features intended to be used with Stefy's downloadable UNANIMATED mod.\nNew \"Animate\" Notes in the 2nd lane can now be edited in a new menu underneath the inspector.\nThe menu allows you to set and modify camera commands, along with their parameters.\nTo start, select the new \"Animate\" note preset on the left, place it, and select it. The menu will then appear.",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = osuConfig.GetBindable<bool>(OsuSetting.EditorUnanimated),
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                },
+                                new TooltipCheckbox
+                                {
+                                    LabelText = "More hold transparency",
+                                    TooltipText = "Hold notes are slightly transparent so you can place notes behind them.\nThis setting makes them even more transparent, in case you have many hold notes at once.",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = osuConfig.GetBindable<bool>(OsuSetting.EditorMoreTransparency),
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                },
+                                new TooltipCheckbox
+                                {
+                                    LabelText = "Long export path fix",
+                                    TooltipText = "Enable if UNBEATABLE can't load your exported map because the file name is too long. Makes exported file names shorter.",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = osuConfig.GetBindable<bool>(OsuSetting.EditorShortNames),
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                },
+                                new TooltipCheckbox
+                                {
+                                    LabelText = "Add a 40ms offset on export",
+                                    //TooltipText = "Feature disabled for now.",
+                                    TooltipText = "When enabled, all notes and timings will have a 40ms offset added to them when exporting maps.\nIt is supposed to close the gap between this editor's waveform offset (20ms) and the offset of the offical editor (60ms).\nWhen importing a map that has this offset, you can use the \"Offset all points\" input in the timing tab to move all points back again.\nNote that this only affects maps that are EXPORTED, your charts will not change in the editor.\n(Be aware that offsets may feel different depending on the song or player, so be sure to test your map with and without this offset.)",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = osuConfig.GetBindable<bool>(OsuSetting.Editor60msOffset),
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                },
+                            }
                         },
                         new SettingsGroup
                         {
@@ -349,7 +365,7 @@ public partial class SettingsPopover : OsuPopover
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
-            Spacing = new Vector2(0, 2);
+            Spacing = new Vector2(0, 1);
             Margin = new MarginPadding { Bottom = 10 };
         }
 
