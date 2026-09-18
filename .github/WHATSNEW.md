@@ -12,7 +12,7 @@ In this update, I primarily re-arranged the UI a little and added some quality-o
   - Parameters for notes are now decimals (The new values are the old ones divided by 10)
   - True/False inputs are now done with a checkbox
   - Added a "Hold Duration" number input for more control
-- Bundled the "Playfield" and "Unbeatable" toggles in the editor under one "Quick Settings" category
+- Bundled some toggles in the editor under one "Quick Settings" category
 - Removed the option to use the old update button, as the auto updater appears to work fine.
 - Removed unnecessary menu options from the "View" menu
 
