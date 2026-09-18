@@ -19,6 +19,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UMania.Edit.Blueprints;
 using osu.Game.Rulesets.UMania.Objects;
 using osu.Game.Screens.Edit;
@@ -278,6 +279,32 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
                         UbAnimateToolboxData.FloatOption.UseTextBox.Value = v.NewValue;
                     });
                 }
+            }
+
+            
+            var hitObject = noteBuilder.GetHitObject();
+            if (hitObject is IHasDuration durationNote)
+            {
+                var duration = durationNote.Duration;
+                
+                var boxBindable = new Bindable<string>(duration.ToString());
+             
+                var numberBox = new FormNumberBox(allowDecimals: true)
+                {
+                    Caption = "Hold Duration",
+                    Current = boxBindable
+                };
+                
+                parameterContainer.Add(numberBox);
+                
+                boxBindable.BindValueChanged(v =>
+                {
+                    if (double.TryParse(v.NewValue, out double newDuration))
+                    {
+                        durationNote.Duration = newDuration;
+                        beatmap.Update(hitObject);
+                    }
+                }, true);
             }
         }
         
