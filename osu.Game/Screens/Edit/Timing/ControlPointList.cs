@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Edit.Timing
                 deleteButton.Enabled.Value = selected.NewValue != null;
 
                 addButton.Text = selected.NewValue != null
-                    ? "+ Clone to current time"
+                    ? "+ Add to current time"
                     : "+ Add at current time";
             }, true);
         }

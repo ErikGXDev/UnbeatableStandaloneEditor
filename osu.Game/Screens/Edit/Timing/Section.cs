@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Edit.Timing
                         Flow = new FillFlowContainer
                         {
                             Padding = new MarginPadding(10) { Top = 0 },
-                            Spacing = new Vector2(20),
+                            Spacing = new Vector2(14),
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,

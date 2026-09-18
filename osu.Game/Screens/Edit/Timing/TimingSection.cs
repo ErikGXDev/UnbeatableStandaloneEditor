@@ -32,12 +32,12 @@ namespace osu.Game.Screens.Edit.Timing
                     FixedLabelWidth = 220,
                     Current = configManager.GetBindable<bool>(OsuSetting.EditorAdjustExistingObjectsOnTimingChanges),
                 },
-                new TapTimingControl(),
                 bpmTextEntry = new BPMTextBox(),
                 timeSignature = new LabelledTimeSignature
                 {
                     Label = "Time Signature"
                 },
+                new TapTimingControl(),
                 omitBarLine = new LabelledSwitchButton { Label = "Skip Bar Line" },
             });
         }
