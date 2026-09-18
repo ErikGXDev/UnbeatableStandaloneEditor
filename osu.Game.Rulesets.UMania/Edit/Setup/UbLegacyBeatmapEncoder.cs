@@ -215,7 +215,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     // This is an unanimated note, so write the enable command automatically
                     if (!wroteEnableUnanimated)
                     {
-                        writer.WriteLine("Enable,0,");
+                        writer.WriteLine("UNANIMATED,0,Enable");
                         wroteEnableUnanimated = true;
                     }
                     

@@ -487,7 +487,7 @@ namespace osu.Game.Beatmaps.Formats
             // UNANIMATED
             // Attempt to read the line like a camera event
             var splitLine = line.Split(',');
-            if (splitLine.First().StartsWith("Enable")) // Enable event is slightly special
+            if (splitLine.First().Contains("Enable")) // Enable event is slightly special
             {
                 return;
             }

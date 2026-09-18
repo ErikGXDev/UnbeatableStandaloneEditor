@@ -12,12 +12,26 @@ namespace osu.Game.Rulesets.UMania.Edit;
 
 public enum CategoryType
 {
+    UNANIMATED,
     Camera,
     Character,
     Gameplay,
     [Description("Stage Switch")]
     StageScene,
     UI
+}
+
+public enum UnanimatedAction
+{
+    [Description("Set Default Stage")]
+    DefaultStageScene,
+    
+    [Description("Show background video")]
+    ShowBackgroundVideo,
+    
+    [Description("Use old units (pre-0.1.14)")]
+    LegacyCameraUnits,
+    
 }
 
 public enum CameraAction
@@ -473,15 +487,23 @@ public partial class UbAnimateToolboxData
     public static readonly Dictionary<CategoryType, Dictionary<Enum, List<BaseOption>>> CategoryOptions = new()
     {
         {
+            CategoryType.UNANIMATED, new Dictionary<Enum, List<BaseOption>>
+            {
+                { UnanimatedAction.DefaultStageScene, [new EnumStringOption<StageSceneAction>("Stage")] },
+                { UnanimatedAction.ShowBackgroundVideo, [] },
+                { UnanimatedAction.LegacyCameraUnits, [] }
+            }
+        },
+        {
             CategoryType.Camera, new Dictionary<Enum, List<BaseOption>>
             {
                 { CameraAction.Reset, [new FloatOption("Position Only?", 0, 0, 1, 1)] },
                 { CameraAction.CameraTarget, [new EnumStringOption<CameraPoint>("Camera Point")] },
-                { CameraAction.ZoomOffset, [new FloatOption("Offset", 0, -10, 10, 0.1f)] },
+                { CameraAction.ZoomOffset, [new FloatOption("Offset", 0, -10, 10, 0.1f), new FloatOption("Reverse direction?", 0, 0, 1, 1)] },
                 { CameraAction.ZoomTarget, [new FloatOption("Target", 0, -10, 10, 0.1f)] },
-                { CameraAction.RotOffset, [new FloatOption("Degrees", 0, -720, 720, 0.1f)] },
+                { CameraAction.RotOffset, [new FloatOption("Degrees", 0, -720, 720, 0.1f), new FloatOption("Reverse direction?", 0, 0, 1, 1)] },
                 { CameraAction.RotTarget, [new FloatOption("Degrees", 0, -720, 720, 0.1f)] },
-                { CameraAction.HorizontalOffset, [new FloatOption("Offset", 0, -10, 10, 0.1f)] },
+                { CameraAction.HorizontalOffset, [new FloatOption("Offset", 0, -10, 10, 0.1f), new FloatOption("Reverse direction?", 0, 0, 1, 1)] },
                 { CameraAction.HorizontalTarget, [new FloatOption("Target", 0, -10, 10, 0.1f)] },
                 {
                     CameraAction.CustomCameraTarget,
@@ -493,7 +515,7 @@ public partial class UbAnimateToolboxData
                 },
                 { CameraAction.EaseTime, [new FloatOption("Time (ms)", 0, 0, 5000, 1f)] },
                 { CameraAction.EaseMode, [new EnumStringOption<CameraEasing>("Easing")] },
-                { CameraAction.FOVTarget, [new FloatOption("Target (Degrees)", 60, 1, 180, 0.1f)] },
+                { CameraAction.FOVTarget, [new FloatOption("Target (Degrees)", 60, 1, 180, 0.1f), new FloatOption("Reverse direction?", 0, 0, 1, 1)] },
                 { CameraAction.FOVOffset, [new FloatOption("Offset (Degrees)", 0, -180, 180, 0.1f)] }
             }
            
@@ -525,6 +547,7 @@ public partial class UbAnimateToolboxData
     public static readonly Dictionary<CategoryType, CategoryInfo> CategoryTypeInfo = new()
     {
         { CategoryType.Camera, new CategoryInfo(typeof(CameraAction), "Type") },
+        { CategoryType.UNANIMATED, new CategoryInfo(typeof(UnanimatedAction), "Type") },
         { CategoryType.Character, new CategoryInfo(typeof(CharacterAction), "Type") },
         { CategoryType.Gameplay, new CategoryInfo(typeof(GameplayAction), "Type") },
         { CategoryType.StageScene, new CategoryInfo(typeof(StageSceneAction), "New Stage") },
