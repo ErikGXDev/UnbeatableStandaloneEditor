@@ -65,6 +65,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             if (editor != null)
                 editor.ShowSampleEditPopoverRequested += onShowSampleEditPopoverRequested;
+
+            Alpha = 1f;
         }
 
         private readonly Bindable<bool> contracted = new Bindable<bool>();
@@ -248,7 +250,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         Direction = FillDirection.Vertical,
                         AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(0, 10),
-                        Children = new[]
+                        Children = new Drawable[]
                         {
                             togglesCollection = new FillFlowContainer
                             {
@@ -261,13 +263,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             {
                                 Label = "Normal Bank",
                                 Items = HitSampleInfo.ALL_BANKS,
+                                Alpha = 0,
                             },
                             additionBank = new LabelledDropdown<string>(padded: false)
                             {
                                 Label = "Addition Bank",
                                 Items = HitSampleInfo.ALL_BANKS,
+                                Alpha = 0,
                             },
-                            createSampleSetContent(),
+                            //createSampleSetContent(),
                             volume = new IndeterminateSliderWithTextBoxInput<int>("Volume", new BindableInt(100)
                             {
                                 MinValue = DrawableHitObject.MINIMUM_SAMPLE_VOLUME,
@@ -406,10 +410,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 additionBank.Current.Value = !string.IsNullOrEmpty(commonAdditionBank) ? commonAdditionBank : "(multiple)";
 
                 bool anyAdditions = allRelevantSamples.Any(o => o.samples.Any(s => s.Name != HitSampleInfo.HIT_NORMAL));
-                if (anyAdditions)
+                /*if (anyAdditions)
                     additionBank.Show();
                 else
-                    additionBank.Hide();
+                    additionBank.Hide();*/
             }
 
             private void updateSampleSetState()
