@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.UMania;
 using osu.Game.Screens.Edit;
@@ -43,6 +44,8 @@ namespace osu.Game.Rulesets.UMania.Edit
         {
             string iconName = "Textures/" + iconType.ToString().ToKebabCase();
 
+            /*if (OverlayColourProvider.IsDiscrete && ForShow) iconName += "-d";*/
+
             lock (cachedTextures)
             {
                 if (!cachedTextures.TryGetValue(iconType, out var texture))
@@ -54,7 +57,9 @@ namespace osu.Game.Rulesets.UMania.Edit
                     }
 
                     texture = sharedTextureStore.Get(iconName)!;
-                    cachedTextures[iconType] = texture;
+                    
+                    /*if (!ForShow)*/
+                        cachedTextures[iconType] = texture;
                 }
 
                 Texture = texture;
@@ -63,15 +68,32 @@ namespace osu.Game.Rulesets.UMania.Edit
             Colour = Colour4.White;
             Blending = BlendingParameters.Inherit;
         }
+        
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public override bool UpdateSubTree()
         {
-            if (ForShow) return base.UpdateSubTree();
 
-            Colour = Colour4.White;
             Size = new Vector2(25);
             Blending = BlendingParameters.Inherit;
             X = 7;
+            
+            if (OverlayColourProvider.IsDiscrete)
+            {
+                if (ForShow)
+                {
+                    X = 9;
+                    Colour = colourProvider.Background2;
+                    Size = new Vector2(23);
+                    Blending = BlendingParameters.Additive;
+                }
+                else
+                {
+                    Colour = Colour4.White;
+                }
+            }
+            
             return base.UpdateSubTree();
         }
     }

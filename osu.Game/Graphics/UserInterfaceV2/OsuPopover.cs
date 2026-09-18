@@ -58,10 +58,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected override void PopIn()
         {
-            this.ScaleTo(1, scale_duration, Easing.OutElasticHalf);
+            var mult = OverlayColourProvider.IsDiscrete ? 0.7f : 1f;
+            var easing = OverlayColourProvider.IsDiscrete ? Easing.OutQuint : Easing.OutElasticHalf;
+            
+            this.ScaleTo(1, scale_duration * mult, easing);
             this.FadeIn(fade_duration, Easing.OutQuint);
 
-            samplePopIn?.Play();
+            if (!OverlayColourProvider.IsDiscrete)
+                samplePopIn?.Play();
             wasOpened = true;
         }
 

@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UMania.Objects.Drawables;
 using osu.Game.Rulesets.UMania.UI;
@@ -52,6 +53,12 @@ namespace osu.Game.Rulesets.UMania.Edit
                     Shadow = true,
                     ShadowColour = Colour4.Black
                 });
+            }
+
+            if (OverlayColourProvider.IsDiscrete)
+            {
+                labelText.Y = -40;
+                labelText.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
             }
 
             var is4Key = composer.Is4Key;

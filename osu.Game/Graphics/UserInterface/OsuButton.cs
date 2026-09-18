@@ -11,6 +11,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
 
@@ -75,6 +76,11 @@ namespace osu.Game.Graphics.UserInterface
 
         protected OsuButton(HoverSampleSet? hoverSounds = HoverSampleSet.Button)
         {
+            if (OverlayColourProvider.IsDiscrete)
+            {
+                hoverSounds = HoverSampleSet.Default;
+            }
+            
             Height = 40;
 
             AddInternal(Content = new Container
@@ -137,7 +143,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (Enabled.Value)
+            if (Enabled.Value && !OverlayColourProvider.IsDiscrete)
                 flashLayer.FadeOutFromOne(800, Easing.OutQuint);
 
             return base.OnClick(e);
@@ -149,9 +155,16 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (Enabled.Value)
             {
-                Hover.FadeTo(0.2f, 40, Easing.OutQuint)
-                     .Then()
-                     .FadeTo(HoverLayerFinalAlpha, 800, Easing.OutQuint);
+                if (OverlayColourProvider.IsDiscrete)
+                {
+                    Hover.FadeTo(HoverLayerFinalAlpha * 1.2f, 800, Easing.OutQuint);
+                }
+                else
+                {
+                    Hover.FadeTo(0.2f, 40, Easing.OutQuint)
+                         .Then()
+                         .FadeTo(HoverLayerFinalAlpha, 800, Easing.OutQuint);
+                }
             }
 
             return base.OnHover(e);
@@ -166,13 +179,15 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            Content.ScaleTo(0.9f, 4000, Easing.OutQuint);
+            if (!OverlayColourProvider.IsDiscrete)
+                Content.ScaleTo(0.9f, 4000, Easing.OutQuint);
             return base.OnMouseDown(e);
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            Content.ScaleTo(1, 1000, Easing.OutElastic);
+            if (!OverlayColourProvider.IsDiscrete)
+                Content.ScaleTo(1, 1000, Easing.OutElastic);
             base.OnMouseUp(e);
         }
 

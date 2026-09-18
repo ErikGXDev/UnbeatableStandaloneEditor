@@ -180,6 +180,9 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
             LocalConfig.SetValue(OsuSetting.EditorShowSpeedChanges, true);
         }
 
+        OverlayColourProvider.IsDiscrete = LocalConfig.Get<bool>(OsuSetting.EditorDiscrete);
+        Logger.Log("Is discrete: " + OverlayColourProvider.IsDiscrete);
+
         var maniaRuleset = UbRuleset.GetRulesetInfo();
         Ruleset.Value = maniaRuleset;
 

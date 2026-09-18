@@ -4,15 +4,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using NUnit.Framework.Constraints;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Overlays;
 using osu.Game.Screens.Edit;
 using osu.Game.Storyboards.Drawables;
 
@@ -47,6 +52,9 @@ namespace osu.Game.Screens.Backgrounds
             };
         }
 
+        private OverlayColourProvider aquamarine = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+        private OverlayColourProvider plum = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
@@ -60,8 +68,9 @@ namespace osu.Game.Screens.Backgrounds
 
         private IEnumerable<Drawable> createContent() =>
         [
-            new Background(@"Backgrounds/bg1") { RelativeSizeAxes = Axes.Both, },
-            new BeatmapBackground(beatmap.Value) { RelativeSizeAxes = Axes.Both, },
+            new Background(@"Backgrounds/bg1") { RelativeSizeAxes = Axes.Both, Alpha = OverlayColourProvider.IsDiscrete ? 0 : 1 },
+            (OverlayColourProvider.IsDiscrete ? new Box() { RelativeSizeAxes = Axes.Both, Colour = ColourInfo.GradientVertical(aquamarine.Background2, plum.Background1) } : new Box()),
+            new BeatmapBackground(beatmap.Value) { RelativeSizeAxes = Axes.Both },
             // one reason for this kooky container nesting being here is that the storyboard needs a custom clock
             // but also needs it on an isolated-enough level that doesn't break screen stack expiry logic (which happens if the clock was put on `this`),
             // or doesn't make it literally impossible to fade the storyboard in/out in real time (which happens if the fade transforms were to be applied directly to the storyboard).
@@ -87,11 +96,11 @@ namespace osu.Game.Screens.Backgrounds
 
         private void updateState(double duration = 500)
         {
-            storyboardContainer.FadeTo(showStoryboard.Value ? 1 : 0, duration, Easing.OutQuint);
-            background.FadeTo(showStoryboard.Value ? 1 : 0, duration, Easing.OutQuint);
+            storyboardContainer.FadeTo(showStoryboard.Value ? 1 : 0, duration, Easing.None);
+            background.FadeTo(showStoryboard.Value ? 1 : 0, duration, Easing.None);
             // yes, this causes overdraw, but is also a (crude) fix for bad-looking transitions on screen entry
             // caused by the previous background on the background stack poking out from under this one and then instantly fading out
-            background.FadeColour(beatmap.Value.Storyboard.ReplacesBackground && showStoryboard.Value ? Colour4.Black : Colour4.White, duration, Easing.OutQuint);
+            background.FadeColour(beatmap.Value.Storyboard.ReplacesBackground && showStoryboard.Value ? Colour4.Black : Colour4.White, duration, Easing.None);
         }
 
         public void ChangeClockSource(IFrameBasedClock frameBasedClock)

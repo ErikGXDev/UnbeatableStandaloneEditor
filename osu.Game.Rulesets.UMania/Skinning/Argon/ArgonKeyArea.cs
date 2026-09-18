@@ -12,6 +12,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.UMania.UI;
 using osu.Game.Screens.Play;
@@ -162,6 +163,11 @@ namespace osu.Game.Rulesets.UMania.Skinning.Argon
 
             // Yes, proxy everything.
             column.TopLevelContainer.Add(CreateProxy());
+
+            if (OverlayColourProvider.IsDiscrete)
+            {
+                bottomIcon.Alpha = 0;
+            }
         }
 
         private void onDirectionChanged(ValueChangedEvent<ScrollingDirection> direction)
@@ -195,32 +201,37 @@ namespace osu.Game.Rulesets.UMania.Skinning.Argon
                 .Then()
                 .FadeTo(0.8f, 500);
 
-            hitTargetLine.FadeColour(Color4.White, lighting_fade_in_duration, Easing.OutQuint);
-            hitTargetLine.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
+            
+            
+            if (!OverlayColourProvider.IsDiscrete)
             {
-                Type = EdgeEffectType.Glow,
-                Colour = lightingColour.Opacity(0.4f),
-                Radius = 20,
-            }, lighting_fade_in_duration, Easing.OutQuint);
-
-            topIcon.ScaleTo(0.9f, lighting_fade_in_duration, Easing.OutQuint);
-            topIcon.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Glow,
-                Colour = lightingColour.Opacity(0.1f),
-                Radius = 20,
-            }, lighting_fade_in_duration, Easing.OutQuint);
-
-            bottomIcon.FadeColour(Color4.White, lighting_fade_in_duration, Easing.OutQuint);
-
-            foreach (var circle in bottomIcon)
-            {
-                circle.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
+                hitTargetLine.FadeColour(Color4.White, lighting_fade_in_duration, Easing.OutQuint);
+                hitTargetLine.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
-                    Colour = lightingColour.Opacity(0.2f),
-                    Radius = 60,
+                    Colour = lightingColour.Opacity(0.4f),
+                    Radius = 20,
                 }, lighting_fade_in_duration, Easing.OutQuint);
+            
+                topIcon.ScaleTo(0.9f, lighting_fade_in_duration, Easing.OutQuint);
+                topIcon.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Colour = lightingColour.Opacity(0.1f),
+                    Radius = 20,
+                }, lighting_fade_in_duration, Easing.OutQuint);
+
+                bottomIcon.FadeColour(Color4.White, lighting_fade_in_duration, Easing.OutQuint);
+
+                foreach (var circle in bottomIcon)
+                {
+                    circle.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Glow,
+                        Colour = lightingColour.Opacity(0.2f),
+                        Radius = 60,
+                    }, lighting_fade_in_duration, Easing.OutQuint);
+                }
             }
 
             return false;
@@ -239,33 +250,38 @@ namespace osu.Game.Rulesets.UMania.Skinning.Argon
                       .Then()
                       .FadeOut(lighting_fade_out_duration, Easing.OutQuint);
 
-            topIcon.ScaleTo(1f, 200, Easing.OutQuint);
-            topIcon.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
+            if (!OverlayColourProvider.IsDiscrete)
             {
-                Type = EdgeEffectType.Glow,
-                Colour = lightingColour,
-                Radius = 20,
-            }, lighting_fade_out_duration, Easing.OutQuint);
-
-            hitTargetLine.FadeColour(OsuColour.Gray(196 / 255f), lighting_fade_out_duration, Easing.OutQuint);
-            hitTargetLine.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Glow,
-                Colour = lightingColour,
-                Radius = 25,
-            }, lighting_fade_out_duration, Easing.OutQuint);
-
-            bottomIcon.FadeColour(accentColour.Value, lighting_fade_out_duration, Easing.OutQuint);
-
-            foreach (var circle in bottomIcon)
-            {
-                circle.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
+                topIcon.ScaleTo(1f, 200, Easing.OutQuint);
+                topIcon.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
                     Colour = lightingColour,
-                    Radius = 30,
+                    Radius = 20,
                 }, lighting_fade_out_duration, Easing.OutQuint);
+            
+                hitTargetLine.FadeColour(OsuColour.Gray(196 / 255f), lighting_fade_out_duration, Easing.OutQuint);
+                
+                hitTargetLine.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Colour = lightingColour,
+                    Radius = 25,
+                }, lighting_fade_out_duration, Easing.OutQuint);
+                
+                bottomIcon.FadeColour(accentColour.Value, lighting_fade_out_duration, Easing.OutQuint);
+
+                foreach (var circle in bottomIcon)
+                {
+                    circle.TransformTo(nameof(EdgeEffect), new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Glow,
+                        Colour = lightingColour,
+                        Radius = 30,
+                    }, lighting_fade_out_duration, Easing.OutQuint);
+                }
             }
+            
         }
 
         private Color4 getLightingColour() => Interpolation.ValueAt(0.2f, accentColour.Value, Color4.White, 0, 1);

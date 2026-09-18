@@ -23,6 +23,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Composition
             this.Icon = icon;
         }
 
-        public override Drawable CreateIcon() => new UbIcon(Icon);
+        public override Drawable CreateIcon() => new UbIcon(Icon) { ForShow = true };
     }
 }

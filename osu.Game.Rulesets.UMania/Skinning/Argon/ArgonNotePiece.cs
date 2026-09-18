@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.UMania.Skinning.Argon
             CornerRadius = CORNER_RADIUS;
             Masking = true;
 
-            InternalChildren = new[]
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.UMania.Skinning.Argon
                     RelativeSizeAxes = Axes.X,
                     Height = CORNER_RADIUS * 2,
                 },
-                CreateIcon(),
+                //CreateIcon(),
             };
         }
 

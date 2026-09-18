@@ -4,8 +4,11 @@
 #nullable disable
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -24,6 +27,21 @@ namespace osu.Game.Graphics.Backgrounds
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore textures)
         {
+
+            if (OverlayColourProvider.IsDiscrete)
+            {
+                var overlayColour = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
+                AddInternal(new Box()
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = overlayColour.Background2,
+                    Alpha = 1f,
+                });
+
+                Sprite.Alpha = 0;
+            }
+            
+            
             Sprite.Texture = Beatmap?.GetBackground() ?? textures.Get(fallbackTextureName);
         }
 

@@ -11,6 +11,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -115,6 +116,11 @@ namespace osu.Game.Rulesets.UMania.UI
 
             BackgroundContainer.Add(background);
             TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
+
+            if (OverlayColourProvider.IsDiscrete)
+            {
+                HitObjectArea.Explosions.Alpha = 0f;
+            }
 
             RegisterPool<Note, DrawableNote>(10, 50);
             RegisterPool<HoldNote, DrawableHoldNote>(10, 50);

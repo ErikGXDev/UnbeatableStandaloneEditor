@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -46,7 +47,8 @@ namespace osu.Game.Graphics.Cursor
                 if (IsPresent)
                 {
                     AutoSizeDuration = 250;
-                    background.FlashColour(OsuColour.Gray(0.4f), 1000, Easing.OutQuint);
+                    if (!OverlayColourProvider.IsDiscrete)
+                        background.FlashColour(OsuColour.Gray(0.4f), 1000, Easing.OutQuint);
                 }
                 else
                     AutoSizeDuration = 0;

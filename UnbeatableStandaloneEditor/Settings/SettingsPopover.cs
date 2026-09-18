@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -140,6 +141,14 @@ public partial class SettingsPopover : OsuPopover
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.Editor60msOffset),
                                     Margin = new MarginPadding { Bottom = 10 },
                                 },
+                                new TooltipCheckbox()
+                                {
+                                    LabelText = "Discrete user interface",
+                                    TooltipText = "Make the editor less shiny and visually overwhelming. Removes most animations, sound effects and decorations from the user interface.",
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = osuConfig.GetBindable<bool>(OsuSetting.EditorDiscrete),
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                }
                                 /*new TooltipCheckbox()
                                 {
                                     LabelText = "Use old update button",
@@ -299,6 +308,12 @@ public partial class SettingsPopover : OsuPopover
 
             editorConfig.SetValue(EditorSetting.ShowSystemCursor, e.NewValue);
         };
+
+        osuConfig.GetBindable<bool>(OsuSetting.EditorDiscrete).BindValueChanged(e =>
+        {
+            OverlayColourProvider.IsDiscrete = e.NewValue;
+            Logger.Log("Is discrete: " + OverlayColourProvider.IsDiscrete);
+        }, true);
 
         Add(new Container
         {

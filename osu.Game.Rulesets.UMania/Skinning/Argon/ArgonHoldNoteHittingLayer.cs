@@ -4,6 +4,7 @@
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Game.Overlays;
 using osuTK.Graphics;
 using Box = osu.Framework.Graphics.Shapes.Box;
 
@@ -32,12 +33,20 @@ namespace osu.Game.Rulesets.UMania.Skinning.Argon
 
             IsHitting.BindValueChanged(hitting =>
             {
-                const float animation_length = 80;
+                
+                float animation_length = 80;
 
                 ClearTransforms();
 
                 if (hitting.NewValue)
                 {
+                    if (OverlayColourProvider.IsDiscrete)
+                    {
+                        this.FadeTo(0.5f, animation_length, Easing.OutQuint);
+                        return;
+                    }
+                    
+                    
                     // wait for the next sync point
                     double synchronisedOffset = animation_length * 2 - Time.Current % (animation_length * 2);
 

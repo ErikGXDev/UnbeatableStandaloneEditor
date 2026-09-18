@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Audio;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -40,7 +41,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override void PlayHoverSample()
         {
-            if (!Enabled.Value)
+            if (!Enabled.Value || OverlayColourProvider.IsDiscrete)
                 return;
 
             SamplePlaybackHelper.PlayWithRandomPitch(sampleHover, pitchVariation: 0.02);

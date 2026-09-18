@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Graphics.Cursor
@@ -64,6 +65,8 @@ namespace osu.Game.Graphics.Cursor
             tapSample = audio.Samples.Get(@"UI/cursor-tap");
 
             Add(mouseInputDetector = new MouseInputDetector());
+
+            Alpha = 0;
         }
 
         [Resolved]
@@ -236,11 +239,13 @@ namespace osu.Game.Graphics.Cursor
 
         private void playTapSample(double baseFrequency = 1f)
         {
+            
             const float random_range = 0.02f;
             SampleChannel channel = tapSample.GetChannel();
 
             // Scale to [-0.75, 0.75] so that the sample isn't fully panned left or right (sounds weird)
-            channel.Balance.Value = ((activeCursor.X / DrawWidth) * 2 - 1) * OsuGameBase.SFX_STEREO_STRENGTH;
+            if (!OverlayColourProvider.IsDiscrete)
+                channel.Balance.Value = ((activeCursor.X / DrawWidth) * 2 - 1) * OsuGameBase.SFX_STEREO_STRENGTH;
             channel.Frequency.Value = baseFrequency - (random_range / 2f) + RNG.NextDouble(random_range);
             channel.Volume.Value = baseFrequency;
 

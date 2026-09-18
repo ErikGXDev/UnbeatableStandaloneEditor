@@ -12,6 +12,8 @@ namespace osu.Game.Overlays
         /// </summary>
         public int Hue { get; private set; }
 
+        public static bool IsDiscrete = false;
+
         public OverlayColourProvider(OverlayColourScheme colourScheme)
             : this(colourScheme.GetHue())
         {
