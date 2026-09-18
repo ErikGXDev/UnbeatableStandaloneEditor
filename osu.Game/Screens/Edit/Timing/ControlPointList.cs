@@ -77,6 +77,7 @@ namespace osu.Game.Screens.Edit.Timing
                                 new RoundedButton
                                 {
                                     Text = "Select closest to current time",
+                                    BackgroundColour = colourProvider.Background4,
                                     Action = SelectClosestTimingPoint,
                                     Size = new Vector2(220, 30),
                                     Anchor = Anchor.CentreLeft,
