@@ -442,8 +442,39 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
         }
 
 
+        PlayfieldToolbox.OfType<FillFlowContainer>().Single().AddRange(new Drawable[]
+        {
+            new DrawableTernaryButton
+            {
+                Current = SettingShowAllowedColumns,
+                Description = "Use column hints",
+                CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Lightbulb },
+            },
+            new DrawableTernaryButton
+            {
+                Current = SettingShowPlacementOrder,
+                Description = "Placement order",
+                Alpha = 0, // Just hide for now
+                CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Circle },
+            },
+            new DrawableTernaryButton
+            {
+                Current = SettingShowPreview,
+                Description = "Show preview",
+                CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Tv },
+            },
+            new DrawableTernaryButton
+            {
+                Current = SettingUseKeyCharting,
+                Description = "Key-based charting",
+                TooltipText = "Press 1-6 to place notes in the corresponding column, similar to the official editor.\nHold a key and scroll to create hold notes.\nUse Shift to place a Dodge, Double or Zoom note (depending on the column).\nModifier buttons (Q-P) still apply to placed notes.\n(Experimental!)",
+                CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Keyboard },
+            }
+        });
 
-        LeftToolbox.Add(new EditorToolboxGroup("unbeatable")
+        PlayfieldToolbox.Expanded.Value = false;
+
+        /*LeftToolbox.Add(new EditorToolboxGroup("unbeatable")
         {
             Child = new FillFlowContainer
             {
@@ -453,35 +484,11 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
                 Spacing = new Vector2(0, 5),
                 Children =
                 [
-                    new DrawableTernaryButton
-                    {
-                        Current = SettingShowAllowedColumns,
-                        Description = "Use column hints",
-                        CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Lightbulb },
-                    },
-                    new DrawableTernaryButton
-                    {
-                        Current = SettingShowPlacementOrder,
-                        Description = "Placement order",
-                        Alpha = 0, // Just hide for now
-                        CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Circle },
-                    },
-                    new DrawableTernaryButton
-                    {
-                        Current = SettingShowPreview,
-                        Description = "Show preview",
-                        CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Tv },
-                    },
-                    new DrawableTernaryButton
-                    {
-                        Current = SettingUseKeyCharting,
-                        Description = "Key-based charting",
-                        TooltipText = "Press 1-6 to place notes in the corresponding column, similar to the official editor.\nHold a key and scroll to create hold notes.\nUse Shift to place a Dodge, Double or Zoom note (depending on the column).\nModifier buttons (Q-P) still apply to placed notes.\n(Experimental!)",
-                        CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Keyboard },
-                    }
+                  
                 ]
             },
         });
+        */
 
         RightToolbox.Add(new UbPlacementToolbox());
         

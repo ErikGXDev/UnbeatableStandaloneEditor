@@ -41,12 +41,14 @@ namespace osu.Game.Rulesets.Edit
         {
         }
 
+        protected EditorToolboxGroup PlayfieldToolbox;
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             if (DrawableRuleset is ISupportConstantAlgorithmToggle toggleRuleset)
             {
-                LeftToolbox.Add(new EditorToolboxGroup("playfield")
+                LeftToolbox.Add(PlayfieldToolbox = new EditorToolboxGroup("quick settings")
                 {
                     Child = new FillFlowContainer
                     {
@@ -65,7 +67,7 @@ namespace osu.Game.Rulesets.Edit
                         }
                     },
                 });
-
+                
                 configShowSpeedChanges = config.GetBindable<bool>(OsuSetting.EditorShowSpeedChanges);
                 configShowSpeedChanges.BindValueChanged(enabled => showSpeedChanges.Value = enabled.NewValue ? TernaryState.True : TernaryState.False, true);
 
