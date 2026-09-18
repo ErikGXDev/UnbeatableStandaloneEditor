@@ -3,9 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Logging;
 using osu.Game.Audio;
-using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
@@ -42,6 +40,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
         {
             hitObject = newHitObject;
         }
+        
+        public HitObject GetHitObject() => hitObject;
 
         static bool isModActive(DrawableTernaryButton modButton)
         {
