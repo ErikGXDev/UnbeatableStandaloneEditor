@@ -380,6 +380,38 @@ public partial class UbAnimateToolboxData
             return (textBox, bindable);
         }
     }
+
+    public class IntCheckboxOption : BaseOption<Bindable<int>>
+    {
+        public int DefaultValue { get; set; }
+        
+        public IntCheckboxOption(string label, int defaultValue)
+        {
+            Label = label;
+            DefaultValue = defaultValue;
+        }
+        
+        public override (Drawable, IBindable) CreateDrawableAndBindable(Action? onValueChanged)
+        {
+            var bindable = new Bindable<int>(DefaultValue);
+            
+            var boolBindable = new Bindable<bool>(DefaultValue == 1 ? true : false);
+            
+            boolBindable.BindValueChanged(v =>
+            {
+                bindable.Value = v.NewValue ? 1 : 0;
+                onValueChanged?.Invoke();
+            });
+            
+            var checkbox = new FormCheckBox()
+            {
+                Caption = Label,
+                Current = boolBindable,
+            };
+            
+            return (checkbox, bindable);
+        }
+    }
     
     
     // An option that represents an enum by having the dropdown items be the enum values as strings
@@ -497,13 +529,13 @@ public partial class UbAnimateToolboxData
         {
             CategoryType.Camera, new Dictionary<Enum, List<BaseOption>>
             {
-                { CameraAction.Reset, [new FloatOption("Position Only?", 0, 0, 1, 1)] },
+                { CameraAction.Reset, [new IntCheckboxOption("Position Only?", 0)] },
                 { CameraAction.CameraTarget, [new EnumStringOption<CameraPoint>("Camera Point")] },
-                { CameraAction.ZoomOffset, [new FloatOption("Offset", 0, -10, 10, 0.1f), new FloatOption("Reverse direction?", 0, 0, 1, 1)] },
+                { CameraAction.ZoomOffset, [new FloatOption("Offset", 0, -10, 10, 0.1f), new IntCheckboxOption("Reversed?", 0)] },
                 { CameraAction.ZoomTarget, [new FloatOption("Target", 0, -10, 10, 0.1f)] },
-                { CameraAction.RotOffset, [new FloatOption("Degrees", 0, -720, 720, 0.1f), new FloatOption("Reverse direction?", 0, 0, 1, 1)] },
+                { CameraAction.RotOffset, [new FloatOption("Degrees", 0, -720, 720, 0.1f), new IntCheckboxOption("Reversed?", 0)] },
                 { CameraAction.RotTarget, [new FloatOption("Degrees", 0, -720, 720, 0.1f)] },
-                { CameraAction.HorizontalOffset, [new FloatOption("Offset", 0, -10, 10, 0.1f), new FloatOption("Reverse direction?", 0, 0, 1, 1)] },
+                { CameraAction.HorizontalOffset, [new FloatOption("Offset", 0, -10, 10, 0.1f), new IntCheckboxOption("Reversed?", 0)] },
                 { CameraAction.HorizontalTarget, [new FloatOption("Target", 0, -10, 10, 0.1f)] },
                 {
                     CameraAction.CustomCameraTarget,
@@ -515,10 +547,9 @@ public partial class UbAnimateToolboxData
                 },
                 { CameraAction.EaseTime, [new FloatOption("Time (ms)", 0, 0, 5000, 1f)] },
                 { CameraAction.EaseMode, [new EnumStringOption<CameraEasing>("Easing")] },
-                { CameraAction.FOVTarget, [new FloatOption("Target (Degrees)", 60, 1, 180, 0.1f), new FloatOption("Reverse direction?", 0, 0, 1, 1)] },
-                { CameraAction.FOVOffset, [new FloatOption("Offset (Degrees)", 0, -180, 180, 0.1f)] }
+                { CameraAction.FOVTarget, [new FloatOption("Target (Degrees)", 60, 1, 180, 0.1f)] },
+                { CameraAction.FOVOffset, [new FloatOption("Offset (Degrees)", 0, -180, 180, 0.1f), new IntCheckboxOption("Reversed?", 0)] }
             }
-           
         },
         {
             CategoryType.Character, new Dictionary<Enum, List<BaseOption>>
@@ -530,15 +561,15 @@ public partial class UbAnimateToolboxData
         {
             CategoryType.Gameplay, new Dictionary<Enum, List<BaseOption>>
             {
-                { GameplayAction.ScreenShake, [new FloatOption("Enabled?", 1, 0, 1, 1f)] },
-                { GameplayAction.ScreenRot, [new FloatOption("Enabled?", 1, 0, 1, 1f)] },
-                { GameplayAction.ScreenZoom, [new FloatOption("Enabled?", 1, 0, 1, 1f)] }
+                { GameplayAction.ScreenShake, [new IntCheckboxOption("Enabled?", 1)] },
+                { GameplayAction.ScreenRot, [new IntCheckboxOption("Enabled?", 1)] },
+                { GameplayAction.ScreenZoom, [new IntCheckboxOption("Enabled?", 1)] }
             }
         },
         {
             CategoryType.UI, new Dictionary<Enum, List<BaseOption>>
             {
-                { UIAction.ForceLockedUI, [new FloatOption("Enabled?", 1, 0, 1, 1f)] }
+                { UIAction.ForceLockedUI, [new IntCheckboxOption("Enabled?", 1)] }
             }
         }
         

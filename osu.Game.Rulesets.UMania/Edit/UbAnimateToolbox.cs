@@ -264,6 +264,7 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
                 
                 parameterContainer.Add(checkbox = new FormCheckBox()
                 {
+                    Margin = new MarginPadding() { Top = 3 },
                     Current = UbAnimateToolboxData.FloatOption.UseTextBox,
                     Caption = "Disable number limits"
                 });
