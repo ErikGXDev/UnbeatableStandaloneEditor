@@ -24,6 +24,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Framework.Testing;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Rulesets.UMania.Edit.Preview;
 using osuTK;
 using osuTK.Input;
@@ -41,6 +42,10 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
     [Resolved] private OsuConfigManager config { get; set; } = null!;
     
     [Resolved] private BindableBeatDivisor beatDivisor { get; set; } = null!;
+    
+    [Resolved] private Editor editor { get; set; } = null!;
+    
+    [Resolved] private OsuColour colours { get; set; } = null!;
 
     public bool Is4Key => config.Get<bool>(OsuSetting.Editor4KeyMode);
     
@@ -76,7 +81,7 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
         {
             Anchor = Anchor.TopCentre,
             Origin = Anchor.TopCentre,
-            Y = 20,
+            Y = 40,
             AutoSizeAxes = Axes.Both,
             Alpha = EditorBeatmap.HasTiming.Value ? 0 : 1,
             Children = new Drawable[]
@@ -106,7 +111,7 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
                             Size = new Vector2(24),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Colour = Colour4.Orange,
+                            Colour = colours.Orange3,
                         },
                         new SpriteText
                         {
@@ -119,11 +124,24 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
                         new SpriteText
                         {
                             Text = "Go to the timing tab to add one",
-                            Font = OsuFont.GetFont(size: 13),
+                            Font = OsuFont.GetFont(size: 14),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Colour = Colour4.White.Opacity(0.8f),
                         },
+                        new RoundedButton()
+                        {
+                            Text = "Go to timing",
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Size = new Vector2(120, 30),
+                            Margin = new MarginPadding() { Top = 5 },
+                            BackgroundColour = colours.Orange3,
+                            Action = () =>
+                            {
+                                editor.Mode.Value = EditorScreenMode.Timing;
+                            },
+                        }
                     },
                 },
             },

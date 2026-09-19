@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
@@ -26,6 +27,8 @@ namespace osu.Game.Screens.Edit.Timing
         private Container controls = null!;
         private OsuButton deleteButton = null!;
         private RoundedButton addButton = null!;
+        
+        private OsuSpriteText noTimingPointsText = null!;
 
         [Resolved]
         private EditorClock clock { get; set; } = null!;
@@ -51,6 +54,16 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     RelativeSizeAxes = Axes.Both,
                     Groups = { BindTarget = Beatmap.ControlPointInfo.Groups, },
+                },
+                noTimingPointsText = new OsuSpriteText()
+                {
+                    Text = "No timing points yet.\nPress \"Add at current time\" to add one.",
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Y = -220,
+                    Colour = colourProvider.Background1,
+                    Alpha = 0,
+                    Font = OsuFont.Default.With(size: 16, weight: FontWeight.SemiBold),
                 },
                 controls = new Container
                 {
@@ -171,6 +184,11 @@ namespace osu.Game.Screens.Edit.Timing
                 addButton.Text = selected.NewValue != null
                     ? "+ Add to current time"
                     : "+ Add at current time";
+            }, true);
+            
+            Beatmap.HasTiming.BindValueChanged(hasTiming =>
+            {
+                noTimingPointsText.Alpha = hasTiming.NewValue ? 0 : 1;
             }, true);
         }
 
