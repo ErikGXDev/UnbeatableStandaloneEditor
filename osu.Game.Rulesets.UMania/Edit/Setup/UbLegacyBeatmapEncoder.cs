@@ -191,13 +191,13 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             foreach (var b in beatmap.HitObjects)
             {
                 int? xPos = null;
-                float? endTime = null;
+                int? endTime = null;
                 
                 if (b is IHasXPosition hasXPosition)
                     xPos = (int)hasXPosition.X;
 
                 if (b is IHasDuration hasDuration)
-                    endTime = (float)hasDuration.EndTime;
+                    endTime = (int)hasDuration.EndTime;
                 
                 if (xPos == null)
                     continue;
@@ -237,7 +237,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     
                     // Write the event line
                     var stringBuilder = new StringBuilder();
-                    stringBuilder.Append($"{category},{(float)b.StartTime}");
+                    stringBuilder.Append($"{category},{(int)b.StartTime}");
                     if (endTime != null)
                         stringBuilder.Append($",{endTime}");
                     stringBuilder.Append($",{type}");
