@@ -3,10 +3,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -23,6 +25,9 @@ public partial class BeatmapSetRow : OsuClickableContainer
     private readonly BeatmapSetInfo set;
     private readonly Bindable<BeatmapSetInfo?> selectedSet;
 
+    [Resolved]
+    private BeatmapManager beatmapManager { get; set; } = null!;
+
     private Box selectionOverlay = null!;
     private Box hoverOverlay = null!;
     private Box leftAccent = null!;
@@ -34,11 +39,6 @@ public partial class BeatmapSetRow : OsuClickableContainer
         this.set = set;
         this.selectedSet = selectedSet;
         this.doubleClick = doubleClick;
-
-        RelativeSizeAxes = Axes.X;
-        Height = 56;
-        Masking = true;
-        CornerRadius = 5;
     }
 
     [BackgroundDependencyLoader]
@@ -48,9 +48,56 @@ public partial class BeatmapSetRow : OsuClickableContainer
 
         Action = () => selectedSet.Value = set;
 
+        RelativeSizeAxes = Axes.X;
+        Height = 56;
+        Masking = true;
+        CornerRadius = 5;
+
         Children =
         [
             new Box { RelativeSizeAxes = Axes.Both, Colour = colours.Background3 },
+            new Container
+            {
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+                Width = 0.42f,
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 55,
+                        Origin = Anchor.CentreLeft,
+                        Anchor = Anchor.CentreLeft,
+                        CornerRadius = 5,
+                        Masking = true,
+                        Child = new BeatmapBackgroundSprite(beatmapManager.GetWorkingBeatmap(set.Beatmaps.FirstOrDefault()))
+                        {
+                            Y = -4,
+                            RelativeSizeAxes = Axes.Both,
+                            Origin = Anchor.CentreLeft,
+                            FillMode = FillMode.Fill,
+                            Alpha = 1f,
+                            AlwaysPresent = true,
+                        }
+                    },
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black.Opacity(0.08f),
+                        AlwaysPresent = true,
+                        Scale = new Vector2(1.05f)
+                    },
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = ColourInfo.GradientHorizontal(colours.Background3, colours.Background3.Opacity(0)),
+                        AlwaysPresent = true,
+                        Scale = new Vector2(1.05f)
+                    },
+                }
+            },
             selectionOverlay = new Box
             {
                 RelativeSizeAxes = Axes.Both,
@@ -88,12 +135,12 @@ public partial class BeatmapSetRow : OsuClickableContainer
                     [
                         new OsuSpriteText
                         {
-                            Text = $"{set.Metadata.Artist} \u2014 {set.Metadata.Title}",
+                            Text = $"{set.Metadata.Artist} \u2014 {set.Metadata.Title}".Truncate(250),
                             Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold),
                         },
                         new OsuSpriteText
                         {
-                            Text = $"by {set.Metadata.Author.Username}  \u2022  {diffLabel}  \u2022  {HumanizerUtils.Humanize(set.DateAdded)}",
+                            Text = $"by {set.Metadata.Author.Username}  \u2022  {diffLabel}  \u2022  {HumanizerUtils.Humanize(set.DateAdded)}".Truncate(250),
                             Font = OsuFont.GetFont(size: 14),
                             Alpha = 0.55f,
                         }
