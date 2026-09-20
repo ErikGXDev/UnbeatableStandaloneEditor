@@ -27,10 +27,13 @@ public partial class BeatmapSetRow : OsuClickableContainer
     private Box hoverOverlay = null!;
     private Box leftAccent = null!;
 
-    public BeatmapSetRow(BeatmapSetInfo set, Bindable<BeatmapSetInfo?> selectedSet)
+    private Action doubleClick = null!;
+
+    public BeatmapSetRow(BeatmapSetInfo set, Bindable<BeatmapSetInfo?> selectedSet, Action doubleClick)
     {
         this.set = set;
         this.selectedSet = selectedSet;
+        this.doubleClick = doubleClick;
 
         RelativeSizeAxes = Axes.X;
         Height = 56;
@@ -123,6 +126,13 @@ public partial class BeatmapSetRow : OsuClickableContainer
     {
         hoverOverlay.FadeOut(60);
         base.OnHoverLost(e);
+    }
+
+    protected override bool OnDoubleClick(DoubleClickEvent e)
+    {
+        selectedSet.Value = set;
+        doubleClick.Invoke();
+        return base.OnDoubleClick(e);
     }
 
     protected override void Dispose(bool isDisposing)

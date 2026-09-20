@@ -296,7 +296,7 @@ public partial class BeatmapPickerScreen : OsuScreen
             firstSet ??= detached;
             if (prevId.HasValue && detached.ID == prevId.Value)
                 newSelection = detached;
-            setsFlow.Add(new BeatmapSetRow(detached, selectedSet));
+            setsFlow.Add(new BeatmapSetRow(detached, selectedSet, openEditor));
         }
 
         // If nothing was previously selected (e.g. first beatmap just created),
