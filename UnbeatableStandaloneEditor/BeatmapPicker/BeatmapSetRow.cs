@@ -7,9 +7,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -66,10 +67,14 @@ public partial class BeatmapSetRow : OsuClickableContainer
         Masking = true;
         CornerRadius = 5;
 
+        var working = beatmapManager.GetWorkingBeatmap(set.Beatmaps.FirstOrDefault());
+        var background = working.GetBackground();
+        var hasBackground = background != null;
+
         Children =
         [
             new Box { RelativeSizeAxes = Axes.Both, Colour = colours.Background3 },
-            new Container
+            hasBackground ? new Container
             {
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
@@ -85,7 +90,7 @@ public partial class BeatmapSetRow : OsuClickableContainer
                         Anchor = Anchor.CentreLeft,
                         CornerRadius = 5,
                         Masking = true,
-                        Child = new BeatmapBackgroundSprite(beatmapManager.GetWorkingBeatmap(set.Beatmaps.FirstOrDefault()))
+                        Child = new RowBackgroundSprite(background)
                         {
                             Y = -4,
                             RelativeSizeAxes = Axes.Both,
@@ -110,7 +115,7 @@ public partial class BeatmapSetRow : OsuClickableContainer
                         Scale = new Vector2(1.05f)
                     },
                 }
-            },
+            } : Empty(),
             selectionOverlay = new Box
             {
                 RelativeSizeAxes = Axes.Both,
@@ -194,5 +199,23 @@ public partial class BeatmapSetRow : OsuClickableContainer
         base.Dispose(isDisposing);
         if (isDisposing)
             selectedSet.ValueChanged -= onSelectionChanged;
+    }
+
+    public partial class RowBackgroundSprite : Sprite
+    {
+        private readonly Texture texture;
+
+        public RowBackgroundSprite(Texture texture)
+        {
+            ArgumentNullException.ThrowIfNull(texture);
+
+            this.texture = texture;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Texture = texture;
+        }
     }
 }
