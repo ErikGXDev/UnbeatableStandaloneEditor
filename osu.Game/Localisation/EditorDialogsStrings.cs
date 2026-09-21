@@ -25,9 +25,9 @@ namespace osu.Game.Localisation
         public static LocalisableString CreateCopy => new TranslatableString(getKey(@"create_copy"), @"No, create an exact copy of this difficulty");
 
         /// <summary>
-        /// "I changed my mind, I want to keep editing this difficulty"
+        /// "Actually, I want to keep editing this difficulty"
         /// </summary>
-        public static LocalisableString KeepEditing => new TranslatableString(getKey(@"keep_editing"), @"I changed my mind, I want to keep editing this difficulty");
+        public static LocalisableString KeepEditing => new TranslatableString(getKey(@"keep_editing"), @"Actually, I want to keep editing this difficulty");
 
         /// <summary>
         /// "Did you want to save your changes?"
