@@ -155,6 +155,7 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
         };
         PlayfieldContentContainer.Add(keyBasedChartingHandler);
 
+        // Key-based charting
         KeyBasedCharting = config.GetBindable<bool>(OsuSetting.EditorKeyBasedCharting);
         KeyBasedCharting.BindValueChanged(v =>
         {
@@ -177,6 +178,22 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
         }, true);
 
         SettingUseKeyCharting.BindValueChanged(v => KeyBasedCharting.Value = v.NewValue == TernaryState.True);
+
+        // Column hints
+        var columnHints = config.GetBindable<bool>(OsuSetting.EditorColumnHints);
+        columnHints.BindValueChanged(v =>
+        {
+            SettingShowAllowedColumns.Value = v.NewValue ? TernaryState.True : TernaryState.False;
+        }, true);
+        SettingShowAllowedColumns.BindValueChanged(v => columnHints.Value = v.NewValue == TernaryState.True);
+        
+        // Show preview
+        var showPreview = config.GetBindable<bool>(OsuSetting.EditorShowPreview);
+        showPreview.BindValueChanged(v =>
+        {
+            SettingShowPreview.Value = v.NewValue ? TernaryState.True : TernaryState.False;
+        }, true);
+        SettingShowPreview.BindValueChanged(v => showPreview.Value = v.NewValue == TernaryState.True);
 
         hasTimingHandler = hasTiming =>
         {
