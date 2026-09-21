@@ -138,7 +138,7 @@ namespace osu.Game.Graphics.UserInterface
                                         new TrianglesV2
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Alpha = 0.1f,
+                                            Alpha = 0.08f,
                                             Velocity = 0.7f,
                                             Blending = BlendingParameters.Additive,
                                             Shear = -OsuGame.SHEAR,
