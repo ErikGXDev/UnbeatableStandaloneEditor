@@ -225,6 +225,46 @@ public partial class BeatmapPickerScreen : OsuScreen
             deleteButton.Enabled.Value = has;
         }, true);
 
+        // Load all the beatmap sets
+        realm.RegisterForNotifications(
+            r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending),
+            (sets, _) =>
+            {
+
+                if (this.IsCurrentScreen())
+                    buildFlowFromSets(sets.ToList());
+            }
+        );
+
+        sortByButton.CurrentSortMode.BindValueChanged(v =>
+        {
+            rebuildBeatmapList();
+        });
+    }
+
+    public override void OnEntering(ScreenTransitionEvent e)
+    {
+        base.OnEntering(e);
+
+        checkForUpdates();
+    }
+
+    public override void OnResuming(ScreenTransitionEvent e)
+    {
+        base.OnResuming(e);
+
+        checkForUpdates();
+    }
+
+    private double lastUpdateCheckTime = double.NegativeInfinity;
+
+    private void checkForUpdates()
+    {
+        if (Time.Current - lastUpdateCheckTime < 300000 * 5) // 25 minutes
+            return;
+
+        lastUpdateCheckTime = Time.Current;
+
         // Check for updates asynchronously
         Task.Run(async () =>
         {
@@ -233,6 +273,7 @@ public partial class BeatmapPickerScreen : OsuScreen
             {
                 Schedule(() =>
                 {
+                    updateButton?.Expire();
                     updateButton = new UpdateButton()
                     {
                         Action = () => openUpdateRelease(update),
@@ -245,20 +286,6 @@ public partial class BeatmapPickerScreen : OsuScreen
                     });
                 });
             }
-        });
-
-        // Load all the beatmap sets
-        realm.RegisterForNotifications(
-            r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending),
-            (sets, _) =>
-            {
-                buildFlowFromSets(sets.ToList());
-            }
-        );
-
-        sortByButton.CurrentSortMode.BindValueChanged(v =>
-        {
-            rebuildBeatmapList();
         });
     }
 
