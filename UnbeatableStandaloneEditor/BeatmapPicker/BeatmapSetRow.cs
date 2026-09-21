@@ -1,5 +1,6 @@
 using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -41,12 +42,24 @@ public partial class BeatmapSetRow : OsuClickableContainer
         this.doubleClick = doubleClick;
     }
 
+    private double lastClickTime;
+
     [BackgroundDependencyLoader]
     private void load(OverlayColourProvider colours)
     {
         string diffLabel = set.Beatmaps.Count == 1 ? "1 difficulty" : $"{set.Beatmaps.Count} difficulties";
 
-        Action = () => selectedSet.Value = set;
+        Action = () =>
+        {
+            selectedSet.Value = set;
+
+            if (Time.Current - lastClickTime < 200)
+            {
+                //doubleClick.Invoke();
+            }
+
+            lastClickTime = Time.Current;
+        };
 
         RelativeSizeAxes = Axes.X;
         Height = 56;
@@ -150,6 +163,7 @@ public partial class BeatmapSetRow : OsuClickableContainer
         ];
     }
 
+
     protected override void LoadComplete()
     {
         base.LoadComplete();
@@ -173,13 +187,6 @@ public partial class BeatmapSetRow : OsuClickableContainer
     {
         hoverOverlay.FadeOut(60);
         base.OnHoverLost(e);
-    }
-
-    protected override bool OnDoubleClick(DoubleClickEvent e)
-    {
-        selectedSet.Value = set;
-        doubleClick.Invoke();
-        return base.OnDoubleClick(e);
     }
 
     protected override void Dispose(bool isDisposing)
