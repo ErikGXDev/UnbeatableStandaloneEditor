@@ -56,7 +56,30 @@ class Program
                 {
                     string fileName = Path.GetFileName(file);
                     string targetFilePath = Path.Combine(targetDirectory, fileName);
-                    File.Copy(file, targetFilePath, true);
+
+                    const int maxAttempts = 10;
+                    int attempt = 0;
+                    bool copied = false;
+
+                    while (!copied && attempt < maxAttempts)
+                    {
+                        try
+                        {
+                            File.Copy(file, targetFilePath, true);
+                            copied = true;
+                        }
+                        catch (IOException ex)
+                        {
+                            attempt++;
+                            Thread.Sleep(200 * attempt);
+
+                            if (attempt >= maxAttempts)
+                            {
+                                var errorContents = $"Failed to copy '{file}' to '{targetFilePath}' after {maxAttempts} attempts: {ex}";
+                                throw new Exception(errorContents);
+                            }
+                        }
+                    }
                 }
 
                 string targetExecutablePath = Path.Combine(targetDirectory, Updater.GetExecutableName());
@@ -86,7 +109,9 @@ class Program
         }
         catch (Exception ex)
         {
-            File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "update_error.txt"), ex.ToString());
+            var errorContents = Environment.NewLine + string.Join(" ", args) + Environment.NewLine + ex.ToString();
+
+            File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "update_error.txt"), errorContents);
         }
 
         using var host = Host.GetSuitableDesktopHost("unbeatable-beatmap-editor", new HostOptions()
