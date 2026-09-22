@@ -135,7 +135,19 @@ public partial class UpdatePopup : OsuFocusedOverlayContainer
             var progress = new Progress<double>(p =>
         {
                 int percent = (int)(p * 100);
-                Schedule(() => updateStatusText.Text = $"Downloading version {releaseInfo.Version}... {percent}%");
+
+                if (percent >= 100)
+                {
+                    Schedule(() =>
+                    {
+                        updateStatusText.Text = $"Restarting...";
+                    });
+                }
+                else
+                {
+                    Schedule(() => updateStatusText.Text = $"Downloading version {releaseInfo.Version}... {percent}%");
+                }
+
             });
 
             Task.Run(async () =>
@@ -148,7 +160,7 @@ public partial class UpdatePopup : OsuFocusedOverlayContainer
                 {
                     Logger.Log($"Error downloading update: {ex.Message}", LoggingTarget.Runtime, LogLevel.Error);
                     Schedule(() => updateStatusText.Text = $"Error downloading update (This error has been logged): {ex.Message}");
-                    await Task.Delay(5000).ContinueWith(_ =>
+                    await Task.Delay(8000).ContinueWith(_ =>
                     {
                         Hide();
                     });
