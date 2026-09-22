@@ -1,10 +1,10 @@
 ﻿## What's new
 
-- Cover art added to charts is now displayed in the main chart list
-- New updates are now checked more frequently
-- Updated UNANIMATED integration (v0.1.16)
-- Carried over changes from newer osu versions
-  - Updated the visual style of the inspector and popup dialogs
-  - Fixed offset adjustment not respecting "Adjust notes when changing timing" setting
+- All options in the editor's "Quick Settings" menu are now saved between sessions.
+- Updated UNANIMATED integration (v0.1.17)
+  - Added UI Show/Hide, CustomCameraOffset and CustomRotOffset options
+  - Increased precision of numbers by one more decimal place (0.1 -> 0.01)
+  - (Tip: you can click on the number values to type in your own numbers)
+- Updating files is now retried if it fails
 
 **Happy mapping!**
