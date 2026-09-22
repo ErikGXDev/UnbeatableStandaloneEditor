@@ -29,7 +29,8 @@
 param(
     [string]$Runtime = "win-x64",
     [string]$Configuration = "Release",
-    [string]$Version = ""
+    [string]$Version = "",
+    [string]$Output = ""
 )
 
 $StripResources = $true
@@ -39,6 +40,10 @@ $ErrorActionPreference = "Stop"
 $repoRoot   = Split-Path $PSScriptRoot -Parent
 $project    = Join-Path $repoRoot "UnbeatableStandaloneEditor\UnbeatableStandaloneEditor.csproj"
 $outputDir  = Join-Path $repoRoot "UnbeatableStandaloneEditor\publish"
+
+if ($Output) {
+    $outputDir = Join-Path $outputDir $Output
+}
 
 # Default to version from .csproj if not provided
 if (-not $Version) {
