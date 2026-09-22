@@ -37,51 +37,57 @@ public enum UnanimatedAction
 public enum CameraAction
 {
     [Description("Reset")]
-    Reset = 0,
+    Reset,
 
     [Description("Camera Target")]
-    CameraTarget = 1,
+    CameraTarget,
 
     [Description("Zoom Offset")]
-    ZoomOffset = 2,
+    ZoomOffset,
 
     [Description("Zoom Target")]
-    ZoomTarget = 3,
+    ZoomTarget,
 
     [Description("Rotation Offset")]
-    RotOffset = 4,
+    RotOffset,
 
     [Description("Rotation Target")]
-    RotTarget = 5,
+    RotTarget,
 
     [Description("Horizontal Offset")]
-    HorizontalOffset = 6,
+    HorizontalOffset,
 
     [Description("Horizontal Target")]
-    HorizontalTarget = 7,
+    HorizontalTarget,
 
     [Description("Custom Camera Target")]
-    CustomCameraTarget = 8,
+    CustomCameraTarget,
+    
+    [Description("Custom Camera Offset")]
+    CustomCameraOffset,
     
     [Description("Custom Rotation Target")]
-    CustomRotTarget = 9,
+    CustomRotTarget,
+    
+    [Description("Custom Rotation Offset")]
+    CustomRotOffset,
 
     [Description("Ease Time")]
-    EaseTime = 10,
+    EaseTime,
 
     [Description("Ease Mode")]
-    EaseMode = 11,
+    EaseMode,
 
     [Description("FOV Target")]
-    FOVTarget = 12,
+    FOVTarget,
 
     [Description("FOV Offset")]
-    FOVOffset = 13
+    FOVOffset
 }
 
 public enum CharacterAction
 {
-    Reset = 0,
+    Reset,
     
     [Description("Set Character")]
     SetCharacter
@@ -90,13 +96,13 @@ public enum CharacterAction
 public enum GameplayAction
 {
     [Description("Screen Shake")]
-    ScreenShake = 0,
+    ScreenShake,
     
     [Description("Screen Rotation")]
-    ScreenRot = 1,
+    ScreenRot,
     
     [Description("Screen Zoom")]
-    ScreenZoom = 2
+    ScreenZoom
 }
 
 public enum StageSceneAction
@@ -132,7 +138,11 @@ public enum StageSceneAction
 public enum UIAction
 {
     [Description("Force Locked UI")]
-    ForceLockedUI = 0
+    ForceLockedUI,
+    
+    Show,
+    
+    Hide
 }
 
 
@@ -217,7 +227,13 @@ public partial class UbAnimateToolboxData
                                          
                                          Stage swapping only works if the "Default" stage is selected in UNBEATABLE.
                                          """;
-    
+
+    public static string ShowHideText = """
+                                        Show or hide UI elements by entering them here, separated by vertical bars (|).
+                                        
+                                        List of available UI elements:
+                                        Accuracy, Score, MaxCombo, VignetteBars, JudgementLine, Reticle, Health, SpeedLines, BlackBGBars
+                                        """;
     
     public abstract class BaseOption
     {
@@ -549,7 +565,23 @@ public partial class UbAnimateToolboxData
                     ]
                 },
                 {
+                  CameraAction.CustomCameraOffset,  
+                    [
+                        new FloatOption("X", 0, -10, 10, 0.1f),
+                        new FloatOption("Y", 0, -10, 10, 0.1f),
+                        new FloatOption("Z", 0, -10, 10, 0.1f)
+                    ]
+                },
+                {
                     CameraAction.CustomRotTarget,
+                    [
+                        new FloatOption("X", 0, -360, 360, 0.1f),
+                        new FloatOption("Y", 0, -360, 360, 0.1f),
+                        new FloatOption("Z", 0, -360, 360, 0.1f)
+                    ]
+                },
+                {
+                    CameraAction.CustomRotOffset,
                     [
                         new FloatOption("X", 0, -360, 360, 0.1f),
                         new FloatOption("Y", 0, -360, 360, 0.1f),
@@ -580,7 +612,9 @@ public partial class UbAnimateToolboxData
         {
             CategoryType.UI, new Dictionary<Enum, List<BaseOption>>
             {
-                { UIAction.ForceLockedUI, [new IntCheckboxOption("Enabled?", 1)] }
+                { UIAction.ForceLockedUI, [new IntCheckboxOption("Enabled?", 1)] },
+                { UIAction.Show, [new StringOption("Elements", "", ShowHideText)] },
+                { UIAction.Hide, [new StringOption("Elements", "", ShowHideText)] }
             }
         }
         
