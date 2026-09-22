@@ -258,7 +258,7 @@ public partial class UbAnimateToolboxData
         public float[]? Markers { get; set; }
         public float Precision { get; set; }
 
-        public FloatOption(string label, float defaultValue, float min, float max, float precision, float[]? markers = null)
+        public FloatOption(string label, float defaultValue, float min, float max, float precision = 0.01f, float[]? markers = null)
         {
             Label = label;
             DefaultValue = defaultValue;
@@ -550,48 +550,48 @@ public partial class UbAnimateToolboxData
             {
                 { CameraAction.Reset, [new IntCheckboxOption("Position Only?", 0)] },
                 { CameraAction.CameraTarget, [new EnumStringOption<CameraPoint>("Camera Point")] },
-                { CameraAction.ZoomOffset, [new FloatOption("Offset", 0, -10, 10, 0.1f), new IntCheckboxOption("Reversed?", 0)] },
-                { CameraAction.ZoomTarget, [new FloatOption("Target", 0, -10, 10, 0.1f)] },
-                { CameraAction.RotOffset, [new FloatOption("Degrees", 0, -720, 720, 0.1f), new IntCheckboxOption("Reversed?", 0)] },
-                { CameraAction.RotTarget, [new FloatOption("Degrees", 0, -720, 720, 0.1f)] },
-                { CameraAction.HorizontalOffset, [new FloatOption("Offset", 0, -10, 10, 0.1f), new IntCheckboxOption("Reversed?", 0)] },
-                { CameraAction.HorizontalTarget, [new FloatOption("Target", 0, -10, 10, 0.1f)] },
+                { CameraAction.ZoomOffset, [new FloatOption("Offset", 0, -10, 10), new IntCheckboxOption("Reversed?", 0)] },
+                { CameraAction.ZoomTarget, [new FloatOption("Target", 0, -10, 10)] },
+                { CameraAction.RotOffset, [new FloatOption("Degrees", 0, -720, 720), new IntCheckboxOption("Reversed?", 0)] },
+                { CameraAction.RotTarget, [new FloatOption("Degrees", 0, -720, 720)] },
+                { CameraAction.HorizontalOffset, [new FloatOption("Offset", 0, -10, 10), new IntCheckboxOption("Reversed?", 0)] },
+                { CameraAction.HorizontalTarget, [new FloatOption("Target", 0, -10, 10)] },
                 {
                     CameraAction.CustomCameraTarget,
                     [
-                        new FloatOption("X", 0, -10, 10, 0.1f, new float[] { -5.5f, -1.9f, -1.0f, 0, 1.0f, 1.9f, 5.5f }),
-                        new FloatOption("Y", 0, -10, 10, 0.1f, new float[] { 2.0f, 3.5f, 5 }),
-                        new FloatOption("Z", 0, -10, 10, 0.1f, new float[] { -6.0f, -8.0f, -8.5f })
+                        new FloatOption("X", 0, -10, 10, 0.01f, new float[] { -5.5f, -1.9f, -1.0f, 0, 1.0f, 1.9f, 5.5f }),
+                        new FloatOption("Y", 0, -10, 10, 0.01f, new float[] { 2.0f, 3.5f, 5 }),
+                        new FloatOption("Z", 0, -10, 10, 0.01f, new float[] { -6.0f, -8.0f, -8.5f })
                     ]
                 },
                 {
                   CameraAction.CustomCameraOffset,  
                     [
-                        new FloatOption("X", 0, -10, 10, 0.1f),
-                        new FloatOption("Y", 0, -10, 10, 0.1f),
-                        new FloatOption("Z", 0, -10, 10, 0.1f)
+                        new FloatOption("X", 0, -10, 10),
+                        new FloatOption("Y", 0, -10, 10),
+                        new FloatOption("Z", 0, -10, 10)
                     ]
                 },
                 {
                     CameraAction.CustomRotTarget,
                     [
-                        new FloatOption("X", 0, -360, 360, 0.1f),
-                        new FloatOption("Y", 0, -360, 360, 0.1f),
-                        new FloatOption("Z", 0, -360, 360, 0.1f)
+                        new FloatOption("X", 0, -360, 360),
+                        new FloatOption("Y", 0, -360, 360),
+                        new FloatOption("Z", 0, -360, 360)
                     ]
                 },
                 {
                     CameraAction.CustomRotOffset,
                     [
-                        new FloatOption("X", 0, -360, 360, 0.1f),
-                        new FloatOption("Y", 0, -360, 360, 0.1f),
-                        new FloatOption("Z", 0, -360, 360, 0.1f)
+                        new FloatOption("X", 0, -360, 360),
+                        new FloatOption("Y", 0, -360, 360),
+                        new FloatOption("Z", 0, -360, 360)
                     ]
                 },
                 { CameraAction.EaseTime, [new FloatOption("Time (ms)", 0, 0, 5000, 1f)] },
                 { CameraAction.EaseMode, [new EnumStringOption<CameraEasing>("Easing")] },
-                { CameraAction.FOVTarget, [new FloatOption("Target (Degrees)", 60, 1, 180, 0.1f)] },
-                { CameraAction.FOVOffset, [new FloatOption("Offset (Degrees)", 0, -180, 180, 0.1f), new IntCheckboxOption("Reversed?", 0)] }
+                { CameraAction.FOVTarget, [new FloatOption("Target (Degrees)", 60, 1, 180)] },
+                { CameraAction.FOVOffset, [new FloatOption("Offset (Degrees)", 0, -180, 180), new IntCheckboxOption("Reversed?", 0)] }
             }
         },
         {
