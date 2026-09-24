@@ -85,6 +85,18 @@ public enum CameraAction
     FOVOffset
 }
 
+public enum CustomModifier
+{
+    [Description("None")]
+    Normal,
+    
+    [Description("Instant")]
+    Instant,
+    
+    [Description("Reversed")]
+    Reversed,
+}
+
 public enum CharacterAction
 {
     Reset,
@@ -574,7 +586,8 @@ public partial class UbAnimateToolboxData
                     [
                         new FloatOption("X", 0, -10, 10, 0.01f, new float[] { -5.5f, -1.9f, -1.0f, 0, 1.0f, 1.9f, 5.5f }),
                         new FloatOption("Y", 0, -10, 10, 0.01f, new float[] { 2.0f, 3.5f, 5 }),
-                        new FloatOption("Z", 0, -10, 10, 0.01f, new float[] { -6.0f, -8.0f, -8.5f })
+                        new FloatOption("Z", 0, -10, 10, 0.01f, new float[] { -6.0f, -8.0f, -8.5f }),
+                        new EnumStringOption<CustomModifier>("Modifier")
                     ]
                 },
                 {
@@ -582,7 +595,8 @@ public partial class UbAnimateToolboxData
                     [
                         new FloatOption("X", 0, -10, 10),
                         new FloatOption("Y", 0, -10, 10),
-                        new FloatOption("Z", 0, -10, 10)
+                        new FloatOption("Z", 0, -10, 10),
+                        new EnumStringOption<CustomModifier>("Modifier")
                     ]
                 },
                 {
@@ -590,7 +604,8 @@ public partial class UbAnimateToolboxData
                     [
                         new FloatOption("X", 0, -360, 360),
                         new FloatOption("Y", 0, -360, 360),
-                        new FloatOption("Z", 0, -360, 360)
+                        new FloatOption("Z", 0, -360, 360),
+                        new EnumStringOption<CustomModifier>("Modifier")
                     ]
                 },
                 {
@@ -598,7 +613,8 @@ public partial class UbAnimateToolboxData
                     [
                         new FloatOption("X", 0, -360, 360),
                         new FloatOption("Y", 0, -360, 360),
-                        new FloatOption("Z", 0, -360, 360)
+                        new FloatOption("Z", 0, -360, 360),
+                        new EnumStringOption<CustomModifier>("Modifier")
                     ]
                 },
                 { CameraAction.EaseTime, [new FloatOption("Time (ms)", 0, 0, 5000, 1f)] },
