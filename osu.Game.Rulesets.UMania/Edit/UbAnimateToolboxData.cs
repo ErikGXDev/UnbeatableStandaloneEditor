@@ -142,7 +142,13 @@ public enum UIAction
     
     Show,
     
-    Hide
+    Hide,
+    
+    [Description("Slide In")]
+    SlideIn,
+    
+    [Description("Slide Out")]
+    SlideOut
 }
 
 
@@ -232,7 +238,14 @@ public partial class UbAnimateToolboxData
                                         Show or hide UI elements by entering them here, separated by vertical bars (|).
                                         
                                         List of available UI elements:
-                                        Accuracy, Score, MaxCombo, VignetteBars, JudgementLine, Reticle, Health, SpeedLines, BlackBGBars
+                                        Score, Accuracy, MaxCombo, VignetteBars, BlackBGBars, FourByThreeBars, Health, LeftJudgementLine, RightJudgementLine, MeasureBars, SpeedLines, UpNextIndicators, Reticle, Notes
+                                        """;
+    
+    public static string SlideInOutText = """
+                                        Show or hide UI elements with a transition by entering them here, separated by vertical bars (|).
+
+                                        List of available UI elements:
+                                        AllOverlayUI, LeftJudgementLine, RightJudgementLine, BackgroundGradient, HealthBar, SpeedLines, FourByThreeBars, BlackBGBars
                                         """;
     
     public abstract class BaseOption
@@ -614,7 +627,9 @@ public partial class UbAnimateToolboxData
             {
                 { UIAction.ForceLockedUI, [new IntCheckboxOption("Enabled?", 1)] },
                 { UIAction.Show, [new StringOption("Elements", "", ShowHideText)] },
-                { UIAction.Hide, [new StringOption("Elements", "", ShowHideText)] }
+                { UIAction.Hide, [new StringOption("Elements", "", ShowHideText)] },
+                { UIAction.SlideIn, [new StringOption("Elements", "", SlideInOutText)] },
+                { UIAction.SlideOut, [new StringOption("Elements", "", SlideInOutText)] }
             }
         }
         
