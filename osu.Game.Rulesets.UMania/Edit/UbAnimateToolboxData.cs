@@ -18,7 +18,8 @@ public enum CategoryType
     Gameplay,
     [Description("Stage Switch")]
     StageScene,
-    UI
+    Visuals,
+    UI,
 }
 
 public enum UnanimatedAction
@@ -145,6 +146,32 @@ public enum StageSceneAction
     WomenWrestlingRhythm,
     NOISZRhythm,
     TrainStationRhythmPixel,
+}
+
+public enum VisualsAction
+{
+    [Description("Time and Weather")]
+    TimeAndWeather
+}
+
+public enum WeatherOption
+{
+    Reset,
+    
+    [Description("Morning Clear")]
+    Morning_Clear, 
+    [Description("Morning Foggy")]
+    Morning_Foggy, 
+    [Description("Midday Clear")]
+    Midday_Clear, 
+    [Description("Afternoon Clear")]
+    Afternoon_Clear, 
+    [Description("Sunset Clear")]
+    Sunset_Clear, 
+    [Description("Evening Clear")]
+    Evening_Clear, 
+    [Description("Evening Foggy")]
+    Evening_Foggy
 }
 
 public enum UIAction
@@ -647,6 +674,12 @@ public partial class UbAnimateToolboxData
                 { UIAction.SlideIn, [new StringOption("Elements", "", SlideInOutText)] },
                 { UIAction.SlideOut, [new StringOption("Elements", "", SlideInOutText)] }
             }
+        },
+        {
+            CategoryType.Visuals, new Dictionary<Enum, List<BaseOption>>
+            {
+                { VisualsAction.TimeAndWeather, [new EnumStringOption<WeatherOption>("Weather")] }
+            }
         }
         
     };
@@ -658,7 +691,8 @@ public partial class UbAnimateToolboxData
         { CategoryType.Character, new CategoryInfo(typeof(CharacterAction), "Type") },
         { CategoryType.Gameplay, new CategoryInfo(typeof(GameplayAction), "Type") },
         { CategoryType.StageScene, new CategoryInfo(typeof(StageSceneAction), "New Stage") },
-        { CategoryType.UI, new CategoryInfo(typeof(UIAction), "Type") }
+        { CategoryType.UI, new CategoryInfo(typeof(UIAction), "Type") },
+        { CategoryType.Visuals, new CategoryInfo(typeof(VisualsAction), "Type") },
     };
     
     
