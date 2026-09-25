@@ -125,7 +125,7 @@ public partial class SettingsPopover : OsuPopover
                                 {
                                     LabelText = "4-Key mode in editor",
                                     TooltipText =
-                                        "The first two columns turn into another set of top and bottom lanes.\nThe columns will also be re-arranged slightly.\nWhen zoomed out, notes in the new columns will automatically be flipped.\nWhen zoomed in, the columns simply act as another set of top and bottom lanes.",
+                                        "Turns the first two columns into extra top/bottom lanes. Notes in these lanes are flipped automatically when zoomed out.",
                                     RelativeSizeAxes = Axes.X,
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.Editor4KeyMode),
                                     Margin = new MarginPadding { Bottom = 10, Top = 5 },
@@ -134,7 +134,7 @@ public partial class SettingsPopover : OsuPopover
                                 {
                                     LabelText = "Key-based charting",
                                     TooltipText =
-                                        "Press 1-6 to place notes in the corresponding column, similar to the official editor.\nHold a key and scroll to create hold notes.\nUse Shift to place a Dodge, Double or Zoom note (depending on the column).\nModifier buttons (Q-P) still apply to placed notes.",
+                                        "Enable keybinds similar to the official editor.\nUse the keys 1-6 to place notes in a lane. Scroll while holding a key to add hold notes. Holding Shift places a Dodge, Double or Zoom instead.",
                                     RelativeSizeAxes = Axes.X,
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.EditorKeyBasedCharting),
                                     Margin = new MarginPadding { Bottom = 10 },
@@ -142,7 +142,7 @@ public partial class SettingsPopover : OsuPopover
                                 new TooltipCheckbox
                                 {
                                     LabelText = "\"Unanimated\" notes",
-                                    TooltipText = "This setting enables features intended to be used with Stefy's downloadable UNANIMATED mod.\nNew \"Animate\" Notes in the 2nd lane can now be edited in a new menu underneath the inspector.\nThe menu allows you to set and modify camera commands, along with their parameters.\nTo start, select the new \"Animate\" note preset on the left, place it, and select it. The menu will then appear.",
+                                    TooltipText = "Enables new note types for Stefy's downloadable UNANIMATED mod. Adds new \"Animate\" note types for the 2nd lane, which can be edited in a new menu on the right when selected.",
                                     RelativeSizeAxes = Axes.X,
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.EditorUnanimated),
                                     Margin = new MarginPadding { Bottom = 10 },
