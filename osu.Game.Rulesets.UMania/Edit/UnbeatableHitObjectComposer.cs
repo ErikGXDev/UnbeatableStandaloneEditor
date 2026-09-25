@@ -511,7 +511,7 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
             {
                 Current = SettingUseKeyCharting,
                 Description = "Key-based charting",
-                TooltipText = "Press 1-6 to place notes in the corresponding column, similar to the official editor.\nHold a key and scroll to create hold notes.\nUse Shift to place a Dodge, Double or Zoom note (depending on the column).\nModifier buttons (Q-P) still apply to placed notes.\n(Experimental!)",
+                TooltipText = "Press 1-6 to place notes in the corresponding column, similar to the official editor.\nHold a key and scroll to create hold notes.\nUse Shift to place a Dodge, Double or Zoom note (depending on the column).\nModifier buttons (Q-P) still apply to placed notes.",
                 CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Keyboard },
             }
         });

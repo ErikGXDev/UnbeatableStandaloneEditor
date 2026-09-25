@@ -125,7 +125,7 @@ public partial class SettingsPopover : OsuPopover
                                 {
                                     LabelText = "4-Key mode in editor",
                                     TooltipText =
-                                        "The first two columns turn into another set of top and bottom lanes.\nThe columns will also be re-arranged slightly.\nWhen zoomed out, notes in the new columns will automatically be flipped.\nWhen zoomed in, the columns simply act as another set of top and bottom lanes.\n(Experimental!)",
+                                        "The first two columns turn into another set of top and bottom lanes.\nThe columns will also be re-arranged slightly.\nWhen zoomed out, notes in the new columns will automatically be flipped.\nWhen zoomed in, the columns simply act as another set of top and bottom lanes.",
                                     RelativeSizeAxes = Axes.X,
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.Editor4KeyMode),
                                     Margin = new MarginPadding { Bottom = 10, Top = 5 },
@@ -134,7 +134,7 @@ public partial class SettingsPopover : OsuPopover
                                 {
                                     LabelText = "Key-based charting",
                                     TooltipText =
-                                        "Press 1-6 to place notes in the corresponding column, similar to the official editor.\nHold a key and scroll to create hold notes.\nUse Shift to place a Dodge, Double or Zoom note (depending on the column).\nModifier buttons (Q-P) still apply to placed notes.\n(Experimental!)",
+                                        "Press 1-6 to place notes in the corresponding column, similar to the official editor.\nHold a key and scroll to create hold notes.\nUse Shift to place a Dodge, Double or Zoom note (depending on the column).\nModifier buttons (Q-P) still apply to placed notes.",
                                     RelativeSizeAxes = Axes.X,
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.EditorKeyBasedCharting),
                                     Margin = new MarginPadding { Bottom = 10 },
