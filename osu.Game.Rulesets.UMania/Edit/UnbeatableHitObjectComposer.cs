@@ -194,6 +194,15 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
             SettingShowPreview.Value = v.NewValue ? TernaryState.True : TernaryState.False;
         }, true);
         SettingShowPreview.BindValueChanged(v => showPreview.Value = v.NewValue == TernaryState.True);
+        
+        // Quick settings
+        var showQuickSettings = config.GetBindable<bool>(OsuSetting.EditorQuickSettingsOpen);
+        showQuickSettings.BindValueChanged(v =>
+        {
+            PlayfieldToolbox.Expanded.Value = v.NewValue;
+        }, true);
+        PlayfieldToolbox.Expanded.BindValueChanged(v => showQuickSettings.Value = v.NewValue);
+        
 
         hasTimingHandler = hasTiming =>
         {

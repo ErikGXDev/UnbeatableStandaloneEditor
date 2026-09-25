@@ -224,6 +224,7 @@ namespace osu.Game.Configuration
             
             SetDefault(OsuSetting.EditorColumnHints, true); // FIX: Show column hints in editor
             SetDefault(OsuSetting.EditorShowPreview, true); // FIX: Show preview in editor
+            SetDefault(OsuSetting.EditorQuickSettingsOpen, false); // FIX: Quick settings should be closed by default
             //SetDefault(OsuSetting.EditorSwapPinkInsteadOfCamera, false); // FIX: Swap pink instead of camera
             
             SetDefault(OsuSetting.HideCountryFlags, false);
@@ -527,6 +528,7 @@ namespace osu.Game.Configuration
         
         EditorColumnHints,
         EditorShowPreview,
+        EditorQuickSettingsOpen,
         //EditorSwapPinkInsteadOfCamera,
         
         CreateBackups, // Toggle backup creation on save
