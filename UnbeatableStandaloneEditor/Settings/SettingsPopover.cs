@@ -1,4 +1,5 @@
-﻿using osu.Framework.Allocation;
+﻿using System.Globalization;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -6,9 +7,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
+using osu.Game.Custom;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -17,6 +20,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osuTK;
 using osuTK.Graphics;
+using UnbeatableStandaloneEditor.Components;
 
 namespace UnbeatableStandaloneEditor.Settings;
 
@@ -163,13 +167,17 @@ public partial class SettingsPopover : OsuPopover
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.EditorShortNames),
                                     Margin = new MarginPadding { Bottom = 10 },
                                 },
-                                new TooltipCheckbox
+                                new TooltipNumberInput
                                 {
-                                    LabelText = "Add a 40ms offset on export",
-                                    //TooltipText = "Feature disabled for now.",
-                                    TooltipText = "When enabled, all notes and timings will have a 40ms offset added to them when exporting maps.\nIt is supposed to close the gap between this editor's waveform offset (20ms) and the offset of the offical editor (60ms).\nWhen importing a map that has this offset, you can use the \"Offset all points\" input in the timing tab to move all points back again.\nNote that this only affects maps that are EXPORTED, your charts will not change in the editor.\n(Be aware that offsets may feel different depending on the song or player, so be sure to test your map with and without this offset.)",
-                                    RelativeSizeAxes = Axes.X,
-                                    Current = osuConfig.GetBindable<bool>(OsuSetting.Editor60msOffset),
+                                    LabelText = "Export note offset (ms)",
+                                    TooltipText =
+                                        "All notes and timings will have this offset added to them when exporting maps. (Default: 0)\nWhen importing a map that has this offset, you can use the \"Offset all points\" button in the timing tab to move all points back again.\nBe aware that offsets may feel different depending on the song or player.\nOffset may vary between file types. I blame the game engine.",
+                                    Current =
+                                    {
+                                        BindTarget = osuConfig.GetBindable<int>(OsuSetting.EditorExportOffsetMs)
+                                    },
+                                    MinimumValue = -1000,
+                                    MaximumValue = 1000,
                                     Margin = new MarginPadding { Bottom = 10 },
                                 },
                             }

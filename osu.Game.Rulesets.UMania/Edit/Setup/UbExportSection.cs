@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
         private bool is4Key => config.Get<bool>(OsuSetting.Editor4KeyMode);
 
-        private int msOffset => config.Get<bool>(OsuSetting.Editor60msOffset) ? 40 : 0;
+        private int msOffset => config.Get<int>(OsuSetting.EditorExportOffsetMs);
 
         private UbPlaytestButton websocketButton = null!;
         private CancellationTokenSource websocketCheckCancellation = new CancellationTokenSource();

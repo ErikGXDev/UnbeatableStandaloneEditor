@@ -22,6 +22,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
     {
         protected TrianglesV2? Triangles { get; private set; }
 
+        public bool HasTriangles = true;
+
         protected override float HoverLayerFinalAlpha => 0;
 
         private Color4? triangleGradientSecondColour;
@@ -60,6 +62,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 SpawnRatio = 0.6f,
                 RelativeSizeAxes = Axes.Both,
                 Depth = float.MaxValue,
+                Alpha = HasTriangles ? 1f : 0f
             });
 
             updateColours();
