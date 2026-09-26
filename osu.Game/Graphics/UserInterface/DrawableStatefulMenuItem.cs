@@ -19,6 +19,9 @@ namespace osu.Game.Graphics.UserInterface
         {
         }
 
+        // FIX: Don't close
+        public override bool CloseMenuOnClick => false;
+
         protected override TextContainer CreateTextContainer() => new ToggleTextContainer(Item);
 
         protected override bool OnMouseDown(MouseDownEvent e)
