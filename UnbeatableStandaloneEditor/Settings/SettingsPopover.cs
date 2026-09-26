@@ -170,12 +170,8 @@ public partial class SettingsPopover : OsuPopover
                                 new TooltipNumberInput
                                 {
                                     LabelText = "Export note offset (ms)",
-                                    TooltipText =
-                                        "All notes and timings will have this offset added to them when exporting maps. (Default: 0)\nWhen importing a map that has this offset, you can use the \"Offset all points\" button in the timing tab to move all points back again.\nBe aware that offsets may feel different depending on the song or player.\nOffset may vary between file types. I blame the game engine.",
-                                    Current =
-                                    {
-                                        BindTarget = osuConfig.GetBindable<int>(OsuSetting.EditorExportOffsetMs)
-                                    },
+                                    TooltipText = TooltipNumberInput.OffsetTooltip,
+                                    Current = osuConfig.GetBindable<int>(OsuSetting.EditorExportOffsetMs),
                                     MinimumValue = -1000,
                                     MaximumValue = 1000,
                                     Margin = new MarginPadding { Bottom = 10 },

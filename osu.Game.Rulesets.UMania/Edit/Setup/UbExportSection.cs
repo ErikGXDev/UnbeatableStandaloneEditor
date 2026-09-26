@@ -17,6 +17,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Custom;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -800,6 +801,28 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                             Caption = "Export folder",
                             PlaceholderText = "Select folder to export Unbeatable beatmaps to",
                         },
+                new Container()
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Masking = true,
+                    CornerRadius = 4,
+                    Children = new Drawable[]
+                    {
+                        new FormControlBackground(),
+                        new TooltipNumberInput
+                        {
+                            Padding = new MarginPadding() {Left = 8, Right = 6, Vertical = 6},
+                            LabelText = "Export note offset (ms)",
+                            TooltipText = TooltipNumberInput.OffsetTooltip,
+                            Current = config.GetBindable<int>(OsuSetting.EditorExportOffsetMs),
+                            MinimumValue = -1000,
+                            MaximumValue = 1000,
+                            Margin = new MarginPadding { Top = 2 },
+                        }
+                    },
+                },
+               
                 warningText = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14))
                 {
                     Text = "",
