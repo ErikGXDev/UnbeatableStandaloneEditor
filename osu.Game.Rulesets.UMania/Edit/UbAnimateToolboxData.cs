@@ -274,14 +274,14 @@ public partial class UbAnimateToolboxData
                                          """;
 
     public static string ShowHideText = """
-                                        Show or hide UI elements by entering them here, separated by vertical bars (|).
+                                        Show or hide UI elements by entering them here, separated by semicolons (;).
                                         
                                         List of available UI elements:
                                         Score, Accuracy, MaxCombo, VignetteBars, BlackBGBars, FourByThreeBars, Health, LeftJudgementLine, RightJudgementLine, MeasureBars, SpeedLines, UpNextIndicators, Reticle, Notes
                                         """;
     
     public static string SlideInOutText = """
-                                        Show or hide UI elements with a transition by entering them here, separated by vertical bars (|).
+                                        Show or hide UI elements with a transition by entering them here, separated by semicolons (;).
 
                                         List of available UI elements:
                                         AllOverlayUI, LeftJudgementLine, RightJudgementLine, BackgroundGradient, HealthBar, SpeedLines, FourByThreeBars, BlackBGBars
