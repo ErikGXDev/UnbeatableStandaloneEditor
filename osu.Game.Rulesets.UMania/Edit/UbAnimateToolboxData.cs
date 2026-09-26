@@ -452,9 +452,9 @@ public partial class UbAnimateToolboxData
         }
     }
 
-    public class IntCheckboxOption : BaseOption<Bindable<int>>
+    public class IntCheckboxOption : BaseOption<BindableFloat>
     {
-        public int DefaultValue { get; set; }
+        public float DefaultValue { get; set; }
         
         public IntCheckboxOption(string label, int defaultValue)
         {
@@ -464,20 +464,30 @@ public partial class UbAnimateToolboxData
         
         public override (Drawable, IBindable) CreateDrawableAndBindable(Action? onValueChanged)
         {
-            var bindable = new Bindable<int>(DefaultValue);
+            var bindable = new BindableFloat(DefaultValue);
             
-            var boolBindable = new Bindable<bool>(DefaultValue == 1 ? true : false);
+            var boolBindable = new BindableBool { Value = DefaultValue == 1 };
             
             boolBindable.BindValueChanged(v =>
             {
-                bindable.Value = v.NewValue ? 1 : 0;
+                var newInt = v.NewValue ? 1 : 0;
+                if (bindable.Value != newInt)
+                    bindable.Value = newInt;
+                onValueChanged?.Invoke();
+            });
+            
+            bindable.BindValueChanged(v =>
+            {
+                var newBool = v.NewValue == 1 ? true : false;
+                if (boolBindable.Value != newBool)
+                    boolBindable.Value = newBool;
                 onValueChanged?.Invoke();
             });
             
             var checkbox = new FormCheckBox()
             {
                 Caption = Label,
-                Current = boolBindable,
+                Current = boolBindable
             };
             
             return (checkbox, bindable);
@@ -660,15 +670,15 @@ public partial class UbAnimateToolboxData
         {
             CategoryType.Gameplay, new Dictionary<Enum, List<BaseOption>>
             {
-                { GameplayAction.ScreenShake, [new IntCheckboxOption("Enabled?", 1)] },
-                { GameplayAction.ScreenRot, [new IntCheckboxOption("Enabled?", 1)] },
-                { GameplayAction.ScreenZoom, [new IntCheckboxOption("Enabled?", 1)] }
+                { GameplayAction.ScreenShake, [new IntCheckboxOption("Enable?", 1)] },
+                { GameplayAction.ScreenRot, [new IntCheckboxOption("Enable?", 1)] },
+                { GameplayAction.ScreenZoom, [new IntCheckboxOption("Enable?", 1)] }
             }
         },
         {
             CategoryType.UI, new Dictionary<Enum, List<BaseOption>>
             {
-                { UIAction.ForceLockedUI, [new IntCheckboxOption("Enabled?", 1)] },
+                { UIAction.ForceLockedUI, [new IntCheckboxOption("Enable?", 1)] },
                 { UIAction.Show, [new StringOption("Elements", "", ShowHideText)] },
                 { UIAction.Hide, [new StringOption("Elements", "", ShowHideText)] },
                 { UIAction.SlideIn, [new StringOption("Elements", "", SlideInOutText)] },
