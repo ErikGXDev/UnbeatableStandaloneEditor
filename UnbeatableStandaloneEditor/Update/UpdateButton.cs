@@ -34,7 +34,7 @@ public partial class UpdateButton : RoundedButton
     }
 
     // Weird hack because config bindables dont work for some reason
-    private double lastUpdateCheck = 0;
+    /*private double lastUpdateCheck = 0;
     protected override void Update()
     {
         base.Update();
@@ -49,5 +49,5 @@ public partial class UpdateButton : RoundedButton
             BackgroundColour = useUpdater ? colours.Colour4 : colours.Background3;
             Text = useUpdater ? "Download new version!" : "New version available!";
         }
-    }
+    }*/
 }
