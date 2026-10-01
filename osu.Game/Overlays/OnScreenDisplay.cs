@@ -119,7 +119,7 @@ namespace osu.Game.Overlays
                 toDisplay.Animate(
                     b => b.FadeOutFromOne(1500, Easing.InQuint),
                     b => b.ResizeHeightTo(height_contracted, 1500, Easing.InQuint));
-            }, 500);
+            }, 750);
         }
     }
 }

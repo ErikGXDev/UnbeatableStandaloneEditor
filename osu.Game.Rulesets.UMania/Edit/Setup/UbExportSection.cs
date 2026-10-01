@@ -15,6 +15,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -22,6 +23,8 @@ using osu.Game.Custom;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Framework.Graphics.Sprites;
+using osuTK;
 using osu.Game.Graphics.Containers;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
@@ -54,6 +57,10 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         [Resolved] private EditorClock editorClock { get; set; } = null!;
 
         [Resolved] private OsuConfigManager config { get; set; } = null!;
+
+        [Resolved] private GameHost gameHost { get; set; } = null!;
+        
+        private Color4 accentColour = Color4.White;
 
         private bool is4Key => config.Get<bool>(OsuSetting.Editor4KeyMode);
 
@@ -421,6 +428,10 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             
             string entryPrefix = insideFolder ? baseFilename : string.Empty;
 
+            var directory = exportFolderSelector.SelectedDirectory.Value;
+
+            var savePath = Path.Combine(directory, zipFilename);
+
             using (var zipStream = new MemoryStream())
             {
                 using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
@@ -508,12 +519,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
                 // show file save dialog
 
-                var directory = exportFolderSelector.SelectedDirectory.Value;
-
-                var savePath = Path.Combine(directory, zipFilename);
-
-
-                using (var fs = File.Create(Path.Combine(directory, zipFilename)))
+                using (var fs = File.Create(savePath))
                 {
                     zipStream.Seek(0, SeekOrigin.Begin);
                     zipStream.CopyTo(fs);
@@ -523,7 +529,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             Logger.Log($"Exporting to {zipFilename}...");
 
-            showToast("Export successful", $"Saved as {zipFilename}");
+            showExportToast("Export successful", $"Saved as {zipFilename}", savePath);
         }
 
         public void ExportToFolder(string extension = ".osu") => Task.Run(() => { exportToFolder(extension); });
@@ -643,7 +649,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             Logger.Log($"Exporting to folder {directory}...");
 
-            showToast("Export successful", $"Saved to folder {baseFolderName}");
+            showExportToast("Export successful", $"Saved to folder {baseFolderName}", directory);
         }
 
         public void ExportMap()
@@ -774,10 +780,78 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             {
             }
         }
+        
+        private partial class UbExportSuccessToast : Toast
+        {
+            public UbExportSuccessToast(LocalisableString description, LocalisableString value, string revealPath,
+                                         string revealText, Action<string> revealAction, Color4 accentColour)
+                : base(description, value)
+            {
+                if (string.IsNullOrEmpty(revealPath))
+                    return;
+
+                ValueSpriteText.Y = -5;
+
+                var revealButton = new UbRevealButton
+                {
+                    Text = revealText,
+                    BackgroundColour = accentColour,
+                    RelativeSizeAxes = Axes.X,
+                    Width = 0.42f * 1.05f,
+                    Height = 30 * 1.05f,
+                    Scale = new Vector2(0.9f),
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    HasTriangles = false,
+                    Margin = new MarginPadding { Bottom = 10, Top = 20 },
+                    Action = () => revealAction?.Invoke(revealPath),
+                };
+
+                Content.Add(revealButton);
+            }
+        }
+        
+        private partial class UbRevealButton : RoundedButton
+        {
+            public UbRevealButton()
+            {
+                Add(new SpriteIcon
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    X = 10,
+                    Size = new Vector2(13),
+                    Icon = FontAwesome.Solid.FolderOpen,
+                    Depth = -1,
+                });
+
+                SpriteText.Margin = new MarginPadding { Left = 14 };
+            }
+        }
+        
+        private void revealExportedPath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return;
+
+            try
+            {
+                gameHost.PresentFileExternally(path);
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Failed to reveal exported path: {e.Message}");
+            }
+        }
 
         private void showToast(string title, string message)
         {
             onScreenDisplay?.Display(new BeatmapEditorToast(title, message));
+        }
+        
+        private void showExportToast(string title, string message, string revealPath, string revealText = "Open in explorer")
+        {
+            onScreenDisplay?.Display(new UbExportSuccessToast(title, message, revealPath, revealText, revealExportedPath, accentColour));
         }
 
         private Bindable<ExportMode> exportModeBindable = new Bindable<ExportMode>(ExportMode.OfficialZip);
@@ -788,6 +862,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
+            accentColour = colourProvider.Background2.Darken(0.8f);
+
             Children = new Drawable[]
             {
                 websocketButton = new UbPlaytestButton
