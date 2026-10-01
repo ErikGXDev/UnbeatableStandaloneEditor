@@ -51,9 +51,17 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
         private Container notesLayer = null!;
         private Container decoLayer = null!;
         private PreviewIndicator indicatorLayer = null!;
+        private PreviewCopIndicator copIndicatorLayer = null!;
         private Box cameraBorder;
 
+        private bool chartHasBrawls;
+        private readonly bool[] copAlive = new bool[PreviewCopIndicator.COP_COUNT];
+        private readonly List<CopSpan>[] copSpans = CreateCopSpans();
+
         private List<Circle> hitCircles = new List<Circle>();
+        private readonly List<Circle> copHitCircles = new List<Circle>();
+
+        private readonly UbNoteBuilder noteBuilder = new UbNoteBuilder(null);
 
         private List<PreviewNote> notePool = new List<PreviewNote>();
         private List<PreviewHold> holdPool = new List<PreviewHold>();
@@ -63,8 +71,21 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
         private const double flash_duration = 150;
         private const double hit_window = 50;
 
+        
+        private const float cop_column_offset = 0.16f;
+        private const float cop_travel_distance = 0.75f;
+        private const float brawl_camera_zoom = 0.925f;
+
+        
+        private const float brawl_preview_taller = 1.15f;
+        
+        private const float cop_indicator_inset = 8;
+
+        private const float cop_goal_offset = 0.00f;
 
         [Resolved] private EditorBeatmap editorBeatmap { get; set; } = null!;
+
+        [Resolved] private IEditorChangeHandler? changeHandler { get; set; }
 
         [Resolved] private EditorClock clock { get; set; } = null!;
 
@@ -97,6 +118,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                 {
                     RelativePositionAxes = Axes.X,
                     Position = new Vector2(0.5f, -8),
+                    Depth = 2
+                },
+                copIndicatorLayer = new PreviewCopIndicator
+                {
+                    RelativePositionAxes = Axes.X,
+                    Position = new Vector2(1f, -8),
                     Depth = 2
                 },
                 new Container
@@ -148,6 +175,91 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
 
             if (rightToolbox != null)
                 rightToolbox.Expanded.BindValueChanged(_ => updateToolboxOffset(), true);
+            
+            if (changeHandler != null)
+                changeHandler.OnStateChange += onEditorStateChanged;
+
+            recomputeCopState();
+        }
+
+        private void onEditorStateChanged() => recomputeCopState();
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (!isDisposing)
+                return;
+
+            if (changeHandler != null)
+                changeHandler.OnStateChange -= onEditorStateChanged;
+        }
+        
+        // Tracks when cops are dead/alive across whole beatmap
+        private readonly record struct CopSpan(double Start, double End);
+
+        private static List<CopSpan>[] CreateCopSpans() =>
+            Enumerable.Range(0, PreviewCopIndicator.COP_COUNT).Select(_ => new List<CopSpan>()).ToArray();
+        
+        private void recomputeCopState()
+        {
+            foreach (var spans in copSpans)
+                spans.Clear();
+
+            chartHasBrawls = false;
+
+            foreach (var obj in editorBeatmap.HitObjects)
+            {
+                if (obj is not ManiaHitObject note)
+                    continue;
+
+                var builder = new UbNoteBuilder(note);
+                if (builder.InferObjectTypeIcon() != UbIconType.Brawl)
+                    continue;
+
+                chartHasBrawls = true;
+
+                var modifiers = builder.InferObjectModifierIcons();
+
+                int cop = copIndexFrom(modifiers);
+                if (cop < 0)
+                    continue;
+
+                var spans = copSpans[cop];
+                
+                double endTime = note.GetEndTime();
+
+                bool isAlive = spans.Count > 0 && double.IsPositiveInfinity(spans[spans.Count - 1].End);
+
+                if (modifiers.Contains(UbIconType.ModCopFinish))
+                {
+                    if (isAlive)
+                        spans[spans.Count - 1] = new CopSpan(spans[spans.Count - 1].Start, endTime);
+                }
+                else if (!isAlive)
+                {
+                    spans.Add(new CopSpan(note.StartTime, double.PositiveInfinity));
+                }
+            }
+
+            copIndicatorLayer.FadeTo(chartHasBrawls ? 1 : 0, 200, Easing.OutQuint);
+        }
+
+        private static int copIndexFrom(List<UbIconType> modifiers)
+        {
+            if (modifiers.Contains(UbIconType.ModCop1)) return 0;
+            if (modifiers.Contains(UbIconType.ModCop2)) return 1;
+            if (modifiers.Contains(UbIconType.ModCop3)) return 2;
+            if (modifiers.Contains(UbIconType.ModCop4)) return 3;
+            return -1;
+        }
+
+        private void updateCopLiveness(double time)
+        {
+            for (int i = 0; i < copAlive.Length; i++)
+                copAlive[i] = copSpans[i].Any(span => time >= span.Start && time < span.End);
+
+            copIndicatorLayer.UpdateCops(copAlive);
         }
 
         protected override void LoadComplete()
@@ -193,6 +305,28 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                     hitCircles.Add(hitCircle);
                 }
             }
+            
+            foreach (float x in new[] { left_receptor - cop_column_offset, right_receptor + cop_column_offset })
+            {
+                foreach (float y in new[] { top_receptor + cop_goal_offset, bottom_receptor - cop_goal_offset })
+                {
+                    foreach (var pair in sizePairs)
+                    {
+                        var copCircle = new Circle
+                        {
+                            Colour = pair.Item2,
+                            RelativePositionAxes = Axes.Both,
+                            Position = new Vector2(x, y),
+                            Size = new Vector2(pair.Item1 - cop_indicator_inset),
+                            Origin = Anchor.Centre,
+                            Alpha = 0,
+                        };
+
+                        decoLayer.Add(copCircle);
+                        copHitCircles.Add(copCircle);
+                    }
+                }
+            }
 
             ;
 
@@ -221,6 +355,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
             this.MoveToX(-offset, 200, Easing.OutQuint);
         }
 
+        private int getLowLane()
+        {
+            return composer.Is4Key ? 1 : 3;
+        }
+
         private int getDoubleEndLane(int startLane)
         {
             if (startLane == 2) return 3;
@@ -240,6 +379,9 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
             base.Update();
             
             if (Alpha == 0) return; // Don't update if preview is hidden
+
+            if (chartHasBrawls)
+                updateCopLiveness(clock.CurrentTime);
             
             // Lerp viewFieldMultiplier towards ViewFieldMultiplier
             viewFieldMultiplier = Interpolation.Lerp(viewFieldMultiplier, ViewFieldMultiplier, 0.05f);
@@ -261,6 +403,10 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
 
             bool camUpdated = false;
 
+            bool soonestNoteRecorded = false;
+            bool soonestIsBrawl = false;
+            bool activeBrawlHold = false;
+
 
             foreach (var obj in editorBeatmap.HitObjects)
             {
@@ -279,9 +425,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                     if (note.StartTime > time + viewField + viewFieldTolerance)
                         continue;
 
-                    var ubhelper = new UbNoteBuilder(obj);
-
-                    var iconType = ubhelper.InferObjectTypeIcon();
+                    var iconType = getIconType(note);
 
                     int col = note.Column;
 
@@ -307,13 +451,18 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
 
                 double startTime = note.StartTime;
                 bool isHold = note is IHasDuration;
-                double endTime = note is IHasDuration duration ? startTime + duration.Duration : startTime;
+                double endTime = note.GetEndTime();
+
+                bool isBrawl = getIconType(note) == UbIconType.Brawl;
+
+                // Cop holds are always drawn on the low lane unless heavy
+                int brawlColumn = isBrawl && isForcedLowBrawl(column, note) ? getLowLane() : column;
 
 
                 // Check if this note is being hit (within hit window)
                 if (column >= 0 && column < 4 && Math.Abs(time - startTime) < hit_window)
                 {
-                    int innerCircleIndex = getInnerCircleIndexForColumnAndFlip(column, flippedRight);
+                    int innerCircleIndex = getInnerCircleIndexForColumnAndFlip(isBrawl ? brawlColumn : column, flippedRight);
                     if (innerCircleIndex >= 0)
                     {
                         hitCircles[innerCircleIndex].FlashColour(colourProvider.Background1, (float)flash_duration);
@@ -322,53 +471,65 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
 
                 if (isHold && endTime > time && startTime < time + viewField + viewFieldTolerance)
                 {
-                    var pos = GetPreviewNotePosition(column, startTime, time, flippedRight, zoomedIn);
+                    var iconType = getIconType(note);
 
-                    var ubhelper = new UbNoteBuilder(note);
-                    var iconType = ubhelper.InferObjectTypeIcon();
+                    if (isBrawl && endTime > time)
+                        activeBrawlHold = true;
 
-                    int endColumn = column;
+                    int endColumn = isBrawl ? brawlColumn : column;
+
                     if (iconType == UbIconType.Double)
                         endColumn = getDoubleEndLane(column);
 
-                    var tailPos = GetPreviewNotePosition(endColumn, endTime, time, flippedRight, zoomedIn);
+                    Vector2 getPosition(int col, double t) => isBrawl
+                        ? GetBrawlNotePosition(col, t, time, flippedRight, zoomedIn)
+                        : GetPreviewNotePosition(col, t, time, flippedRight, zoomedIn);
+
+                    var pos = getPosition(isBrawl ? brawlColumn : column, startTime);
+                    var tailPos = getPosition(endColumn, endTime);
 
                     // diagonal for double holds
                     bool holdFlippedRight = flippedRight;
                     if (column < 2 && !zoomedIn) holdFlippedRight = !holdFlippedRight;
 
-                    if (iconType == UbIconType.Double)
+                    if (isBrawl || iconType == UbIconType.Double)
                     {
-                        float startY = pos.Y;
-                        float endY = tailPos.Y;
+                        var holdStart = pos;
+                        bool drawDiagonal = true;
 
-                        double holdDuration = endTime - startTime;
-                        float speedX = holdFlippedRight
-                            ? (float)((1.0 - right_receptor) / viewField)
-                            : -(float)(left_receptor / viewField);
-                        float D = (float)holdDuration * speedX;
-
-                        if (Math.Abs(D) > 0.0001f)
+                        if (!isBrawl)
                         {
-                            float deltaY = endY - startY;
-                            float slope = deltaY / D;
+                            double holdDuration = endTime - startTime;
+                            float speedX = holdFlippedRight
+                                ? (float)((1.0 - right_receptor) / viewField)
+                                : -(float)(left_receptor / viewField);
+                            float D = (float)holdDuration * speedX;
 
-                            float clampedX = holdFlippedRight
-                                ? Math.Max(pos.X, right_receptor)
-                                : Math.Min(pos.X, left_receptor);
-                            float lineStartY = tailPos.Y - slope * (tailPos.X - clampedX);
-                            var lineStart = new Vector2(clampedX, lineStartY);
+                            drawDiagonal = Math.Abs(D) > 0.0001f;
 
+                            if (drawDiagonal)
+                            {
+                                float slope = (tailPos.Y - pos.Y) / D;
+                                float clampedX = holdFlippedRight
+                                    ? Math.Max(pos.X, right_receptor)
+                                    : Math.Min(pos.X, left_receptor);
+
+                                holdStart = new Vector2(clampedX, tailPos.Y - slope * (tailPos.X - clampedX));
+                            }
+                        }
+
+                        if (drawDiagonal)
+                        {
                             var previewHold = getPooledHold();
                             if (notesLayer.DrawSize != Vector2.Zero)
-                                previewHold.SetDiagonal(lineStart, tailPos, notesLayer.DrawSize);
+                                previewHold.SetDiagonal(holdStart, tailPos, notesLayer.DrawSize);
                             previewHold.Show();
 
                             if (time >= startTime)
                             {
                                 var previewNote2 = getPooledNote();
                                 previewNote2.SetIconType(iconType);
-                                previewNote2.Position = lineStart;
+                                previewNote2.Position = holdStart;
                                 previewNote2.Show();
                             }
                         }
@@ -423,46 +584,20 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                 // Continue search until window is reached
                 if (note.StartTime < time) continue;
 
+                // check if closest is brawl
+                if (!soonestNoteRecorded && column != 4 && note.StartTime <= time + viewField)
+                {
+                    soonestNoteRecorded = true;
+                    soonestIsBrawl = getIconType(note) == UbIconType.Brawl;
+                }
+
                 // Putting camera update in here because this about the time where we are
                 // close to the current time
                 if (!camUpdated)
                 {
                     camUpdated = true;
 
-                    if (olZoomedIn)
-                    {
-                        if (centerForUpcomingFlip)
-                        {
-                            // Upcoming flip stage: nudge slightly inward from the current side instead of centering.
-                            float inwardPull = olFlippedRight ? 0.04f : -0.04f;
-
-                            cameraBorder.MoveTo(new Vector2(cam_middle_receptor + inwardPull, cam_middle_receptor), 700,
-                                Easing.OutQuint);
-                            cameraBorder.ResizeTo(new Vector2(preview_width * 0.52f, preview_height * 0.79f), 700,
-                                Easing.OutQuint);
-                        }
-                        else if (olFlippedRight)
-                        {
-                            cameraBorder.MoveTo(new Vector2(cam_right_receptor, cam_middle_receptor), 700,
-                                Easing.OutQuint);
-                            cameraBorder.ResizeTo(new Vector2(preview_width * 0.48f, preview_height * 0.75f), 700,
-                                Easing.OutQuint);
-                        }
-                        else
-                        {
-                            cameraBorder.MoveTo(new Vector2(cam_left_receptor, cam_middle_receptor), 700,
-                                Easing.OutQuint);
-                            cameraBorder.ResizeTo(new Vector2(preview_width * 0.48f, preview_height * 0.75f), 700,
-                                Easing.OutQuint);
-                        }
-                    }
-                    else
-                    {
-                        cameraBorder.MoveTo(new Vector2(cam_middle_receptor, cam_middle_receptor), 700,
-                            Easing.OutQuint);
-                        cameraBorder.ResizeTo(new Vector2(preview_width * 0.7f, preview_height * 0.90f), 700,
-                            Easing.OutQuint);
-                    }
+                    updateCamera(olZoomedIn, olFlippedRight, centerForUpcomingFlip, soonestIsBrawl || activeBrawlHold);
 
                     indicatorLayer.UpdateIndicators(olFlippedRight, !olZoomedIn, centerForUpcomingFlip);
                 }
@@ -474,7 +609,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                     continue;
 
                 var previewNote = makeNote(note);
-                previewNote.Position = GetPreviewNotePosition(column, startTime, time, flippedRight, zoomedIn);
+
+                if (previewNote.IconType == UbIconType.Brawl)
+                    previewNote.Position = GetBrawlNotePosition(isForcedLowBrawl(column, note) ? getLowLane() : column,
+                        startTime, time, flippedRight, zoomedIn);
+                else
+                    previewNote.Position = GetPreviewNotePosition(column, startTime, time, flippedRight, zoomedIn);
 
                 if (previewNote.IconType == UbIconType.Dodge)
                 {
@@ -487,6 +627,54 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
 
                 previewNote.Show();
             }
+
+            bool brawlPull = soonestIsBrawl || activeBrawlHold;
+
+            if (!camUpdated)
+            {
+                updateCamera(olZoomedIn, olFlippedRight, centerForUpcomingFlip, brawlPull);
+                indicatorLayer.UpdateIndicators(olFlippedRight, !olZoomedIn, centerForUpcomingFlip);
+            }
+
+            // Update cop circles
+            for (int i = 0; i < copHitCircles.Count; i++)
+                copHitCircles[i].FadeTo(brawlPull && (i < 4) == !olFlippedRight ? 1 : 0, 200, Easing.OutQuint);
+            
+            // Update height of preview
+            this.ResizeTo(new Vector2(preview_width, preview_height * (brawlPull ? brawl_preview_taller : 1)), 700, Easing.OutQuint);
+        }
+
+        private void updateCamera(bool zoomedIn, bool flippedRight, bool centerForUpcomingFlip, bool brawlPull)
+        {
+            float x, width, height;
+
+            if (brawlPull)
+            {
+                x = flippedRight ? right_receptor + cop_column_offset : left_receptor - cop_column_offset;
+                width = preview_width * 0.48f * brawl_camera_zoom;
+                height = preview_height * 0.9f * brawl_camera_zoom;
+            }
+            else if (!zoomedIn)
+            {
+                x = cam_middle_receptor;
+                width = preview_width * 0.7f;
+                height = preview_height * 0.90f;
+            }
+            else if (centerForUpcomingFlip)
+            {
+                x = cam_middle_receptor + (flippedRight ? 0.04f : -0.04f);
+                width = preview_width * 0.52f;
+                height = preview_height * 0.79f;
+            }
+            else
+            {
+                x = flippedRight ? cam_right_receptor : cam_left_receptor;
+                width = preview_width * 0.48f;
+                height = preview_height * 0.75f;
+            }
+
+            cameraBorder.MoveTo(new Vector2(x, cam_middle_receptor), 700, Easing.OutQuint);
+            cameraBorder.ResizeTo(new Vector2(width, height), 700, Easing.OutQuint);
         }
         
         private bool shouldCenterForUpcomingFlip(double currentTime)
@@ -508,17 +696,17 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                     break;
 
 
-                var ubhelper = new UbNoteBuilder(note);
-                if (ubhelper.InferObjectTypeIcon() == UbIconType.Zoom)
+                var flipIconType = getIconType(note);
+                if (flipIconType == UbIconType.Zoom)
                 {
                     zoomTimes.Add(note);
                     continue;
                 }
 
-                if (ubhelper.InferObjectTypeIcon() != UbIconType.Flip)
+                if (flipIconType != UbIconType.Flip)
                     continue;
 
-                if (ubhelper.InferObjectModifierIcons().Contains(UbIconType.ModSwapImmediate))
+                if (noteBuilder.InferObjectModifierIcons().Contains(UbIconType.ModSwapImmediate))
                     continue;
                 
                 //double twoBeats = editorBeatmap.ControlPointInfo.TimingPointAt(note.StartTime).BeatLength * 2.0D;
@@ -528,7 +716,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                 if (probablyCenter)
                 {
               
-                    // Convert above loop to foreach
                     foreach (var zoom in zoomTimes)
                     {
                         if (zoom.StartTime > currentTime && zoom.StartTime <= note.StartTime)
@@ -599,13 +786,18 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
             activeHoldCount++;
             return newHold;
         }
+        
+        private UbIconType getIconType(HitObject note)
+        {
+            noteBuilder.ChangeHitObject(note);
+            return noteBuilder.InferObjectTypeIcon();
+        }
 
         private PreviewNote makeNote(ManiaHitObject hitObject)
         {
             var note = getPooledNote();
-            var ubiconHelper = new UbNoteBuilder(hitObject);
 
-            var iconType = ubiconHelper.InferObjectTypeIcon();
+            var iconType = getIconType(hitObject);
 
             // Extra logic to detect smaller freestyle notes
             if (iconType == UbIconType.Freestyle)
@@ -617,18 +809,13 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                     if (composer.Is4Key)
                         columns = [0, 1, 2, 3];
                     
-                    var prevUbIconHelper = new UbNoteBuilder(null);
-                    
                     for (int i = index - 1; i >= 0; i--)
                     {
                         var prevObj = editorBeatmap.HitObjects[i];
                         if (prevObj is ManiaHitObject prevNote)
                         {
-                            
-                            prevUbIconHelper.ChangeHitObject(prevNote);
-                            
-                            var prevIconType = prevUbIconHelper.InferObjectTypeIcon();
-                            
+                            var prevIconType = getIconType(prevNote);
+
                             if (columns.Contains(prevNote.Column))
                             {
                                 if (prevIconType == UbIconType.Animated || prevIconType == UbIconType.AnimatedHold)
@@ -696,6 +883,45 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
             }
 
             return vector;
+        }
+        
+        private bool isForcedLowBrawl(int column, ManiaHitObject note)
+        {
+            if (column != 0 && column != 2)
+                return false;
+
+            if (note is not IHasDuration)
+                return false;
+
+            noteBuilder.ChangeHitObject(note);
+            return !noteBuilder.InferObjectModifierIcons().Contains(UbIconType.ModCopHeavy);
+        }
+        
+        private Vector2 GetBrawlNotePosition(int column, double hitTime, double currentTime, bool flippedRight, bool zoomedIn)
+        {
+            var pos = GetPreviewNotePosition(column, hitTime, currentTime, flippedRight, zoomedIn);
+            
+            if (column <= 1 && !zoomedIn)
+                flippedRight = !flippedRight;
+
+            pos.X = flippedRight ? right_receptor + cop_column_offset : left_receptor - cop_column_offset;
+
+            if (column != 5)
+            {
+                double travel = Math.Max(0, hitTime - currentTime);
+                float progress = (float)Math.Clamp(travel / viewField, 0, 1);
+                
+                if (column == 2 || column == 0)
+                {
+                    pos.Y = top_receptor + cop_goal_offset - cop_travel_distance * progress;
+                }
+                else
+                {
+                    pos.Y = bottom_receptor - cop_goal_offset + cop_travel_distance * progress;
+                }
+            }
+
+            return pos;
         }
 
         public double Map(double value, double fromSource, double toSource, double fromTarget, double toTarget)
