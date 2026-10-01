@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -319,7 +320,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
     {
         public FormEnumDropdown()
         {
-            Items = Enum.GetValues<T>();
+            Items = EnumExtensions.GetValuesInOrder<T>();
         }
     }
 }

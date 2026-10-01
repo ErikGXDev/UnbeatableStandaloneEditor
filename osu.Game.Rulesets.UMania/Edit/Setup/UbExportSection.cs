@@ -15,6 +15,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Custom;
@@ -373,9 +374,17 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             return beatmapStream;
         }
 
-        public void ExportToZip(string extension = ".osu") => Task.Run(() => { exportToZip(extension); });
+        public void ExportToZip(string extension = ".osu", bool insideFolder = false) => Task.Run(() => { exportToZip(extension, insideFolder); });
 
-        private void exportToZip(string extension = ".osu")
+        
+        private static string getZipEntryName(string prefix, string name)
+        {
+            name = name.Replace('\\', '/');
+
+            return string.IsNullOrEmpty(prefix) ? name : $"{prefix}/{name}";
+        }
+
+        private void exportToZip(string extension = ".osu", bool insideFolder = false)
         {
             if (string.IsNullOrEmpty(exportFolderSelector.SelectedDirectory.Value) ||
                 Beatmap.BeatmapInfo.BeatmapSet == null)
@@ -409,6 +418,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             
             // Create the .zip file
             string zipFilename = baseFilename + ".zip";
+            
+            string entryPrefix = insideFolder ? baseFilename : string.Empty;
 
             using (var zipStream = new MemoryStream())
             {
@@ -423,7 +434,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                         var newDifficulty = beatmap.Metadata.Source ?? "Easy";
 
                         var beatmapName = getBaseFilenameWithDiff(artist, title, author, newDifficulty);
-                        var beatmapEntry = archive.CreateEntry(beatmapName + extension, CompressionLevel.Optimal);
+                        var beatmapEntry = archive.CreateEntry(getZipEntryName(entryPrefix, beatmapName + extension), CompressionLevel.Optimal);
 
                         using (var entryStream = beatmapEntry.Open())
                         {
@@ -440,7 +451,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                         var audioStream = workingBeatmap.GetStream(audioFile.File.GetStoragePath());
                         if (audioStream != null)
                         {
-                            var audioEntry = archive.CreateEntry(audioFilename, CompressionLevel.Optimal);
+                            var audioEntry = archive.CreateEntry(getZipEntryName(entryPrefix, audioFilename), CompressionLevel.Optimal);
 
                             using (var entryStream = audioEntry.Open())
                             {
@@ -457,7 +468,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                         var coverStream = workingBeatmap.GetStream(coverFile.File.GetStoragePath());
                         if (coverStream != null)
                         {
-                            var coverEntry = archive.CreateEntry("cover.png", CompressionLevel.Optimal);
+                            var coverEntry = archive.CreateEntry(getZipEntryName(entryPrefix, "cover.png"), CompressionLevel.Optimal);
 
                             using (var entryStream = coverEntry.Open())
                             {
@@ -477,7 +488,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                             string videoEntryName = videoFilename.EndsWith(".webm", StringComparison.OrdinalIgnoreCase)
                                 ? "video.webm"
                                 : "video.mp4";
-                            var videoEntry = archive.CreateEntry(videoEntryName, CompressionLevel.Optimal);
+                            var videoEntry = archive.CreateEntry(getZipEntryName(entryPrefix, videoEntryName), CompressionLevel.Optimal);
 
                             using (var entryStream = videoEntry.Open())
                             {
@@ -662,6 +673,10 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             else if (exportModeBindable.Value == ExportMode.OfficialZip)
             {
                 ExportToZip(".txt");
+            }
+            else if (exportModeBindable.Value == ExportMode.FolderInPackage)
+            {
+                ExportToZip(".txt", insideFolder: true);
             }
             else if (exportModeBindable.Value == ExportMode.Zip)
             {
@@ -965,19 +980,28 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             base.Dispose(isDisposing);
         }
 
+        [HasOrderedElements]
         enum ExportMode
         {
             [Description("Official Package (.zip file, .txt)")]
-            OfficialZip,
+            [Order(0)]
+            OfficialZip = 0,
+            
+            [Description("Folder in Package (.zip file, .txt)")]
+            [Order(1)]
+            FolderInPackage = 4,
 
             [Description("As Folder (.txt)")]
-            OfficialFolder,
+            [Order(2)]
+            OfficialFolder = 1,
 
             [Description("Legacy Package (.zip file, .osu)")]
-            Zip,
+            [Order(3)]
+            Zip = 2,
 
             [Description("Legacy Folder (.osu)")]
-            Folder,
+            [Order(4)]
+            Folder = 3,
         }
     }
 }
