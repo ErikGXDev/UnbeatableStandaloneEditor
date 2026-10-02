@@ -58,7 +58,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected override void PopIn()
         {
-            this.ScaleTo(1, scale_duration, Easing.OutElasticHalf);
+            this.ScaleTo(1, scale_duration / 2, Easing.OutQuint);
             this.FadeIn(fade_duration, Easing.OutQuint);
 
             samplePopIn?.Play();
