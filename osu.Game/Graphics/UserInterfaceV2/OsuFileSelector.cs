@@ -108,6 +108,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                     if (SupportedExtensions.IMAGE_EXTENSIONS.Contains(extension))
                         return FontAwesome.Regular.FileImage;
+                    
+                    if (SupportedExtensions.ARCHIVE_EXTENSIONS.Contains(extension))
+                        return FontAwesome.Regular.FileArchive;
 
                     return FontAwesome.Regular.File;
                 }

@@ -8,6 +8,7 @@ namespace osu.Game.Utils
         public static readonly string[] VIDEO_EXTENSIONS = [@".mp4", @".webm"];
         public static readonly string[] AUDIO_EXTENSIONS = [@".mp3", @".ogg", @".wav"];
         public static readonly string[] IMAGE_EXTENSIONS = [/*@".jpg", @".jpeg",*/ @".png"]; // FIX: Only a cover.png is supported.
+        public static readonly string[] ARCHIVE_EXTENSIONS = [@".zip"];
 
         public static readonly string[] ALL_EXTENSIONS =
         [
