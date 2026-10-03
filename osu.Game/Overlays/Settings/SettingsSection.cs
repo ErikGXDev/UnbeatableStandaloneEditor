@@ -113,7 +113,8 @@ namespace osu.Game.Overlays.Settings
                             {
                                 new OsuSpriteText
                                 {
-                                    Font = OsuFont.TorusAlternate.With(size: header_size),
+                                    // FIX: Better font
+                                    Font = OsuFont.Default.With(size: header_size),
                                     Text = Header,
                                     Margin = SettingsPanel.CONTENT_PADDING,
                                 },

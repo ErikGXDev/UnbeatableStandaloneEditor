@@ -15,6 +15,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens;
 using osu.Game.Screens.Edit;
 using UnbeatableStandaloneEditor.BeatmapPicker;
+using UnbeatableStandaloneEditor.Settings;
 
 namespace UnbeatableStandaloneEditor;
 
@@ -28,6 +29,9 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
 
     [Cached]
     private VolumeOverlay volumeOverlay = new VolumeOverlay();
+
+    [Cached]
+    private EditorSettingsOverlay settingsOverlay = new EditorSettingsOverlay();
 
     private OsuScreenStack screenStack = null!;
     private EditorConfigManager editorConfig = null!;
@@ -52,6 +56,7 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
         Add(dialogOverlay);
         Add(notificationOverlay);
         Add(volumeOverlay);
+        Add(settingsOverlay);
         Add(onScreenDisplay);
     }
 

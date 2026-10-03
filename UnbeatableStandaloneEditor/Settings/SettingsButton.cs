@@ -16,12 +16,15 @@ using UnbeatableStandaloneEditor.Components;
 
 namespace UnbeatableStandaloneEditor.Settings;
 
-public partial class SettingsButton : BlankButton, IHasPopover // Didnt want the triangles, so OsuButton only
+public partial class SettingsButton : BlankButton // Didnt want the triangles, so OsuButton only
 {
     public SettingsButton() {}
 
     [Resolved]
     private OverlayColourProvider colourProvider { get; set; } = null!;
+
+    [Resolved]
+    private EditorSettingsOverlay settingsOverlay { get; set; } = null!;
 
     [BackgroundDependencyLoader]
     private void load()
@@ -41,11 +44,6 @@ public partial class SettingsButton : BlankButton, IHasPopover // Didnt want the
             Depth = -1,
         });
 
-        Action = () =>
-        {
-            this.ShowPopover();
-        };
+        Action = () => settingsOverlay.ToggleVisibility();
     }
-
-    public Popover GetPopover() => new SettingsPopover();
 }
