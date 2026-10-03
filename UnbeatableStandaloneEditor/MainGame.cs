@@ -147,6 +147,37 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
 
     public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) { }
 
+    // one must imagine a dialog to save changes before closing is simple to implement
+    protected override bool OnExiting()
+    {
+        if (screenStack.CurrentScreen is OsuScreen { AllowUserExit: true })
+        {
+            windowCloseRequested = true;
+            screenStack.Exit();
+            return true;
+        }
+
+        return base.OnExiting();
+    }
+
+    private bool windowCloseRequested;
+
+    protected override void Update()
+    {
+        base.Update();
+
+        if (!windowCloseRequested)
+            return;
+
+        if (dialogOverlay.CurrentDialog != null)
+            return;
+
+        if (screenStack.CurrentScreen is BeatmapPickerScreen)
+            RequestExit();
+        else
+            windowCloseRequested = false;
+    }
+
     // Volume controls
     protected override bool OnScroll(ScrollEvent e)
     {
