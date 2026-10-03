@@ -20,6 +20,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -49,6 +50,9 @@ namespace osu.Game.Screens.Edit.Setup
 
         private bool reloading;
         private bool dirty;
+
+        // retry for track loading logic
+        private ScheduledDelegate? songLengthRetry;
 
         public override LocalisableString Title => EditorSetupStrings.MetadataHeader;
 
@@ -186,15 +190,8 @@ namespace osu.Game.Screens.Edit.Setup
             });
             
             
-            songLength.ReadOnly = true;
-            
-            songLength.Current.BindValueChanged(ev =>
-            {
-                applyMetadata();
-            });
-            
             if (setupScreen != null)
-                setupScreen.MetadataChanged += reloadMetadata;
+                setupScreen.MetadataChanged += () => reloadMetadata(audioChanged: true);
 
             reloadMetadata();
         }
@@ -269,7 +266,7 @@ namespace osu.Game.Screens.Edit.Setup
             RomanisedTitleTextBox.ReadOnly = MetadataUtils.IsRomanised(TitleTextBox.Current.Value);
         }
 
-        private void reloadMetadata()
+        private void reloadMetadata(bool audioChanged = false)
         {
             reloading = true;
 
@@ -291,13 +288,41 @@ namespace osu.Game.Screens.Edit.Setup
             var tagsData = parseTags(metadata.Tags);
             levelTextBox.Current.Value = tagsData.Level?.ToString() ?? string.Empty;
             flavorTextTextBox.Current.Value = tagsData.FlavorText ?? string.Empty;
-            songLength.Current.Value = (music.CurrentTrack.Length / 1000).ToString(CultureInfo.InvariantCulture);
             coverArtist.Current.Value = tagsData.CoverArt ?? string.Empty;
-            
 
+            songLength.Current.Value = tagsData.SongLength?.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
+            songLengthRetry?.Cancel();
+            reloadSongLength(audioChanged);
+            
             updateReadOnlyState();
 
             reloading = false;
+        }
+        
+        private void reloadSongLength(bool audioChanged = false)
+        {
+            var track = music.CurrentTrack;
+            if (track.IsDummyDevice)
+                return;
+
+            if (!track.TrackLoaded)
+            {
+                track.Seek(track.CurrentTime);
+
+                if (!track.TrackLoaded)
+                {
+                    songLengthRetry = Scheduler.AddDelayed(() => reloadSongLength(), 100);
+                    return;
+                }
+            }
+
+            // A length differing from the real one is a user edit
+            if (!audioChanged && float.TryParse(songLength.Current.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var current)
+                && current != 0
+                && Math.Abs(current - track.Length / 1000.0) > 0.001)
+                return;
+
+            songLength.Current.Value = Math.Round(track.Length / 1000.0, 5).ToString(CultureInfo.InvariantCulture);
         }
 
         
