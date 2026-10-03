@@ -189,6 +189,15 @@ public partial class SettingsPopover : OsuPopover
                                 new VolumeSlider(audio.VolumeTrack),
                                 new MenuLabel("Effects"),
                                 new VolumeSlider(audio.VolumeSample),
+                                new OsuSpriteText()
+                                {
+                                    AllowMultiline = true,
+                                    RelativeSizeAxes = Axes.X,
+                                    Text = "Tip: Use Alt+Shift+Scroll to summon the volume controls anywhere in the editor.",
+                                    Font = OsuFont.Default.With(size: 12, weight: FontWeight.Regular),
+                                    Colour = colourProvider.Content1.Opacity(0.75f),
+                                    Margin = new MarginPadding { Top = 8 },
+                                }
                             },
                         },
                         new SettingsGroup()
@@ -268,45 +277,38 @@ public partial class SettingsPopover : OsuPopover
                             },
                         },
 
-                        new OsuSpriteText
+                        new SettingsGroup()
                         {
-                            Text = "Key Bindings",
-                            Font = OsuFont.Default.With(size: 16, weight: FontWeight.Bold),
-                            Margin = new MarginPadding { Top = 10, Bottom = 5 },
-                        },
-                        keybindingsContainer = new OsuScrollContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 250,
-                            Masking = true,
-                            Child = new EditorKeyBindingsSubsection(),
-                            ScrollDistance = 65
-                        },
-                        editKeybindingsButton = new RoundedButton
-                        {
-                            Width = 150,
-                            Height = 30,
-                            Text = "Click to show...",
-                            Colour = colourProvider.Colour1,
-                            BackgroundColour = colourProvider.Background2,
-                            Scale = new Vector2(0.9f),
-                            Action = () =>
+                            Label = "Key Bindings",
+                            Controls = new Drawable[]
                             {
-                                keybindingsContainer.Show();
-                                editKeybindingsButton.Hide();
-                            },
+                                keybindingsContainer = new OsuScrollContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 250,
+                                    Masking = true,
+                                    Child = new EditorKeyBindingsSubsection(),
+                                    ScrollDistance = 65
+                                },
+                                editKeybindingsButton = new RoundedButton
+                                {
+                                    Width = 150,
+                                    Height = 30,
+                                    Text = "Click to show...",
+                                    Colour = colourProvider.Colour1,
+                                    BackgroundColour = colourProvider.Background2,
+                                    Scale = new Vector2(0.9f),
+                                    Action = () =>
+                                    {
+                                        keybindingsContainer.Show();
+                                        editKeybindingsButton.Hide();
+                                    },
+                                },
+                            }
                         },
 
-                        new OsuSpriteText()
-                        {
-                            AllowMultiline = true,
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Tip: Use Alt+Shift+Scroll to summon the volume controls anywhere in the editor.",
-                            Font = OsuFont.Default.With(size: 12, weight: FontWeight.Regular),
-                            Colour = colourProvider.Content1.Opacity(0.75f),
-                            Margin = new MarginPadding { Top = 15 },
 
-                        }
+
                     }
 
 
