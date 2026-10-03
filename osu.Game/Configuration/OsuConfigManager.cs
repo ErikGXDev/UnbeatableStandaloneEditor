@@ -214,6 +214,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorExportOffsetMs, 0); // FIX: Customisable ms offset applied when exporting maps
             SetDefault(OsuSetting.Editor60msOffset, false); // FIX: 60ms offset for editor
             SetDefault(OsuSetting.CreateBackups, true); // FIX: Toggle backup creation on save
+            SetDefault(OsuSetting.EditorBackupIntervalMinutes, 0); // FIX: back up this often while editing
             SetDefault(OsuSetting.EditorUnanimated, false); // FIX: Support for the UNANIMATED note feature
             SetDefault(OsuSetting.EditorUnanimatedNoLimit, false); // FIX: Support for the UNANIMATED note feature without limit
             SetDefault(OsuSetting.EditorExportMode, 0); // FIX: Export mode should persist as a config, enum is converted to int
@@ -534,6 +535,7 @@ namespace osu.Game.Configuration
         //EditorSwapPinkInsteadOfCamera,
         
         CreateBackups, // Toggle backup creation on save
+        EditorBackupIntervalMinutes, // FIX: Interval in minutes for automatic backups while editing
         
         EditorExportMode, // Persist export settings
         EditorExportFolder

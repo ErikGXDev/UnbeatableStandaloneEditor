@@ -99,6 +99,11 @@ namespace osu.Game.Screens.Edit
 
         protected override bool PlayExitSound => !ExitConfirmed && !switchingDifficulty;
 
+        
+        // Backup timing
+        private DateTime lastBackupTime = DateTime.Now;
+        private int backupIntervalMinutes = 0;
+
         protected bool HasUnsavedChanges
         {
             get
@@ -258,6 +263,8 @@ namespace osu.Game.Screens.Edit
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, OverlayColourProvider colourProvider)
         {
+            backupIntervalMinutes = config.Get<int>(OsuSetting.EditorBackupIntervalMinutes);
+
             var loadableBeatmap = Beatmap.Value;
 
             if (loadableBeatmap is DummyWorkingBeatmap)
@@ -645,6 +652,9 @@ namespace osu.Game.Screens.Edit
 
         public bool MakeBackup(bool sendToast = false)
         {
+            // Reset backup timer
+            lastBackupTime = DateTime.Now;
+
             if (!osuConfig.Get<bool>(OsuSetting.CreateBackups))
             {
                 return false;
@@ -826,6 +836,10 @@ namespace osu.Game.Screens.Edit
             clock.ProcessFrame();
 
             discardChangesMenuItem.Action.Disabled = !HasUnsavedChanges;
+
+            // Create a backup every few minutes of editing
+            if (backupIntervalMinutes > 0 && DateTime.Now - lastBackupTime >= TimeSpan.FromMinutes(backupIntervalMinutes))
+                Task.Run(() => MakeBackup());
         }
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)

@@ -205,6 +205,15 @@ public partial class SettingsPopover : OsuPopover
                                     Current = osuConfig.GetBindable<bool>(OsuSetting.CreateBackups),
                                     Margin = new MarginPadding { Bottom = 10, Top = 5 },
                                 },
+                                new TooltipNumberInput
+                                {
+                                    LabelText = "Backup interval (minutes)",
+                                    TooltipText = "Additionally create a backup automatically this often while you are editing, even if you don't save. Set to 0 to disable.",
+                                    Current = osuConfig.GetBindable<int>(OsuSetting.EditorBackupIntervalMinutes),
+                                    MinimumValue = 0,
+                                    MaximumValue = 240,
+                                    Margin = new MarginPadding { Bottom = 10 },
+                                },
                                 new OsuTextFlowContainer(t =>
                                     t.Font = OsuFont.Default.With(size: 14, weight: FontWeight.Regular))
                                 {
