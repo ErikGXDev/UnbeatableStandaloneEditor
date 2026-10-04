@@ -14,6 +14,7 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -37,12 +38,16 @@ public partial class BeatmapPickerScreen : OsuScreen
     [Resolved] private EditorConfigManager config { get; set; } = null!;
 
     private readonly Bindable<BeatmapSetInfo?> selectedSet = new();
+    private readonly Bindable<string> searchQuery = new();
+    private readonly BindableBool gridViewToggle = new();
 
     private FillFlowContainer setsFlow = null!;
     private RoundedButton editButton = null!;
     private RoundedButton deleteButton = null!;
     private RoundedButton? updateButton;
     private SortButton sortByButton = null!;
+    private SearchTextBox searchBox = null!;
+    private ListGridToggle gridViewButton = null!;
 
     private OsuClickableContainer versionText = null!;
     private Container? updateButtonContainer;
@@ -80,19 +85,31 @@ public partial class BeatmapPickerScreen : OsuScreen
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Text = "Your Beatmaps",
+                                Text = "Your Charts",
                                 Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                             },
-                            sortByButton = new SortButton(),
-                            new RoundedButton
+                            new FillFlowContainer()
                             {
+                                Direction = FillDirection.Horizontal,
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
-                                Width = 148,
-                                Height = 32,
-                                Text = "+ New Beatmap",
-                                Action = createNewBeatmap,
+                                Spacing = new Vector2(8, 0),
+                                Children = [
+                                    new RoundedButton
+                                    {
+                                        Anchor = Anchor.CentreRight,
+                                        Origin = Anchor.CentreRight,
+                                        Width = 148,
+                                        Height = 32,
+                                        Text = "+ New Chart",
+                                        Action = createNewBeatmap,
+                                    },
+                                    sortByButton = new SortButton(),
+                                    gridViewButton = new ListGridToggle(gridViewToggle),
+                                    searchBox = new SearchBeatmaps(searchQuery)
+                                ]
                             }
+
                         ],
                     },
                     // Scrollable list
@@ -147,7 +164,7 @@ public partial class BeatmapPickerScreen : OsuScreen
                                         Origin = Anchor.CentreRight,
                                         Width = 148,
                                         Height = 32,
-                                        Text = "Edit Beatmap",
+                                        Text = "Edit Chart",
                                         Action = openEditor,
                                     }
                                 ],
@@ -240,6 +257,16 @@ public partial class BeatmapPickerScreen : OsuScreen
         {
             rebuildBeatmapList();
         });
+
+        searchQuery.BindValueChanged(v =>
+        {
+            rebuildBeatmapList();
+        });
+
+        gridViewToggle.BindValueChanged(v =>
+        {
+            rebuildBeatmapList();
+        });
     }
 
     public override void OnEntering(ScreenTransitionEvent e)
@@ -298,6 +325,17 @@ public partial class BeatmapPickerScreen : OsuScreen
         });
     }
 
+    private bool matchesSearch(BeatmapSetInfo set)
+    {
+        var query = searchQuery.Value?.Trim().ToLowerInvariant();
+        if (string.IsNullOrEmpty(query))
+            return true;
+
+        return set.Metadata.Artist.ToLowerInvariant().Contains(query) ||
+               set.Metadata.Title.ToLowerInvariant().Contains(query) ||
+               set.Metadata.Author.Username.ToLowerInvariant().Contains(query);
+    }
+
     private void buildFlowFromSets(List<BeatmapSetInfo> sets)
     {
 
@@ -317,7 +355,7 @@ public partial class BeatmapPickerScreen : OsuScreen
         BeatmapSetInfo? newSelection = null;
         BeatmapSetInfo? firstSet = null;
 
-        foreach (var set in sets.OrderBy(sortByButton.GetSortObject).ThenBy(s => s.Metadata.Title))
+        foreach (var set in sets.Where(matchesSearch).OrderBy(sortByButton.GetSortObject).ThenBy(s => s.Metadata.Title))
         {
             var detached = set.Detach();
             firstSet ??= detached;
@@ -325,7 +363,6 @@ public partial class BeatmapPickerScreen : OsuScreen
                 newSelection = detached;
             setsFlow.Add(new BeatmapSetRow(detached, selectedSet, openEditor));
         }
-
         // If nothing was previously selected (e.g. first beatmap just created),
         // fall back to the first set so the buttons activate automatically.
         selectedSet.Value = newSelection ?? firstSet;
