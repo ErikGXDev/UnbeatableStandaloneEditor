@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -42,6 +43,7 @@ public partial class BeatmapPickerScreen : OsuScreen
     private readonly BindableBool gridViewToggle = new();
 
     private FillFlowContainer setsFlow = null!;
+    private FillFlowContainer setsGrid = null!;
     private RoundedButton editButton = null!;
     private RoundedButton deleteButton = null!;
     private RoundedButton? updateButton;
@@ -121,14 +123,27 @@ public partial class BeatmapPickerScreen : OsuScreen
                         Child = new OsuScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = setsFlow = new FillFlowContainer
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Direction = FillDirection.Vertical,
-                                Spacing = new Vector2(0, 3),
-                                Padding = new MarginPadding { Right = 10, Bottom = 10 },
-                            },
+                                setsFlow = new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(0, 3),
+                                    Padding = new MarginPadding { Right = 10, Bottom = 10 },
+                                    AlwaysPresent = true
+                                },
+                                setsGrid = new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Full,
+                                    Spacing = Vector2.Zero,
+                                    Padding = new MarginPadding { Right = 10, Bottom = 10 },
+                                    AlwaysPresent = true
+                                },
+                            }
                         },
                     },
                     // Footer
@@ -245,11 +260,10 @@ public partial class BeatmapPickerScreen : OsuScreen
         // Load all the beatmap sets
         realm.RegisterForNotifications(
             r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending),
-            (sets, _) =>
+            (_, _) =>
             {
-
                 if (this.IsCurrentScreen())
-                    buildFlowFromSets(sets.ToList());
+                    rebuildBeatmapList(false);
             }
         );
 
@@ -260,7 +274,7 @@ public partial class BeatmapPickerScreen : OsuScreen
 
         searchQuery.BindValueChanged(v =>
         {
-            rebuildBeatmapList();
+            rebuildBeatmapListDebounced();
         });
 
         gridViewToggle.BindValueChanged(v =>
@@ -316,56 +330,164 @@ public partial class BeatmapPickerScreen : OsuScreen
         });
     }
 
-    private void rebuildBeatmapList()
+    private CancellationTokenSource? rebuildCancellation;
+
+    private ScheduledDelegate? pendingSearchRebuild;
+
+    private void rebuildBeatmapListDebounced()
     {
-        realm.Run(r =>
-        {
-            var sets = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending);
-            buildFlowFromSets(sets.ToList());
-        });
+        pendingSearchRebuild?.Cancel();
+        pendingSearchRebuild = Scheduler.AddDelayed(() => rebuildBeatmapList(true), 200);
     }
 
-    private bool matchesSearch(BeatmapSetInfo set)
+    private void rebuildBeatmapList(bool withAnimation = true)
     {
-        var query = searchQuery.Value?.Trim().ToLowerInvariant();
+        rebuildCancellation?.Cancel();
+        rebuildCancellation?.Dispose();
+
+        var cancellation = new CancellationTokenSource();
+        rebuildCancellation = cancellation;
+
+        CancellationToken token = cancellation.Token;
+
+        string query = searchQuery.Value ?? string.Empty;
+        SortMode sortMode = sortByButton.CurrentSortMode.Value;
+        Guid? selectedId = selectedSet.Value?.ID;
+
+        realm.RunAsync(r =>
+        {
+            var sets = r.All<BeatmapSetInfo>()
+                .Where(s => !s.DeletePending)
+                .ToList()
+                .Detach();
+
+            if (token.IsCancellationRequested)
+                return new List<BeatmapSetInfo>();
+
+            return sets.Where(set => matchesSearch(set, query))
+                .OrderBy(set => SortButton.GetSortObject(set, sortMode))
+                .ThenBy(set => set.Metadata.Title)
+                .ToList();
+        }, token).ContinueWith(task =>
+        {
+            if (token.IsCancellationRequested || task.IsFaulted || task.IsCanceled)
+                return;
+
+            if (task.IsCompletedSuccessfully)
+                Schedule(() => displaySets(task.Result, selectedId, withAnimation));
+        }, token);
+    }
+
+    private static bool matchesSearch(BeatmapSetInfo set, string query)
+    {
         if (string.IsNullOrEmpty(query))
             return true;
+
+        query = query.Trim().ToLowerInvariant();
 
         return set.Metadata.Artist.ToLowerInvariant().Contains(query) ||
                set.Metadata.Title.ToLowerInvariant().Contains(query) ||
                set.Metadata.Author.Username.ToLowerInvariant().Contains(query);
     }
 
-    private void buildFlowFromSets(List<BeatmapSetInfo> sets)
+    private void displaySets(List<BeatmapSetInfo> sets, Guid? selectedId, bool withAnimation = true)
     {
-
-        var prevId = selectedSet.Value?.ID;
         setsFlow.Clear();
+        setsGrid.Clear();
 
-        if (!sets.Any())
+        setsFlow.Alpha = gridViewToggle.Value ? 0 : 1;
+        setsGrid.Alpha = gridViewToggle.Value ? 1 : 0;
+
+        bool grid = gridViewToggle.Value;
+
+        var activeFlow = grid ? setsGrid : setsFlow;
+
+
+        Logger.Log($"Displaying {sets.Count} sets (selected ID: {selectedId})");
+        if (sets.Count == 0)
         {
-            sortByButton.Alpha = 0;
-            setsFlow.Add(new EmptyState());
             selectedSet.Value = null;
+
+            if (string.IsNullOrEmpty(searchQuery.Value?.Trim()))
+            {
+                Logger.Log("No charts yet!");
+                sortByButton.Alpha = 0;
+                activeFlow.Add(new EmptyState(@"No charts yet. Click ""+ New Chart"" to get started.", FontAwesome.Regular.FolderOpen));
+            }
+            else
+            {
+                Logger.Log("No charts match your search...");
+                activeFlow.Add(new EmptyState("No charts match your search...", FontAwesome.Solid.Search));
+            }
+
             return;
         }
 
         sortByButton.Alpha = 1;
 
         BeatmapSetInfo? newSelection = null;
-        BeatmapSetInfo? firstSet = null;
 
-        foreach (var set in sets.Where(matchesSearch).OrderBy(sortByButton.GetSortObject).ThenBy(s => s.Metadata.Title))
+        var currentSelectedID = selectedSet.Value?.ID;
+
+        foreach (var set in sets)
         {
-            var detached = set.Detach();
-            firstSet ??= detached;
-            if (prevId.HasValue && detached.ID == prevId.Value)
-                newSelection = detached;
-            setsFlow.Add(new BeatmapSetRow(detached, selectedSet, openEditor));
+            newSelection ??= set;
+
+            // async loading magic
+            if (grid)
+            {
+                setsGrid.Add(new SquareDelayedLoadWrapper(
+                    () => new BeatmapSetCard(set, selectedSet),
+                    timeBeforeLoad: 0)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Width = 0.25f,
+                    AlwaysPresent = true,
+                });
+            }
+            else
+            {
+                // async loading magic
+                setsFlow.Add(new DelayedLoadWrapper(
+                    () => new BeatmapSetRow(set, selectedSet, openEditor),
+                    timeBeforeLoad: 0)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 56,
+                });
+            }
+
+            if (currentSelectedID.HasValue && set.ID == currentSelectedID.Value)
+                newSelection = set;
         }
-        // If nothing was previously selected (e.g. first beatmap just created),
-        // fall back to the first set so the buttons activate automatically.
-        selectedSet.Value = newSelection ?? firstSet;
+
+        activeFlow.FadeInFromZero(250, Easing.OutQuint);
+        if (withAnimation)
+        {
+            activeFlow.MoveToY(10);
+            activeFlow.MoveToY(0, 250, Easing.OutQuint);
+        }
+
+        selectedSet.Value = newSelection ?? sets[0];
+    }
+
+    protected override void Dispose(bool isDisposing)
+    {
+        try
+        {
+            pendingSearchRebuild?.Cancel();
+
+            rebuildCancellation?.Cancel();
+            rebuildCancellation?.Dispose();
+            rebuildCancellation = null;
+        }
+        catch
+        {
+            // ignored
+        }
+
+
+        base.Dispose(isDisposing);
     }
 
     private void createNewBeatmap()
@@ -425,9 +547,33 @@ public partial class BeatmapPickerScreen : OsuScreen
         /*BrowserUtil.OpenUrl(update.ReleaseUrl);*/
     }
 
+    private partial class SquareDelayedLoadWrapper : DelayedLoadWrapper
+    {
+        public SquareDelayedLoadWrapper(Func<Drawable> createFunc, double timeBeforeLoad = 500)
+            : base(createFunc, timeBeforeLoad)
+        {
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            Height = DrawWidth;
+        }
+    }
+
+
     // For when there are no beatmaps
     private partial class EmptyState : CompositeDrawable
     {
+        private readonly string message;
+        private readonly IconUsage icon;
+
+        public EmptyState(string message, IconUsage icon)
+        {
+            this.message = message;
+            this.icon = icon;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -446,7 +592,7 @@ public partial class BeatmapPickerScreen : OsuScreen
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Icon = FontAwesome.Regular.FolderOpen,
+                        Icon = icon,
                         Size = new Vector2(40),
                         Alpha = 0.25f,
                     },
@@ -454,7 +600,7 @@ public partial class BeatmapPickerScreen : OsuScreen
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = @"No beatmaps yet. Click ""+ New Beatmap"" to get started.",
+                        Text = message,
                         Font = OsuFont.GetFont(size: 16),
                         Alpha = 0.4f,
                     }

@@ -76,19 +76,14 @@ public partial class SortButton : BlankButton
         Text = "Sort by: " + CurrentSortMode.Value.Humanize();
     }
 
-    public object GetSortObject(BeatmapSetInfo set)
+    public static object GetSortObject(BeatmapSetInfo set, SortMode mode)
     {
-        if (CurrentSortMode.Value == SortMode.Artist)
-        {
-            return set.Metadata.Artist;
-        }
-
-        if (CurrentSortMode.Value == SortMode.Title)
+        if (mode == SortMode.Title)
         {
             return set.Metadata.Title;
         }
 
-        if (CurrentSortMode.Value == SortMode.LastEdited)
+        if (mode == SortMode.LastEdited)
         {
             return -set.DateAdded.UtcTicks;
         }
