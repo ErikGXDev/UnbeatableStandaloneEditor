@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -27,12 +28,7 @@ public partial class EditorSettingsOverlay : SettingsPanel
 
     protected override Drawable CreateHeader() => new EditorSettingsHeader();
 
-    protected override Drawable CreateFooter() => new OsuContextMenuContainer
-    {
-        RelativeSizeAxes = Axes.X,
-        AutoSizeAxes = Axes.Y,
-        Child = new EditorSettingsFooter(),
-    };
+    protected override Drawable CreateFooter() => new EditorSettingsFooter();
 
     public EditorSettingsOverlay()
         : base(false)

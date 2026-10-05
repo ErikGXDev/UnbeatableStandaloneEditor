@@ -1,12 +1,13 @@
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Settings;
+using osuTK;
+using UnbeatableStandaloneEditor.Components;
 using OsuSpriteText = osu.Game.Graphics.Sprites.OsuSpriteText;
 
 namespace UnbeatableStandaloneEditor.Settings;
@@ -44,20 +45,48 @@ public partial class EditorSettingsHeader : Container
     }
 }
 
-public partial class EditorSettingsFooter : FillFlowContainer
+public partial class ExpandableCredits : FillFlowContainer
 {
-    [BackgroundDependencyLoader]
-    private void load()
+    private bool expanded;
+
+    public ExpandableCredits()
     {
         RelativeSizeAxes = Axes.X;
         AutoSizeAxes = Axes.Y;
         Direction = FillDirection.Vertical;
-        Padding = new MarginPadding
+        Spacing = new Vector2(0, 5);
+    }
+
+    private OsuTextFlowContainer creditsTextFlow = null!;
+
+    [BackgroundDependencyLoader]
+    private void load(OverlayColourProvider colourProvider)
+    {
+        var button = new BlankButton()
         {
-            Top = 20,
-            Bottom = 30,
-            Left = SettingsPanel.CONTENT_PADDING.Left,
-            Right = SettingsPanel.CONTENT_PADDING.Right,
+            Width = 100,
+            Height = 28,
+            Text = "Credits",
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopCentre,
+            Colour = colourProvider.Background5,
+            BackgroundColour = colourProvider.Background4,
+            Scale = new Vector2(0.75f),
+            Margin = new MarginPadding() { Top = 8 },
+            Action = toggleExpand,
+        };
+
+        creditsTextFlow = new OsuTextFlowContainer(t =>
+        {
+            t.Font = OsuFont.GetFont(size: 11, weight: FontWeight.Regular);
+        })
+        {
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Text = "Created by Erik / ErikGXDev, with the help of the UNBEATABLE Modding and Charting Community, open source and free, under MIT license.\nThis editor uses osu!framework, osu! and other open-source libraries. Not affiliated with D-CELL, Playstack, or ppy. See the included CREDITS file for more information.\nAudio Engine: FMOD Studio by Firelight Technologies Pty Ltd. / BASS",
+            Colour = colourProvider.Content1.Opacity(0.7f),
+            Padding = new MarginPadding { Vertical = 8, Horizontal = 16},
+            Alpha = 0,
         };
 
         Children = new Drawable[]
@@ -75,6 +104,52 @@ public partial class EditorSettingsFooter : FillFlowContainer
                 Origin = Anchor.TopCentre,
                 Text = $"v{AppVersion.Current}",
                 Font = OsuFont.GetFont(size: 16),
+            },
+            button,
+            creditsTextFlow,
+            dummy = new Container
+            {
+                RelativeSizeAxes = Axes.X,
+                Height = 0,
+            }
+        };
+
+    }
+
+    private Container dummy;
+
+    private void toggleExpand()
+    {
+        expanded = !expanded;
+
+        creditsTextFlow.FadeTo(expanded ? 1 : 0, 200, Easing.OutQuint);
+
+        // Scroll to bottom to show the expanded credits
+        if (expanded)
+        {
+            ScheduleAfterChildren(() =>
+            {
+                var panel = this.FindClosestParent<EditorSettingsOverlay>();
+                panel?.SectionsContainer.ScrollTo(dummy);
+            });
+        }
+    }
+}
+
+public partial class EditorSettingsFooter : FillFlowContainer
+{
+    [BackgroundDependencyLoader]
+    private void load()
+    {
+        RelativeSizeAxes = Axes.X;
+        AutoSizeAxes = Axes.Y;
+        Direction = FillDirection.Vertical;
+        Children = new Drawable[]
+        {
+            new ExpandableCredits
+            {
+                RelativeSizeAxes = Axes.X,
+                Margin = new MarginPadding() { Vertical = 10 }
             },
         };
     }
