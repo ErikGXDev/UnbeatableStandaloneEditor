@@ -171,6 +171,7 @@ public partial class BeatmapSetRow : OsuClickableContainer
 
     protected override void LoadComplete()
     {
+        this.FadeInFromZero(400, Easing.OutQuint);
         base.LoadComplete();
         selectedSet.BindValueChanged(onSelectionChanged, true);
     }
