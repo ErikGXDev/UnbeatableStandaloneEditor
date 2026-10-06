@@ -22,6 +22,14 @@
       <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
     </ItemGroup>
 
+    <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">
+      <Content Include="..\osu.Game.Rulesets.UMania\FMOD\native\win-x64\fmod.dll" Link="fmod.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(RuntimeIdentifier)' != 'win-x64'">
+      <Content Include="..\osu.Game.Rulesets.UMania\FMOD\native\linux-x64\libfmod.so.15.0" Link="libfmod.so.15.0" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+      <Content Include="..\osu.Game.Rulesets.UMania\FMOD\native\linux-x64\libfmod.so.15.0" Link="libfmod.so" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+
     <!-- Keep these DLLs as separate files outside the single-file bundle -->
     <Target Name="_ExcludeUserDllsFromSingleFile"
             AfterTargets="ComputeResolvedFilesToPublishList">

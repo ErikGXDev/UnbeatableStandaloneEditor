@@ -24,6 +24,10 @@ public partial class TooltipNumberInput : Container, IHasTooltip
     public static string OffsetTooltip =
         "All notes and timings will have this offset added to them when exporting maps. (Default: 0)\nWhen importing a map that has this offset, you can use the \"Offset all points\" button in the timing tab to move all points back again.\nBe aware that offsets may feel different depending on the song or player.\nOffset may vary between file types. I blame the game engine.";          
     
+    public static string OffsetTooltipShort =
+        "All notes and timings will have this offset added to them when exporting maps. (Default: 0)\nVerify your offset by playtesting the map.";          
+
+    
     private const float height = 24;
     private const float step_width = 18;
     private const float box_width = 56;

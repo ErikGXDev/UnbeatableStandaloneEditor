@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
+using osu.Game.Rulesets.UMania.FMOD;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -46,7 +47,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
     {
         public override LocalisableString Title => "Unbeatable";
 
-        [Resolved] private SetupScreen setupScreen { get; set; } = null!;
+        [Resolved(CanBeNull = true)] private SetupScreen setupScreen { get; set; } = null!;
         
         [Resolved] private Editor editor { get; set; } = null!;
 
@@ -848,6 +849,73 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         {
             onScreenDisplay?.Display(new BeatmapEditorToast(title, message));
         }
+
+        private void approximateExportOffset()
+        {
+            string audioPath;
+
+            try
+            {
+                audioPath = resolveAudioFilePath();
+            }
+            catch (Exception e)
+            {
+                showToast("Could not approximate offset", e.Message);
+                return;
+            }
+
+            approximateOffsetButton.Enabled.Value = false;
+            
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var result = await FmodOffsetAnalyzer.AnalyseAsync(audioPath);
+
+                    Schedule(() =>
+                    {
+                        if (!result.Success)
+                        {
+                            Logger.Log("Offset approximation failed: " + result.Summary);
+                            showToast("Could not approximate offset", result.Summary);
+                            return;
+                        }
+
+                        int delta = (int)Math.Round(result.OffsetMs);
+                        
+                        int visualBias = (int)Math.Round(Editor.WAVEFORM_VISUAL_OFFSET);
+
+                        int gameBias = -60;
+
+                        config.GetBindable<int>(OsuSetting.EditorExportOffsetMs).Value = Math.Clamp(visualBias + delta + gameBias, -1000, 1000);
+
+                        // note: message does not actually work and is hidden.
+                        showToast("Offset approximated", $"{result.Summary}\n\nExport offset set to {visualBias + delta}ms (including {visualBias}ms editor waveform bias).");
+                    });
+                }
+                catch (Exception e)
+                {
+                    Schedule(() => showToast("Could not approximate offset", $"The audio could not be compared with FMOD:\n{e.Message}"));
+                }
+                finally
+                {
+                    Schedule(() => approximateOffsetButton.Enabled.Value = true);
+                }
+            });
+        }
+
+        private string resolveAudioFilePath()
+        {
+            var beatmapSet = Beatmap.BeatmapInfo.BeatmapSet;
+
+            string audioFilename = Beatmap.Metadata.AudioFile;
+
+            var audioFile = beatmapSet.GetFile(audioFilename);
+            if (audioFile == null)
+                throw new FileNotFoundException($"Audio file \"{audioFilename}\" not found in the beatmap set.");
+
+            return gameHost.Storage.GetFullPath(Path.Combine(@"files", audioFile.File.GetStoragePath()));
+        }
         
         private void showExportToast(string title, string message, string revealPath, string revealText = "Open in explorer")
         {
@@ -858,6 +926,18 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         private UbExportFolderSelector exportFolderSelector;
         private OsuTextFlowContainer warningText;
         private IssueList issueList;
+        private ApproximateOffsetButton approximateOffsetButton;
+
+        private partial class ApproximateOffsetButton : RoundedButton 
+        {
+            public ApproximateOffsetButton() { }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Content.CornerRadius = 6;
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
@@ -903,17 +983,50 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                         new FormControlBackground(),
                         new TooltipNumberInput
                         {
-                            Padding = new MarginPadding() {Left = 8, Right = 6, Vertical = 6},
+                            Width = 0.815f,
+                            Padding = new MarginPadding() {Left = 8, Right = 0, Vertical = 6},
                             LabelText = "Export note offset (ms)",
-                            TooltipText = TooltipNumberInput.OffsetTooltip,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            TooltipText = TooltipNumberInput.OffsetTooltipShort,
                             Current = config.GetBindable<int>(OsuSetting.EditorExportOffsetMs),
                             MinimumValue = -1000,
                             MaximumValue = 1000,
-                            Margin = new MarginPadding { Top = 2 },
+                        },
+                        approximateOffsetButton = new ApproximateOffsetButton()
+                        {
+                            Text = "Detect",
+                            TooltipText = "Offset detection functions best with a -60ms chart offset in-game and a chart aligned to the timeline waveform in the editor.",
+                            Action = approximateExportOffset,
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            HasTriangles = false,
+                            BackgroundColour = colourProvider.Colour4,
+                            Width = 80f,
+                            Margin = new MarginPadding(6) { Left = 0, Right = 6, Vertical = 6 },
+                            Scale = new Vector2(0.9f),
+                            Height = 26,
                         }
                     },
                 },
-               
+                /*new Container()
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Masking = true,
+                    CornerRadius = 4,
+                    Children = new Drawable[]
+                    {
+                        new FormControlBackground(),
+                        approximateOffsetButton = new FormButton()
+                        {
+                            Caption = "Approximate offset between BASS and FMOD",
+                            ButtonText = "Detect",
+                            Action = approximateExportOffset,
+                        }
+                    },
+                },*/
+                
                 warningText = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14))
                 {
                     Text = "",
@@ -999,7 +1112,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         
         protected override void Update()
         {
-            if (setupScreen.UpdatedTime == -1) // Check every 5 seconds
+            if (setupScreen != null && setupScreen.UpdatedTime == -1) // Check every 5 seconds
             {
                 Logger.Log("Checking for issues in beatmap...");
                 checkIssues();

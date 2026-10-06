@@ -14,6 +14,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Screens;
 using osu.Game.Screens.Edit;
+using osu.Game.Rulesets.UMania.FMOD;
 using UnbeatableStandaloneEditor.BeatmapPicker;
 using UnbeatableStandaloneEditor.Settings;
 
@@ -161,6 +162,8 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
             screenStack.Exit();
             return true;
         }
+
+        FmodAudioSystem.Dispose();
 
         return base.OnExiting();
     }
