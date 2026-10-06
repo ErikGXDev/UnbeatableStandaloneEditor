@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.Settings
                             Padding = new MarginPadding
                             {
                                 Top = 24,
-                                Bottom = 40,
+                                Bottom = 32,
                             },
                             Children = new Drawable[]
                             {
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Settings
                                     // FIX: Better font
                                     Font = OsuFont.Default.With(size: header_size),
                                     Text = Header,
-                                    Margin = SettingsPanel.CONTENT_PADDING,
+                                    /*Margin = SettingsPanel.CONTENT_PADDING,*/
                                 },
                                 FlowContent
                             }
