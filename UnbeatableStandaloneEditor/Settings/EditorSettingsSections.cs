@@ -82,7 +82,7 @@ public partial class GeneralSettingsSection : EditorSettingsSection
                 LabelText = "Show system cursor",
                 RelativeSizeAxes = Axes.X,
                 Current = new Bindable<bool>(true),
-                Margin = new MarginPadding { Bottom = 10 },
+                Margin = new MarginPadding { Bottom = 10, Top = 5  },
             },
             new TooltipCheckbox
             {
@@ -274,21 +274,40 @@ public partial class BackupSettingsSection : EditorSettingsSection
 
 public partial class WebsocketSettingsSection : EditorSettingsSection
 {
-    public override LocalisableString Header => "Websocket";
+    public override LocalisableString Header => "Useful Mods";
 
-    public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.Cloud };
+    public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.Tools };
 
     [BackgroundDependencyLoader]
     private void load(OverlayColourProvider colourProvider)
     {
         Children = new Drawable[]
         {
+            // WebSocket Mod
+            new OsuSpriteText()
+            {
+                AllowMultiline = true,
+                RelativeSizeAxes = Axes.X,
+                Text = "Websocket Mod",
+                Font = OsuFont.Default.With(size: 18, weight: FontWeight.SemiBold),
+                Colour = colourProvider.Content1,
+                Margin = new MarginPadding { Top = 5 },
+            },
+            new OsuSpriteText()
+            {
+                AllowMultiline = true,
+                RelativeSizeAxes = Axes.X,
+                Text = "by Erik",
+                Font = OsuFont.Default.With(size: 14, weight: FontWeight.Regular),
+                Colour = colourProvider.Content1,
+                Margin = new MarginPadding { Bottom = 8 },
+            },
             new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 14, weight: FontWeight.Regular))
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Text = "Install the Websocket mod to quickly test your maps in UNBEATABLE through the editor.\nIf you have the mod installed, simply leave the game open while editing maps to get access to a new Websocket export option.",
-                Colour = colourProvider.Content1.Opacity(0.75f),
+                Colour = colourProvider.Content1.Opacity(0.85f),
                 Margin = new MarginPadding { Bottom = 8 },
             },
             new RoundedButton
@@ -301,6 +320,44 @@ public partial class WebsocketSettingsSection : EditorSettingsSection
                 Scale = new Vector2(0.9f),
                 Action = () => BrowserUtil.OpenUrl("https://github.com/ErikGXDev/UnbeatableWebsocket#readme-start"),
             },
+
+            // Practice Mode
+            /*new OsuSpriteText()
+            {
+                AllowMultiline = true,
+                RelativeSizeAxes = Axes.X,
+                Text = "Practice Mode",
+                Font = OsuFont.Default.With(size: 18, weight: FontWeight.SemiBold),
+                Colour = colourProvider.Content1,
+                Margin = new MarginPadding { Top = 15 },
+            },
+            new OsuSpriteText()
+            {
+                AllowMultiline = true,
+                RelativeSizeAxes = Axes.X,
+                Text = "by Stefyfresh",
+                Font = OsuFont.Default.With(size: 14, weight: FontWeight.Regular),
+                Colour = colourProvider.Content1,
+                Margin = new MarginPadding { Bottom = 5 },
+            },
+            new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 14, weight: FontWeight.Regular))
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Text = "The practice mode mod allows you to test your maps at different timestamps, in combination with the Websocket mod.",
+                Colour = colourProvider.Content1.Opacity(0.85f),
+                Margin = new MarginPadding { Bottom = 8, Top = 5 },
+            },
+            new RoundedButton
+            {
+                Width = 150,
+                Height = 30,
+                Text = "Download",
+                Colour = colourProvider.Colour1,
+                BackgroundColour = colourProvider.Background2,
+                Scale = new Vector2(0.9f),
+                Action = () => BrowserUtil.OpenUrl("https://github.com/Stefyfresh/UNBEATABLE-practice-mode#unbeatable-practice-mode"),
+            },*/
         };
     }
 }
