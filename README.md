@@ -99,3 +99,5 @@ This project includes [osu-resources](https://github.com/ppy/osu-resources) crea
 Due to the nature of a lot of code being copied from osu!, the osu trademark and license may appear in the code. However, this project **is not affiliated with ppy or osu! in any way**.
 
 This editor may be used to make custom maps for the game UNBEATABLE, but is not affiliated with D-CELL Games, Playstack or similar.
+
+Note license notices at the beginning of files when inspecting source code, if available.
