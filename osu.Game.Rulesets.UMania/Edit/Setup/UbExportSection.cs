@@ -1176,12 +1176,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             [Order(0)]
             OfficialZip = 0,
             
-            [Description("Folder in Package (.zip file, .txt)")]
-            [Order(1)]
+            [Description("Package with Folder (.zip file, .txt)")]
+            [Order(2)]
             FolderInPackage = 4,
 
             [Description("As Folder (.txt)")]
-            [Order(2)]
+            [Order(1)]
             OfficialFolder = 1,
 
             [Description("Legacy Package (.zip file, .osu)")]
