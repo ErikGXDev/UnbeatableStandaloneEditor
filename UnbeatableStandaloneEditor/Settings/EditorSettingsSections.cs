@@ -134,6 +134,8 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
     [BackgroundDependencyLoader]
     private void load(OsuConfigManager osuConfig)
     {
+        var quickExportBindable = new Bindable<QuickExportAction>();
+
         Children = new Drawable[]
         {
             new TooltipCheckbox
@@ -186,9 +188,22 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
                 Current = osuConfig.GetBindable<int>(OsuSetting.EditorExportOffsetMs),
                 MinimumValue = -1000,
                 MaximumValue = 1000,
-                Margin = new MarginPadding { Bottom = 10 },
+                Margin = new MarginPadding { Bottom = 6 },
             },
+            new EnumDropdownSettingsInput<QuickExportAction>()
+            {
+                LabelText = "Quick-Export button",
+                TooltipText = "Choose what the Quick Export button does, located in the bottom-right corner of the editor.",
+                Current = quickExportBindable,
+                Margin = new MarginPadding { Bottom = 10 },
+            }
         };
+
+        quickExportBindable.Value = (QuickExportAction)osuConfig.Get<int>(OsuSetting.EditorQuickExportMode);
+        quickExportBindable.BindValueChanged(e =>
+        {
+            osuConfig.SetValue(OsuSetting.EditorQuickExportMode, (int)e.NewValue);
+        });
     }
 }
 

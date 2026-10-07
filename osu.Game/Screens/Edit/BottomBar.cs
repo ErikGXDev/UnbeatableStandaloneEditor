@@ -9,6 +9,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Events;
 using osu.Framework.Testing;
+using osu.Game.Configuration;
+using osu.Game.Custom;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
@@ -19,13 +21,13 @@ namespace osu.Game.Screens.Edit
 {
     internal partial class BottomBar : CompositeDrawable
     {
-        public TestGameplayButton TestGameplayButton { get; private set; } = null!;
+        public QuickExportButton QuickExportButton { get; private set; } = null!;
 
         private IBindable<bool> saveInProgress = null!;
         private Bindable<bool> composerFocusMode = null!;
 
         [BackgroundDependencyLoader]
-        private void load(Editor editor)
+        private void load(Editor editor, OsuConfigManager config)
         {
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
@@ -42,6 +44,10 @@ namespace osu.Game.Screens.Edit
                 Radius = 10f,
             };
 
+            var quickExportMode = config.Get<int>(OsuSetting.EditorQuickExportMode);
+
+            var exportButtonWidth = quickExportMode == 0 ? 0 : 50;
+
             InternalChildren = new Drawable[]
             {
                 new GridContainer
@@ -53,7 +59,7 @@ namespace osu.Game.Screens.Edit
                         new Dimension(),
                         new Dimension(GridSizeMode.Absolute, 220),
                         // FIX: Remove Test button
-                        new Dimension(GridSizeMode.Absolute, 0),
+                        new Dimension(GridSizeMode.Absolute, exportButtonWidth),
                     },
                     Content = new[]
                     {
@@ -62,11 +68,11 @@ namespace osu.Game.Screens.Edit
                             new TimeInfoContainer { RelativeSizeAxes = Axes.Both }, 
                             new SummaryTimeline { RelativeSizeAxes = Axes.Both },
                             new PlaybackControl { RelativeSizeAxes = Axes.Both },
-                            TestGameplayButton = new TestGameplayButton
+                            QuickExportButton = new QuickExportButton
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Size = new Vector2(0),
-                                Alpha = 0f,
+                                RelativeSizeAxes = Axes.None,
+                                Size = new Vector2(exportButtonWidth),
+                                
                                 
                                 // FIX: Simply remove it
                                 //Action = editor.TestGameplay,
@@ -84,7 +90,7 @@ namespace osu.Game.Screens.Edit
         {
             base.LoadComplete();
 
-            saveInProgress.BindValueChanged(_ => TestGameplayButton.Enabled.Value = !saveInProgress.Value, true);
+            saveInProgress.BindValueChanged(_ => QuickExportButton.Enabled.Value = !saveInProgress.Value, true);
             composerFocusMode.BindValueChanged(_ =>
             {
                 // Transforms should be kept in sync with other usages of composer focus mode.

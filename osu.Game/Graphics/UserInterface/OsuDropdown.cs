@@ -70,7 +70,7 @@ namespace osu.Game.Graphics.UserInterface
                 Alpha = 0;
 
                 // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
-                ItemsContainer.Padding = new MarginPadding(5);
+                ItemsContainer.Padding = new MarginPadding(2);
             }
 
             [BackgroundDependencyLoader(true)]
@@ -330,12 +330,12 @@ namespace osu.Game.Graphics.UserInterface
 
             public OsuDropdownHeader()
             {
-                Foreground.Padding = new MarginPadding(10);
+                Foreground.Padding = new MarginPadding(4) { Horizontal = 8 };
 
                 AutoSizeAxes = Axes.None;
                 Margin = new MarginPadding { Bottom = 4 };
                 CornerRadius = corner_radius;
-                Height = 40;
+                Height = 25;
 
                 Foreground.Child = new GridContainer
                 {

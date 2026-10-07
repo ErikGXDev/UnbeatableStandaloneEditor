@@ -47,7 +47,7 @@ using Logger = osu.Framework.Logging.Logger;
 
 namespace osu.Game.Rulesets.UMania.Edit.Setup
 {
-    public partial class UbExportSection : SetupSection
+    public partial class UbExportSection : SetupSection, IExportsUnbeatable
     {
         public override LocalisableString Title => "Exporting";
 
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             Task.Run(exportToUnbeatable);
         }
 
-        private bool IsWebsocketAvailable()
+        public bool IsWebsocketAvailable()
         {
             try
             {
@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             }, websocketCheckCancellation.Token);
         }
 
-        private async void testAtPracticeTime()
+        public async void TestAtPracticeTime()
         {
             int startTime = (int)editorClock.CurrentTime;
 
@@ -980,7 +980,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 websocketButton = new UbPlaytestButton
                 {
                     ExportToUnbeatable = ExportToUnbeatable,
-                    TestAtPracticeTime = testAtPracticeTime,
+                    TestAtPracticeTime = TestAtPracticeTime,
                     Alpha = 0f,
                 },
                 new FormButton
