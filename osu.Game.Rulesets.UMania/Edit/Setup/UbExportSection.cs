@@ -15,6 +15,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Utils;
@@ -25,8 +27,10 @@ using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
 using osuTK;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
@@ -928,7 +932,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         private IssueList issueList;
         private ApproximateOffsetButton approximateOffsetButton;
 
-        private partial class ApproximateOffsetButton : RoundedButton 
+        private partial class ApproximateOffsetButton : RoundedButton, IHasCustomTooltip
         {
             public ApproximateOffsetButton() { }
 
@@ -936,6 +940,33 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             {
                 base.LoadComplete();
                 Content.CornerRadius = 6;
+            }
+
+            public ITooltip GetCustomTooltip() => new ApproxTooltip();
+
+            public object? TooltipContent => TooltipText;
+        }
+        
+        private partial class ApproxTooltip : OsuTooltipContainer.OsuTooltip
+        {
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                CornerRadius = 5;
+                Masking = true;
+                
+                var textFlowContainer = Content.ChildrenOfType<TextFlowContainer>().FirstOrDefault();
+                if (textFlowContainer != null)
+                {
+                    textFlowContainer.MaximumSize = new Vector2(420f, float.PositiveInfinity);
+                }
+            }
+
+            public override void Move(Vector2 pos)
+            {
+               
+                // This method is called every frame so we can do this safely here.
+                Position = Interpolation.ValueAt(Time.Elapsed, Position, pos + new Vector2(-30, 0), 0, 120, Easing.OutQuint);
             }
         }
 
@@ -1107,8 +1138,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 warningText.Alpha = 0f;
             }
         }
-        
-
         
         protected override void Update()
         {
