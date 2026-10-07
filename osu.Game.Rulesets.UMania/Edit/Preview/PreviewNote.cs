@@ -45,11 +45,13 @@ namespace osu.Game.Rulesets.UMania.Edit
             shape.Colour = colourFor(type);
             shape.Scale = type == UbIconType.Spam ? new Vector2(1, 1.5f) : Vector2.One;
             shape.Y = type == UbIconType.Spam ? -5 : 0;
+            shape.X = 0;
             
             if (type == UbIconType.FreestyleSmall)
             {
                 shape.Scale = new Vector2(0.8f);
                 shape.Y = 2f;
+                shape.X = 1.7f;
             }
             
             iconType = type;
