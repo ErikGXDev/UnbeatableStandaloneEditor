@@ -87,7 +87,7 @@ public partial class BeatmapPickerScreen : OsuScreen
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Text = "Your Charts",
+                                Text = "Your Beatmaps",
                                 Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                             },
                             new FillFlowContainer()
@@ -103,7 +103,7 @@ public partial class BeatmapPickerScreen : OsuScreen
                                         Origin = Anchor.CentreRight,
                                         Width = 148,
                                         Height = 32,
-                                        Text = "+ New Chart",
+                                        Text = "+ New Beatmap",
                                         Action = createNewBeatmap,
                                     },
                                     sortByButton = new SortButton(),
@@ -179,7 +179,7 @@ public partial class BeatmapPickerScreen : OsuScreen
                                         Origin = Anchor.CentreRight,
                                         Width = 148,
                                         Height = 32,
-                                        Text = "Edit Chart",
+                                        Text = "Edit Beatmap",
                                         Action = openEditor,
                                     }
                                 ],
@@ -410,14 +410,12 @@ public partial class BeatmapPickerScreen : OsuScreen
 
             if (string.IsNullOrEmpty(searchQuery.Value?.Trim()))
             {
-                Logger.Log("No charts yet!");
                 sortByButton.Alpha = 0;
-                activeFlow.Add(new EmptyState(@"No charts yet. Click ""+ New Chart"" to get started.", FontAwesome.Regular.FolderOpen));
+                activeFlow.Add(new EmptyState(@"No beatmaps yet. Click ""+ New Beatmap"" to get started.", FontAwesome.Regular.FolderOpen));
             }
             else
             {
-                Logger.Log("No charts match your search...");
-                activeFlow.Add(new EmptyState("No charts match your search...", FontAwesome.Solid.Search));
+                activeFlow.Add(new EmptyState("No beatmaps match your search...", FontAwesome.Solid.Search));
             }
 
             return;

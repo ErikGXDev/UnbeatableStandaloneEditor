@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 {
     public partial class UbExportSection : SetupSection
     {
-        public override LocalisableString Title => "Unbeatable";
+        public override LocalisableString Title => "Exporting";
 
         [Resolved(CanBeNull = true)] private SetupScreen setupScreen { get; set; } = null!;
         
