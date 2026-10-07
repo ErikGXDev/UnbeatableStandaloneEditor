@@ -223,6 +223,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorReverseScroll, false); // FIX: Reverse scroll for editor
             SetDefault(OsuSetting.EditorTimelineShowNotes, true); // FIX: Show notes in timeline for editor
             SetDefault(OsuSetting.EditorShortNames, false);
+
+            SetDefault(OsuSetting.EditorPreviewZoom, 1.0d, 0.1d, 2.5d, 0.001d); // Save zoom level of preview area
             
             SetDefault(OsuSetting.EditorColumnHints, true); // FIX: Show column hints in editor
             SetDefault(OsuSetting.EditorShowPreview, true); // FIX: Show preview in editor
@@ -528,6 +530,7 @@ namespace osu.Game.Configuration
         EditorReverseScroll,
         EditorTimelineShowNotes,
         EditorShortNames,
+        EditorPreviewZoom,
         
         EditorColumnHints,
         EditorShowPreview,

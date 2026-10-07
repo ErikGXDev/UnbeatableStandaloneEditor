@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -43,7 +44,22 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
         private double viewFieldTolerance => 400 * viewFieldMultiplier;
 
         private double viewFieldMultiplier = 1f;
-        public double ViewFieldMultiplier = 1f;
+        
+        private double pViewFieldMultiplier = 1f;
+        public double ViewFieldMultiplier
+        {
+            get => pViewFieldMultiplier;
+            set {
+                if (config != null)
+                {
+                    config.SetValue(OsuSetting.EditorPreviewZoom, value);
+                }
+                pViewFieldMultiplier = value;
+            }
+        }
+        
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
 
 
         private ExpandingToolboxContainer rightToolbox = null!;
@@ -110,8 +126,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
         }
 
         [BackgroundDependencyLoader]
-        private void load(EditorBeatmap beatmap)
+        private void load()
         {
+            ViewFieldMultiplier = config.Get<double>(OsuSetting.EditorPreviewZoom);
+            viewFieldMultiplier = ViewFieldMultiplier;
+            
             InternalChildren = new[]
             {
                 indicatorLayer = new PreviewIndicator
