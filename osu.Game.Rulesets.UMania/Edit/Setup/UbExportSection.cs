@@ -1027,7 +1027,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                         approximateOffsetButton = new ApproximateOffsetButton()
                         {
                             Text = "Detect",
-                            TooltipText = "Offset detection works best with a -60ms chart offset in-game and a chart aligned to the timeline waveform in the editor.",
+                            TooltipText = "Offset detection works best with a chart aligned to the timeline waveform in the editor. Attempts to match official chart offsets.",
                             Action = approximateExportOffset,
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
