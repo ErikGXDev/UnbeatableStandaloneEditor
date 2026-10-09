@@ -221,7 +221,7 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
 
         if (LocalConfig.Get<bool>(OsuSetting.Editor40msWaveformBump))
         {
-            Editor.WAVEFORM_VISUAL_OFFSET = 40;
+            Editor.WAVEFORM_VISUAL_OFFSET = 30;
             Logger.Log("Waveform bump enabled, offset: " + Editor.WAVEFORM_VISUAL_OFFSET);
         }
 

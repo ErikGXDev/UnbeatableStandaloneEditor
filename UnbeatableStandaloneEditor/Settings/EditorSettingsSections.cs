@@ -220,7 +220,7 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
         waveformBumpBindable.BindValueChanged(e =>
         {
             osuConfig.SetValue(OsuSetting.Editor40msWaveformBump, e.NewValue);
-            Editor.WAVEFORM_VISUAL_OFFSET = e.NewValue ? 40 : 20;
+            Editor.WAVEFORM_VISUAL_OFFSET = e.NewValue ? 30 : 20;
         });
     }
 }
