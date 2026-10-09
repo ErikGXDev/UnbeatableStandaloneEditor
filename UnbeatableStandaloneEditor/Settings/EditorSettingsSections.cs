@@ -186,7 +186,7 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
             },
             new TooltipCheckbox()
             {
-                LabelText = "Improve Waveform sync.",
+                LabelText = "Use new waveform offset",
                 TooltipText = "Increases the waveform visual offset from 20ms to 40ms in order to improve sync with hitsounds. All waveforms will appear slightly earlier, so you may have to adjust your notes as well.",
                 RelativeSizeAxes = Axes.X,
                 Current = waveformBumpBindable,

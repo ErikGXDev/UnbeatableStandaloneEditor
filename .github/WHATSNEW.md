@@ -1,8 +1,6 @@
 ﻿## What's new
 
-- Improved the offset finding algorithm
-- You can now double click charts in the beatmap list to load them
-- Grid/List view toggle is now saved
-- Fixed Quick Export not working with files/folders
-
+- Added new "Use new waveform offset" option in settings
+  - This option changes the waveform visual offset to be more in sync with editor hitsounds.
+  
 **Happy mapping!**
