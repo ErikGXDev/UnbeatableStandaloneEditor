@@ -17,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
+using osu.Game.Screens.Edit;
 using osuTK;
 
 namespace UnbeatableStandaloneEditor.Settings;
@@ -136,6 +137,8 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
     {
         var quickExportBindable = new Bindable<QuickExportAction>();
 
+        var waveformBumpBindable = new BindableBool();
+
         Children = new Drawable[]
         {
             new TooltipCheckbox
@@ -181,6 +184,14 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
                 Current = osuConfig.GetBindable<bool>(OsuSetting.EditorShortNames),
                 Margin = new MarginPadding { Bottom = 10 },
             },
+            new TooltipCheckbox()
+            {
+                LabelText = "Improve Waveform sync.",
+                TooltipText = "Increases the waveform visual offset from 20ms to 40ms in order to improve sync with hitsounds. All waveforms will appear slightly earlier, so you may have to adjust your notes as well.",
+                RelativeSizeAxes = Axes.X,
+                Current = waveformBumpBindable,
+                Margin = new MarginPadding { Bottom = 10 },
+            },
             new TooltipNumberInput
             {
                 LabelText = "Export note offset (ms)",
@@ -203,6 +214,13 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
         quickExportBindable.BindValueChanged(e =>
         {
             osuConfig.SetValue(OsuSetting.EditorQuickExportMode, (int)e.NewValue);
+        });
+
+        waveformBumpBindable.Value = osuConfig.Get<bool>(OsuSetting.Editor40msWaveformBump);
+        waveformBumpBindable.BindValueChanged(e =>
+        {
+            osuConfig.SetValue(OsuSetting.Editor40msWaveformBump, e.NewValue);
+            Editor.WAVEFORM_VISUAL_OFFSET = e.NewValue ? 40 : 20;
         });
     }
 }

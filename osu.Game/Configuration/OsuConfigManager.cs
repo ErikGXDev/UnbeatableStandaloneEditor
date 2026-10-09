@@ -224,6 +224,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorTimelineShowNotes, true); // FIX: Show notes in timeline for editor
             SetDefault(OsuSetting.EditorShortNames, false);
             SetDefault(OsuSetting.EditorQuickExportMode, 0); // FIX: Quick export mode for editor
+            SetDefault(OsuSetting.Editor40msWaveformBump, false); // FIX: 40ms waveform bump for editor
 
             SetDefault(OsuSetting.EditorPreviewZoom, 1.0d, 0.1d, 2.5d, 0.001d); // Save zoom level of preview area
             
@@ -533,6 +534,7 @@ namespace osu.Game.Configuration
         EditorShortNames,
         EditorPreviewZoom,
         EditorQuickExportMode,
+        Editor40msWaveformBump,
         
         EditorColumnHints,
         EditorShowPreview,

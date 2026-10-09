@@ -86,8 +86,12 @@ namespace osu.Game.Screens.Edit
         ///
         /// Coming to this value involved running various tests with existing users / beatmaps.
         /// This included both visual and audible comparisons. Ballpark confidence is ≈2 ms.
+        ///
+        /// FIX:
+        /// Added a setting for 40ms offset which improves waveform synchronisation in the editor.
+        /// 
         /// </remarks>
-        public const float WAVEFORM_VISUAL_OFFSET = 20;
+        public static float WAVEFORM_VISUAL_OFFSET = 20;
 
         public override float BackgroundParallaxAmount => 0.1f;
 

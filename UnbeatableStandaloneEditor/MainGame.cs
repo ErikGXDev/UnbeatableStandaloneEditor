@@ -219,6 +219,12 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
             LocalConfig.SetValue(OsuSetting.EditorShowSpeedChanges, true);
         }
 
+        if (LocalConfig.Get<bool>(OsuSetting.Editor40msWaveformBump))
+        {
+            Editor.WAVEFORM_VISUAL_OFFSET = 40;
+            Logger.Log("Waveform bump enabled, offset: " + Editor.WAVEFORM_VISUAL_OFFSET);
+        }
+
         var maniaRuleset = UbRuleset.GetRulesetInfo();
         Ruleset.Value = maniaRuleset;
 
