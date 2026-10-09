@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio.Track;
@@ -58,8 +59,8 @@ namespace osu.Game.Rulesets.UMania.FMOD
 
         // Fail-safe and export offset input limit
         private const int max_shift_ms = 1000;
-        
-        private const float onset_threshold = 0.001f;
+
+        private const float peak_threshold = 0.03f;
 
         public static Task<OffsetAnalysisResult> AnalyseAsync(string audioPath, CancellationToken cancellationToken = default) =>
             // Task factory because Waveform.GetPoints also uses Task.Run
@@ -106,8 +107,29 @@ namespace osu.Game.Rulesets.UMania.FMOD
             cancellationToken.ThrowIfCancellationRequested();
 
             float[] fmodEnvelope = fmodToFloats(fmodSamples, fmodFrequency);
+            
+            // limit bass as well
+            int maxPoints = analysis_window_ms;
+            if (bassEnvelope.Length > maxPoints)
+                bassEnvelope = bassEnvelope.Take(maxPoints).ToArray();
+
+            // equal volume
+            normalizeEnvelope(bassEnvelope);
+            normalizeEnvelope(fmodEnvelope);
 
             return analyseByOnset(bassEnvelope, fmodEnvelope);
+        }
+
+        // FMOD is quieter than BASS
+        private static void normalizeEnvelope(float[] envelope)
+        {
+            float peak = envelope.Max();
+            if (peak > 0.0001f)
+            {
+                float scale = 1f / peak;
+                for (int i = 0; i < envelope.Length; i++)
+                    envelope[i] *= scale;
+            }
         }
         
         private static float[]? bassToFloats(Waveform.Point[] points)
@@ -155,12 +177,22 @@ namespace osu.Game.Rulesets.UMania.FMOD
             return envelope;
         }
 
-        // Find first point where some sound is happening
         private static int findFirstOnset(float[] envelope)
         {
+            if (envelope.Length == 0)
+                return -1;
+
+            // rising edge detection
+            for (int i = 1; i < envelope.Length; i++)
+            {
+                if (envelope[i] >= peak_threshold && envelope[i] > envelope[i - 1])
+                    return i;
+            }
+
+            // fallback
             for (int i = 0; i < envelope.Length; i++)
             {
-                if (envelope[i] > onset_threshold)
+                if (envelope[i] >= peak_threshold)
                     return i;
             }
 
