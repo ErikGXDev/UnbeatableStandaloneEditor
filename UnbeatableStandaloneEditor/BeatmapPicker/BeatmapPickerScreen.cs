@@ -235,6 +235,9 @@ public partial class BeatmapPickerScreen : OsuScreen
             updatePopup = new UpdatePopup(),
             new ImportDropper()
         ];
+
+        var gridViewOn = config.Get<bool>(EditorSetting.GridViewOn);
+        gridViewToggle.Value = gridViewOn;
     }
 
     protected override void LoadComplete()
@@ -279,6 +282,7 @@ public partial class BeatmapPickerScreen : OsuScreen
 
         gridViewToggle.BindValueChanged(v =>
         {
+            config.SetValue(EditorSetting.GridViewOn, v.NewValue);
             rebuildBeatmapList();
         });
     }
@@ -435,7 +439,7 @@ public partial class BeatmapPickerScreen : OsuScreen
             if (grid)
             {
                 setsGrid.Add(new SquareDelayedLoadWrapper(
-                    () => new BeatmapSetCard(set, selectedSet),
+                    () => new BeatmapSetCard(set, selectedSet, openEditor),
                     timeBeforeLoad: 0)
                 {
                     RelativeSizeAxes = Axes.X,

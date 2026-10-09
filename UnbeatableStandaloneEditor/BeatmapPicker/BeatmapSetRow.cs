@@ -56,7 +56,7 @@ public partial class BeatmapSetRow : OsuClickableContainer
 
             if (Time.Current - lastClickTime < 200)
             {
-                //doubleClick.Invoke();
+                doubleClick.Invoke();
             }
 
             lastClickTime = Time.Current;

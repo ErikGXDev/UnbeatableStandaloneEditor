@@ -29,16 +29,31 @@ public partial class BeatmapSetCard : OsuClickableContainer
     private Box hoverOverlay = null!;
     private Box leftAccent = null!;
 
-    public BeatmapSetCard(BeatmapSetInfo set, Bindable<BeatmapSetInfo?> selectedSet)
+    private Action doubleClick = null!;
+
+    public BeatmapSetCard(BeatmapSetInfo set, Bindable<BeatmapSetInfo?> selectedSet, Action doubleClick)
     {
         this.set = set;
         this.selectedSet = selectedSet;
+        this.doubleClick = doubleClick;
     }
+
+    private double lastClickTime;
 
     [BackgroundDependencyLoader]
     private void load(OverlayColourProvider colours)
     {
-        Action = () => selectedSet.Value = set;
+        Action = () =>
+        {
+            selectedSet.Value = set;
+
+            if (Time.Current - lastClickTime < 200)
+            {
+                doubleClick.Invoke();
+            }
+
+            lastClickTime = Time.Current;
+        };
 
         string diffLabel = set.Beatmaps.Count == 1 ? "1 difficulty" : $"{set.Beatmaps.Count} difficulties";
 
