@@ -672,6 +672,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             //warningText.FlashColour(Color4.LightYellow, 500);
             
+            Logger.Log("Exporting to " + exportFolderSelector.SelectedDirectory.Value + " with mode " + exportModeBindable.Value + "...");
+            
 
             if (exportModeBindable.Value == ExportMode.Folder)
             {

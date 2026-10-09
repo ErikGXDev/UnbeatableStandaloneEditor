@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -93,12 +94,20 @@ namespace osu.Game.Custom
             Drawable exportingSection = editorSections.FirstOrDefault(s => s.Title == "Exporting");
 
             if (exportingSection == null)
+            {
                 exportingSection = Empty();
+            }
 
             if (exportingSection is IExportsUnbeatable exportSection)
             {
                 exports = exportSection;
-                Add(exportingSection.With(e => e.Alpha = 0f));
+                Add(exportingSection.With(e =>
+                {
+                    e.AlwaysPresent = true;
+                    e.Alpha = 0f;
+                    e.X = 99999999;
+                    e.Y = 9999999;
+                }));
 
                 Action = () =>
                 {
