@@ -892,8 +892,17 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                         int visualBias = (int)Math.Round(Editor.WAVEFORM_VISUAL_OFFSET);
 
                         int gameBias = -60;
+                        
+                        int biasedOffset = delta + visualBias + gameBias;
+                        
+                        /*Logger.Log($"Offset analysis succeeded:");
+                        Logger.Log($"Result note export offset (ms): {biasedOffset}");
+                        Logger.Log($"Offset (ms): {result.OffsetMs}");
+                        Logger.Log($"Bass Onset (ms): {result.BassOnsetMs}");
+                        Logger.Log($"FMOD Onset (ms): {result.FmodOnsetMs}");
+                        Logger.Log($"Summary: {result.Summary}");*/
 
-                        config.GetBindable<int>(OsuSetting.EditorExportOffsetMs).Value = Math.Clamp(visualBias + delta + gameBias, -1000, 1000);
+                        config.GetBindable<int>(OsuSetting.EditorExportOffsetMs).Value = Math.Clamp(biasedOffset, -1000, 1000);
 
                         // note: message does not actually work and is hidden.
                         showToast("Offset approximated", $"{result.Summary}\n\nExport offset set to {visualBias + delta}ms (including {visualBias}ms editor waveform bias).");

@@ -16,21 +16,37 @@ namespace osu.Game.Rulesets.UMania.FMOD
         public readonly int BassOnsetMs;
         public readonly int FmodOnsetMs;
 
+        public readonly float[] BassEnvelope;
+        public readonly float[] FmodEnvelope;
+
         public readonly string Summary;
 
-        private OffsetAnalysisResult(bool success, double offsetMs, int bassOnsetMs, int fmodOnsetMs, string summary)
+        private OffsetAnalysisResult(bool success, double offsetMs, int bassOnsetMs, int fmodOnsetMs,
+            float[] bassEnvelope, float[] fmodEnvelope, string summary)
         {
             Success = success;
             OffsetMs = offsetMs;
             BassOnsetMs = bassOnsetMs;
             FmodOnsetMs = fmodOnsetMs;
+            BassEnvelope = bassEnvelope;
+            FmodEnvelope = fmodEnvelope;
             Summary = summary;
         }
 
-        public static OffsetAnalysisResult Failure(string summary) => new(false, 0, -1, -1, summary);
+        public static OffsetAnalysisResult Failure(string summary) =>
+            new(false, 0, -1, -1, Array.Empty<float>(), Array.Empty<float>(), summary);
+
+        public static OffsetAnalysisResult Failure(string summary, float[] bassEnvelope, float[] fmodEnvelope) =>
+            new(false, 0, -1, -1, bassEnvelope, fmodEnvelope, summary);
 
         public static OffsetAnalysisResult Succeeded(double offsetMilliseconds, int bassOnsetMilliseconds, int fmodOnsetMilliseconds, string summary) =>
-            new(true, offsetMilliseconds, bassOnsetMilliseconds, fmodOnsetMilliseconds, summary);
+            new(true, offsetMilliseconds, bassOnsetMilliseconds, fmodOnsetMilliseconds, Array.Empty<float>(),
+                Array.Empty<float>(), summary);
+
+        public static OffsetAnalysisResult Succeeded(double offsetMilliseconds, int bassOnsetMilliseconds,
+            int fmodOnsetMilliseconds, float[] bassEnvelope, float[] fmodEnvelope, string summary) =>
+            new(true, offsetMilliseconds, bassOnsetMilliseconds, fmodOnsetMilliseconds, bassEnvelope, fmodEnvelope,
+                summary);
     }
 
     
@@ -43,7 +59,7 @@ namespace osu.Game.Rulesets.UMania.FMOD
         // Fail-safe and export offset input limit
         private const int max_shift_ms = 1000;
         
-        private const float onset_threshold = 0.0001f;
+        private const float onset_threshold = 0.001f;
 
         public static Task<OffsetAnalysisResult> AnalyseAsync(string audioPath, CancellationToken cancellationToken = default) =>
             // Task factory because Waveform.GetPoints also uses Task.Run
@@ -161,15 +177,15 @@ namespace osu.Game.Rulesets.UMania.FMOD
                 string name = bassOnset < 0 && fmodOnset < 0 ? "either decoder"
                     : bassOnset < 0 ? "BASS" : "FMOD";
 
-                return OffsetAnalysisResult.Failure($"Could not find the music start for {name}");
+                return OffsetAnalysisResult.Failure($"Could not find the music start for {name}", bass, fmod);
             }
 
             double offset = fmodOnset - bassOnset;
 
             if (Math.Abs(offset) > max_shift_ms)
-                return OffsetAnalysisResult.Failure($"Huge ahh delay of {offset:F0} ms, something is probably wrong...");
+                return OffsetAnalysisResult.Failure($"Huge ahh delay of {offset:F0} ms, something is probably wrong...", bass, fmod);
 
-            return OffsetAnalysisResult.Succeeded(offset, bassOnset, fmodOnset,
+            return OffsetAnalysisResult.Succeeded(offset, bassOnset, fmodOnset, bass, fmod,
                 $"First audio at {bassOnset}ms (BASS) and {fmodOnset}ms (FMOD).");
         }
     }
