@@ -186,8 +186,8 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
             },
             new TooltipCheckbox()
             {
-                LabelText = "Use new waveform offset",
-                TooltipText = "Increases the waveform visual offset from 20ms to 40ms in order to improve sync with hitsounds. All waveforms will appear slightly earlier, so you may have to adjust your notes as well.",
+                LabelText = "Disable new waveform offset",
+                TooltipText = "The waveform visual offset was changed from 20ms to 30ms in order to improve sync with hitsounds. Disable this here if you don't want to adjust your notes on old charts.",
                 RelativeSizeAxes = Axes.X,
                 Current = waveformBumpBindable,
                 Margin = new MarginPadding { Bottom = 10 },
@@ -216,11 +216,11 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
             osuConfig.SetValue(OsuSetting.EditorQuickExportMode, (int)e.NewValue);
         });
 
-        waveformBumpBindable.Value = osuConfig.Get<bool>(OsuSetting.Editor40msWaveformBump);
+        waveformBumpBindable.Value = osuConfig.Get<bool>(OsuSetting.EditorNew30msWaveformDisable);
         waveformBumpBindable.BindValueChanged(e =>
         {
-            osuConfig.SetValue(OsuSetting.Editor40msWaveformBump, e.NewValue);
-            Editor.WAVEFORM_VISUAL_OFFSET = e.NewValue ? 30 : 20;
+            osuConfig.SetValue(OsuSetting.EditorNew30msWaveformDisable, e.NewValue);
+            Editor.WAVEFORM_VISUAL_OFFSET = e.NewValue ? 20 : 30;
         });
     }
 }

@@ -88,10 +88,10 @@ namespace osu.Game.Screens.Edit
         /// This included both visual and audible comparisons. Ballpark confidence is ≈2 ms.
         ///
         /// FIX:
-        /// Added a setting for 40ms offset which improves waveform synchronisation in the editor.
-        /// 
+        /// Added a setting for 30ms offset which improves waveform synchronisation in the editor.
+        /// 30ms is the default now.
         /// </remarks>
-        public static float WAVEFORM_VISUAL_OFFSET = 20;
+        public static float WAVEFORM_VISUAL_OFFSET = 30;
 
         public override float BackgroundParallaxAmount => 0.1f;
 
