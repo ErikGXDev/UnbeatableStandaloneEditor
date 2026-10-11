@@ -1,7 +1,7 @@
 ﻿## What's new
 
-- The default visual waveform offset is now 30ms (from 20ms)
-  - This makes charting with the waveform and charting by listening to hitsounds lead to the same results!
-  - (You can still toggle this off in the settings if you prefer the old offset.)  
+- Added more rebindable actions for the editor.
+- Added Stefyfresh's Practice Mode to the "Useful Mods" section in settings.
+- Fixed "nudge" keybinds not working.
 
 **Happy mapping!**
