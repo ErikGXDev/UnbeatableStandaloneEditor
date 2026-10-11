@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         },
                         centreMarker.CreateProxy(),
                         ticks.CreateProxy(),
-                        userContent,
+                        userContent.With(d => d.AlwaysPresent = true),
                     }
                 },
             });
