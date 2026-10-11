@@ -204,9 +204,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             notesVisible.BindValueChanged(visible =>
             {
                 if (visible.NewValue)
+                {
                     userContent.FadeIn(400, Easing.OutQuint);
+                    userContent.Y = 0;
+                }
                 else
-                    userContent.FadeOut(200, Easing.OutQuint);
+                {
+                    // Move userContent away so it doesn't interfere with AlwaysPresent = true
+                    userContent.FadeOut(200, Easing.OutQuint).OnComplete((t => userContent.Y = -9999));
+                }
             }, true);
         }
 
