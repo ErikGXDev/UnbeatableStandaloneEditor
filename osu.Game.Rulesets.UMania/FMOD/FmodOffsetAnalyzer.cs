@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio.Track;
 using osu.Framework.Logging;
+using osu.Game.Screens.Edit;
 
 namespace osu.Game.Rulesets.UMania.FMOD
 {
@@ -50,7 +51,7 @@ namespace osu.Game.Rulesets.UMania.FMOD
                 summary);
     }
 
-    
+ 
     public static class FmodOffsetAnalyzer
     {
         // honestly overkill for the song beginning
@@ -61,16 +62,46 @@ namespace osu.Game.Rulesets.UMania.FMOD
         private const int max_shift_ms = 1000;
 
         private const float peak_threshold = 0.03f;
+        
+           
+        public static int AnalyzedOffsetToBiased(double offset) {
+            
+            int delta = (int)Math.Round(offset);
+            
+            int visualBias = (int)Math.Round(Editor.WAVEFORM_VISUAL_OFFSET);
 
-        public static Task<OffsetAnalysisResult> AnalyseAsync(string audioPath, CancellationToken cancellationToken = default) =>
+            int gameBias = -60;
+                        
+            int biasedOffset = delta + visualBias + gameBias;
+            
+            return biasedOffset;
+        }
+        
+        public static int BiasedToAnalyzedOffset(int biasedOffset) {
+            
+            int visualBias = (int)Math.Round(Editor.WAVEFORM_VISUAL_OFFSET);
+
+            int gameBias = -60;
+                        
+            int delta = biasedOffset - visualBias - gameBias;
+            
+            return delta;
+        }
+
+        public class OptionalData
+        {
+            public string? AudioExtension;
+        }
+
+        public static Task<OffsetAnalysisResult> AnalyseAsync(string audioPath, OptionalData? data = default, CancellationToken cancellationToken = default) =>
             // Task factory because Waveform.GetPoints also uses Task.Run
             Task.Factory.StartNew(
-                () => analyse(audioPath, cancellationToken),
+                () => analyse(audioPath, data, cancellationToken),
                 cancellationToken,
                 TaskCreationOptions.LongRunning | TaskCreationOptions.DenyChildAttach,
                 TaskScheduler.Default);
 
-        private static OffsetAnalysisResult analyse(string audioPath, CancellationToken cancellationToken)
+        private static OffsetAnalysisResult analyse(string audioPath, OptionalData? data, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(audioPath))
                 return OffsetAnalysisResult.Failure("No audio file is set for this beatmap.");
@@ -116,6 +147,13 @@ namespace osu.Game.Rulesets.UMania.FMOD
             // equal volume
             normalizeEnvelope(bassEnvelope);
             normalizeEnvelope(fmodEnvelope);
+            
+            // .wav is almost always already on-sync with FMOD, so its analysis can be skipped.
+            if (data?.AudioExtension == ".wav")
+            {
+                return OffsetAnalysisResult.Succeeded(0, 0, 0, bassEnvelope, fmodEnvelope,
+                    "WAV file detected, which is usually on-sync.");
+            }
 
             return analyseByOnset(bassEnvelope, fmodEnvelope);
         }

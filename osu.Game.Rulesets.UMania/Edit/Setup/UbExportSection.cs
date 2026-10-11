@@ -855,14 +855,19 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         {
             onScreenDisplay?.Display(new BeatmapEditorToast(title, message));
         }
+        
+        private OffsetWaveform offsetWaveform;
+        
+        private BindableInt offsetBindable = new BindableInt();
 
         private void approximateExportOffset()
         {
             string audioPath;
+            string audioVisualPath;
 
             try
             {
-                audioPath = resolveAudioFilePath();
+                (audioPath, audioVisualPath) = resolveAudioFilePath();
             }
             catch (Exception e)
             {
@@ -876,7 +881,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             {
                 try
                 {
-                    var result = await FmodOffsetAnalyzer.AnalyseAsync(audioPath);
+                    var data = new FmodOffsetAnalyzer.OptionalData()
+                    {
+                        AudioExtension = Path.GetExtension(audioVisualPath)
+                    };
+                    
+                    var result = await FmodOffsetAnalyzer.AnalyseAsync(audioPath, data);
 
                     Schedule(() =>
                     {
@@ -887,13 +897,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                             return;
                         }
 
-                        int delta = (int)Math.Round(result.OffsetMs);
-                        
-                        int visualBias = (int)Math.Round(Editor.WAVEFORM_VISUAL_OFFSET);
-
-                        int gameBias = -60;
-                        
-                        int biasedOffset = delta + visualBias + gameBias;
+                        int biasedOffset = FmodOffsetAnalyzer.AnalyzedOffsetToBiased(result.OffsetMs);
                         
                         /*Logger.Log($"Offset analysis succeeded:");
                         Logger.Log($"Result note export offset (ms): {biasedOffset}");
@@ -902,10 +906,32 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                         Logger.Log($"FMOD Onset (ms): {result.FmodOnsetMs}");
                         Logger.Log($"Summary: {result.Summary}");*/
 
-                        config.GetBindable<int>(OsuSetting.EditorExportOffsetMs).Value = Math.Clamp(biasedOffset, -1000, 1000);
+                        offsetBindable.Value = Math.Clamp(biasedOffset, -1000, 1000);
 
+                        offsetWaveform.Waveform1Data = result.BassEnvelope;
+                        offsetWaveform.Waveform2Data = result.FmodEnvelope;
+
+                        offsetWaveform.Waveform2Offset = (int)result.OffsetMs;
+
+                        int onsetBass = result.BassOnsetMs;
+                        int onsetFmod = result.FmodOnsetMs;
+                        if (onsetBass > onsetFmod)
+                        {
+                            offsetWaveform.ViewMinIndex = onsetFmod;
+                            offsetWaveform.ViewMaxIndex = onsetBass;
+                        }
+                        else
+                        {
+                            offsetWaveform.ViewMinIndex = onsetBass;
+                            offsetWaveform.ViewMaxIndex = onsetFmod;
+                        }
+
+                        offsetWaveform.UpdateWaveforms();
+                        offsetWaveform.PopIn();
+                        offsetInput.TooltipText = "";
+                        
                         // note: message does not actually work and is hidden.
-                        showToast("Offset approximated", $"{result.Summary}\n\nExport offset set to {visualBias + delta}ms (including {visualBias}ms editor waveform bias).");
+                        showToast("Offset approximated", $"{result.Summary}\n\nExport offset set to {biasedOffset}ms");
                     });
                 }
                 catch (Exception e)
@@ -919,7 +945,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             });
         }
 
-        private string resolveAudioFilePath()
+        private (string, string) resolveAudioFilePath()
         {
             var beatmapSet = Beatmap.BeatmapInfo.BeatmapSet;
 
@@ -929,7 +955,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             if (audioFile == null)
                 throw new FileNotFoundException($"Audio file \"{audioFilename}\" not found in the beatmap set.");
 
-            return gameHost.Storage.GetFullPath(Path.Combine(@"files", audioFile.File.GetStoragePath()));
+            return (gameHost.Storage.GetFullPath(Path.Combine(@"files", audioFile.File.GetStoragePath())), audioFilename);
         }
         
         private void showExportToast(string title, string message, string revealPath, string revealText = "Open in explorer")
@@ -981,9 +1007,26 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             }
         }
 
+        private TooltipNumberInput offsetInput;
+        
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
+            offsetBindable.Value = config.Get<int>(OsuSetting.EditorExportOffsetMs);
+            offsetBindable.BindValueChanged(v =>
+            {
+                config.SetValue(OsuSetting.EditorExportOffsetMs, v.NewValue);
+
+                if (offsetWaveform == null) return;
+                
+                if (offsetWaveform.Alpha > 0f)
+                {
+                    offsetWaveform.Waveform2Offset = FmodOffsetAnalyzer.BiasedToAnalyzedOffset(v.NewValue);
+                    offsetWaveform.UpdateWaveforms();
+                }
+            });
+            
+            
             accentColour = colourProvider.Background2.Darken(0.8f);
 
             Children = new Drawable[]
@@ -1023,7 +1066,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     Children = new Drawable[]
                     {
                         new FormControlBackground(),
-                        new TooltipNumberInput
+                        offsetInput = new TooltipNumberInput
                         {
                             Width = 0.815f,
                             Padding = new MarginPadding() {Left = 8, Right = 0, Vertical = 6},
@@ -1031,7 +1074,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             TooltipText = TooltipNumberInput.OffsetTooltipShort,
-                            Current = config.GetBindable<int>(OsuSetting.EditorExportOffsetMs),
+                            Current = offsetBindable,
                             MinimumValue = -1000,
                             MaximumValue = 1000,
                         },
@@ -1051,6 +1094,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                         }
                     },
                 },
+                offsetWaveform = new OffsetWaveform()
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Alpha = 0f
+                },
+                
                 /*new Container()
                 {
                     RelativeSizeAxes = Axes.X,

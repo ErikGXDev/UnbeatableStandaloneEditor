@@ -39,6 +39,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private readonly Container<Path> maskingContainer;
         private readonly Path path;
+        
+        public Path Path => path;
 
         private float[] values;
 
@@ -61,10 +63,14 @@ namespace osu.Game.Graphics.UserInterface
 
                 pathCached.Invalidate();
 
+                if (!ShouldAnimate) return;
+
                 maskingContainer.Width = 0;
                 maskingContainer.ResizeWidthTo(1, transform_duration, Easing.OutQuint);
             }
         }
+
+        public bool ShouldAnimate = true;
 
         public Color4 LineColour
         {
@@ -82,7 +88,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     AutoSizeAxes = Axes.None,
                     RelativeSizeAxes = Axes.Both,
-                    PathRadius = 1
+                    PathRadius = 2,
                 }
             });
 
