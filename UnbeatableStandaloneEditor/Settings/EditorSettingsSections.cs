@@ -322,7 +322,7 @@ public partial class WebsocketSettingsSection : EditorSettingsSection
                 AllowMultiline = true,
                 RelativeSizeAxes = Axes.X,
                 Text = "Websocket Mod",
-                Font = OsuFont.Default.With(size: 18, weight: FontWeight.SemiBold),
+                Font = OsuFont.Default.With(size: 20, weight: FontWeight.SemiBold),
                 Colour = colourProvider.Content1,
                 Margin = new MarginPadding { Top = 5 },
             },
@@ -355,14 +355,14 @@ public partial class WebsocketSettingsSection : EditorSettingsSection
             },
 
             // Practice Mode
-            /*new OsuSpriteText()
+            new OsuSpriteText()
             {
                 AllowMultiline = true,
                 RelativeSizeAxes = Axes.X,
                 Text = "Practice Mode",
-                Font = OsuFont.Default.With(size: 18, weight: FontWeight.SemiBold),
+                Font = OsuFont.Default.With(size: 20, weight: FontWeight.SemiBold),
                 Colour = colourProvider.Content1,
-                Margin = new MarginPadding { Top = 15 },
+                Margin = new MarginPadding { Top = 25 },
             },
             new OsuSpriteText()
             {
@@ -389,8 +389,8 @@ public partial class WebsocketSettingsSection : EditorSettingsSection
                 Colour = colourProvider.Colour1,
                 BackgroundColour = colourProvider.Background2,
                 Scale = new Vector2(0.9f),
-                Action = () => BrowserUtil.OpenUrl("https://github.com/Stefyfresh/UNBEATABLE-practice-mode#unbeatable-practice-mode"),
-            },*/
+                Action = () => BrowserUtil.OpenUrl("https://github.com/Stefyfresh/UNBEATABLE-practice-mode"),
+            },
         };
     }
 }
