@@ -275,6 +275,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             public FileChooserPopover(string[] handledExtensions, Bindable<FileInfo?> current, string? chooserPath, bool allowClear)
                 : base(false)
             {
+                chooserPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 Child = new Container
                 {
                     Size = new Vector2(600, 400),
