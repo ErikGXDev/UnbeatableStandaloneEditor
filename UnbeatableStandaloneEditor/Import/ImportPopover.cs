@@ -11,6 +11,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -36,6 +37,8 @@ public partial class ImportPopover : OsuPopover
     [Resolved] private BeatmapManager beatmapManager { get; set; } = null!;
 
     [Resolved] private IAPIProvider api { get; set; } = null!;
+
+    [Resolved] private OsuConfigManager config { get; set; } = null!;
 
 
     [BackgroundDependencyLoader]
@@ -138,7 +141,7 @@ public partial class ImportPopover : OsuPopover
     private Task importBeatmap(string filePath)
     {
 
-        if (BeatmapImporter.ImportBeatmap(filePath, beatmapManager))
+        if (BeatmapImporter.ImportBeatmap(filePath, beatmapManager, config))
         {
             showToast("Imported chart successfully!");
         }

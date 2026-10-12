@@ -6,6 +6,7 @@ using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Configuration;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Rulesets.Objects;
@@ -20,10 +21,16 @@ namespace UnbeatableStandaloneEditor.Import;
 public class BeatmapImporter
 {
 
-    public static bool ImportBeatmap(string filePath, BeatmapManager beatmapManager)
+    public static OsuConfigManager config;
+    public static bool ShouldTestOffset => config.Get<bool>(OsuSetting.EditorImportInverseOffsetOption);
+    public static int offsetMs = 0;
+
+    public static bool ImportBeatmap(string filePath, BeatmapManager beatmapManager, OsuConfigManager config)
     {
         try
         {
+            BeatmapImporter.offsetMs = 0;
+            BeatmapImporter.config = config;
 
             if (filePath.EndsWith(".txt") || filePath.EndsWith(".osu"))
             {
@@ -111,7 +118,11 @@ public class BeatmapImporter
 
         reverseExportTransformations(converted);
 
-        var encoder = new LegacyBeatmapEncoder(converted, null, storyboard);
+        PassBeatmapConverter passConverter = new PassBeatmapConverter(converted, converted.BeatmapInfo.Ruleset.CreateInstance(), false, -offsetMs);
+
+        var pass = passConverter.ConvertBeatmap(converted, CancellationToken.None);
+
+        var encoder = new LegacyBeatmapEncoder(pass, null, storyboard);
         var outputStream = new MemoryStream();
         using (var textWriter = new StreamWriter(outputStream, leaveOpen: true))
         {

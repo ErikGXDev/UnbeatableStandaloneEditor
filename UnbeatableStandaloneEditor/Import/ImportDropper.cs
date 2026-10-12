@@ -2,6 +2,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Overlays;
 
@@ -15,6 +16,8 @@ public partial class ImportDropper : Drawable, ICanAcceptFiles
     [Resolved(canBeNull: true)] private OnScreenDisplay? onScreenDisplay { get; set; }
 
     [Resolved] private BeatmapManager beatmapManager { get; set; } = null!;
+
+    [Resolved] private OsuConfigManager config { get; set; } = null!;
 
 
     public ImportDropper() {}
@@ -61,7 +64,7 @@ public partial class ImportDropper : Drawable, ICanAcceptFiles
     private Task importBeatmap(string filePath)
     {
 
-        if (BeatmapImporter.ImportBeatmap(filePath, beatmapManager))
+        if (BeatmapImporter.ImportBeatmap(filePath, beatmapManager, config))
         {
             showToast("Imported chart successfully!");
         }

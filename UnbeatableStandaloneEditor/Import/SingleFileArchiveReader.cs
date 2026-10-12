@@ -48,6 +48,13 @@ public class SingleFileArchiveReader : ArchiveReader
 
         if (File.Exists(audioPath))
         {
+            // Optional offset test
+            if (BeatmapImporter.ShouldTestOffset)
+            {
+                BeatmapImporter.offsetMs = ImportOffsetTester.GetOffset(audioPath);
+            }
+
+
             files.Add(audioPath);
         }
     }

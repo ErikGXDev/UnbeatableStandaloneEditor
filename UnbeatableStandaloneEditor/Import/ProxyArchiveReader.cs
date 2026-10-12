@@ -1,6 +1,9 @@
 ﻿using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Game.IO.Archives;
+using osu.Game.Overlays.Settings.Sections.Audio;
+using osu.Game.Utils;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Readers;
 using SixLabors.ImageSharp.Memory;
@@ -48,6 +51,27 @@ public class ProxyArchiveReader : ArchiveReader
                 }
                 else
                 {
+                    // Optional offset test
+                    if (BeatmapImporter.ShouldTestOffset)
+                    {
+                        if (SupportedExtensions.AUDIO_EXTENSIONS.Contains(Path.GetExtension(entry.Key).ToLowerInvariant()))
+                        {
+                            // Extract entry to a temp file
+                            var tempFilePath = Path.Combine(Path.GetTempPath(), Path.GetFileName(entry.Key));
+                            using (var entryStream = entry.OpenEntryStream())
+                            using (var tempFileStream = File.Create(tempFilePath))
+                            {
+                                entryStream.CopyTo(tempFileStream);
+                            }
+
+                            BeatmapImporter.offsetMs = ImportOffsetTester.GetOffset(tempFilePath);
+
+                            Logger.Log($"Offset for {entry.Key}: {BeatmapImporter.offsetMs} ms");
+
+                            File.Delete(tempFilePath);
+                        }
+                    }
+
                     list.Add(entry.Key);
                 }
             }

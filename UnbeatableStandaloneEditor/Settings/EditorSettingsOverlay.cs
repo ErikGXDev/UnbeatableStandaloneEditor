@@ -22,6 +22,7 @@ public partial class EditorSettingsOverlay : SettingsPanel
             new VolumeSettingsSection(),
             new BackupSettingsSection(),
             new WebsocketSettingsSection(),
+            new ExperimentalSettingsSection(),
             new KeyBindingsSettingsSection(),
         };
     }

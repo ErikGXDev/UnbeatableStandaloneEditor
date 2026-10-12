@@ -395,6 +395,37 @@ public partial class WebsocketSettingsSection : EditorSettingsSection
     }
 }
 
+public partial class ExperimentalSettingsSection : EditorSettingsSection
+{
+    public override LocalisableString Header => "Experimental";
+
+    public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.Flask };
+
+    [BackgroundDependencyLoader]
+    private void load(OsuConfigManager osuConfig, OverlayColourProvider colourProvider)
+    {
+        Children = new Drawable[]
+        {
+            new OsuSpriteText()
+            {
+                AllowMultiline = true,
+                RelativeSizeAxes = Axes.X,
+                Text = "Specific features for specific use cases.",
+                Font = OsuFont.Default.With(size: 14, weight: FontWeight.Regular),
+                Colour = colourProvider.Content1.Opacity(0.85f),
+                Margin = new MarginPadding { Bottom = 8 },
+            },
+            new TooltipCheckbox()
+            {
+                LabelText = "Add inverse offset detection on imports",
+                RelativeSizeAxes = Axes.X,
+                Current = osuConfig.GetBindable<bool>(OsuSetting.EditorImportInverseOffsetOption),
+                Margin = new MarginPadding { Bottom = 10 },
+            },
+        };
+    }
+}
+
 public partial class KeyBindingsSettingsSection : EditorSettingsSection
 {
     public override LocalisableString Header => "Key Bindings";
