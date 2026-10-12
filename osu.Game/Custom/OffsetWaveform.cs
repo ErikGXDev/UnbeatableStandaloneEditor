@@ -4,6 +4,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -28,6 +29,11 @@ public partial class OffsetWaveform : Container
     public int WaveformViewDeltaL = 40;
     public int WaveformViewDeltaR = 80;
 
+    public float WaveformViewDeltaMult = 1;
+    public int WaveformViewDeltaX = 0;
+
+    public Action OnClose;
+
     private LineGraph graph1;
     private LineGraph graph2;
     
@@ -40,8 +46,8 @@ public partial class OffsetWaveform : Container
     public void UpdateWaveforms()
     {
         // Prepare values using min and max indices
-        int minIndex = ViewMinIndex - WaveformViewDeltaL;
-        int maxIndex = ViewMaxIndex + WaveformViewDeltaR;
+        int minIndex = ViewMinIndex - (int)(WaveformViewDeltaL * WaveformViewDeltaMult) - WaveformViewDeltaX;
+        int maxIndex = ViewMaxIndex + (int)(WaveformViewDeltaR * WaveformViewDeltaMult) - WaveformViewDeltaX;
         
         var waveform1Values = new float[maxIndex - minIndex + 1];
         var waveform2Values = new float[maxIndex - minIndex + 1];
@@ -88,6 +94,7 @@ public partial class OffsetWaveform : Container
                 Action = () =>
                 {
                     this.ResizeHeightTo(0, 400, Easing.OutQuint);
+                    OnClose?.Invoke();
                 }
             },
             new FillFlowContainer()
@@ -95,7 +102,7 @@ public partial class OffsetWaveform : Container
                 RelativeSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
                 Padding = new MarginPadding(8),
-                Spacing = new osuTK.Vector2(0, 6),
+                Spacing = new osuTK.Vector2(0, 5),
                 Children = new Drawable[]
                 {
                    
@@ -107,19 +114,23 @@ public partial class OffsetWaveform : Container
                     new OsuClickableContainer()
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 83,
+                        Height = 73,
                         Masking = true,
                         Action = () =>
                         {
                             if (WaveformViewDeltaL == 40)
                             {
+                                WaveformViewDeltaMult = 1;
+                                WaveformViewDeltaX = 0;
                                 graph1.Path.PathRadius = 1;
                                 graph2.Path.PathRadius = 1f;
-                                WaveformViewDeltaL = 100;
-                                WaveformViewDeltaR = 600;
+                                WaveformViewDeltaL = 300;
+                                WaveformViewDeltaR = 400;
                             }
                             else
                             {
+                                WaveformViewDeltaMult = 1;
+                                WaveformViewDeltaX = 0;
                                 graph1.Path.PathRadius = 2;
                                 graph2.Path.PathRadius = 2;
                                 WaveformViewDeltaL = 40;
@@ -152,8 +163,7 @@ public partial class OffsetWaveform : Container
                                         Values = new float[2] { 1f, 0f },
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = colours.Violet,
-                                    }
-                                
+                                    },
                                 }
                             }
                         }
@@ -163,9 +173,33 @@ public partial class OffsetWaveform : Container
         };
     }
 
+    public override bool HandlePositionalInput => true;
+
+    protected override bool OnScroll(ScrollEvent e)
+    {
+        if (!this.IsHovered) return base.OnScroll(e);
+        
+        
+        double scrollDelta = e.ScrollDelta.Y != 0 ? e.ScrollDelta.Y : e.ScrollDelta.X;
+
+        if (e.AltPressed)
+        {
+            WaveformViewDeltaMult = Math.Clamp(WaveformViewDeltaMult + (float)(-scrollDelta * 0.4), 0.1f, 10f);
+            UpdateWaveforms();
+        }
+        
+        if (e.ShiftPressed)
+        {
+            WaveformViewDeltaX += (int)(scrollDelta * 10);
+            UpdateWaveforms();
+        }
+        
+        return base.OnScroll(e);
+    }
+
     public void PopIn()
     {
-        Height = 120;
+        Height = 110;
         this.FadeTo(1f, 400, Easing.OutQuint);
     }
 

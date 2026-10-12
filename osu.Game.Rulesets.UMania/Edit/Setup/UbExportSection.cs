@@ -926,6 +926,9 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                             offsetWaveform.ViewMaxIndex = onsetFmod;
                         }
 
+                        offsetWaveform.WaveformViewDeltaMult = 1f;
+                        offsetWaveform.WaveformViewDeltaX = 0;
+
                         offsetWaveform.UpdateWaveforms();
                         offsetWaveform.PopIn();
                         offsetInput.TooltipText = "";
@@ -1097,7 +1100,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 offsetWaveform = new OffsetWaveform()
                 {
                     RelativeSizeAxes = Axes.X,
-                    Alpha = 0f
+                    Alpha = 0f,
+                    OnClose = () =>
+                    {
+                        offsetInput.TooltipText = TooltipNumberInput.OffsetTooltipShort;
+                    }
                 },
                 
                 /*new Container()
