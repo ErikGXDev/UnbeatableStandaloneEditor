@@ -1,7 +1,6 @@
 ﻿## What's new
 
-- Added more rebindable actions for the editor.
-- Added Stefyfresh's Practice Mode to the "Useful Mods" section in settings.
-- Fixed "nudge" keybinds not working.
+- Added a waveform display for the the new offset detection feature to confirm results
+- Added "Inverse offset detection on imports" option in new Experimental category
 
 **Happy mapping!**
