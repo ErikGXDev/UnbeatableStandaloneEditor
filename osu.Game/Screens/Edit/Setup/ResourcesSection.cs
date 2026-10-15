@@ -228,6 +228,25 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     artist = tagSource.Tag.JoinedAlbumArtists ?? tagSource.Tag.JoinedPerformers;
                     title = tagSource.Tag.Title;
+
+                    // Overwrite cover image from audio file
+                    if (tagSource.Tag.Pictures.Length > 0)
+                    {
+                        if (string.IsNullOrEmpty(working.Value.Metadata.BackgroundFile))
+                        {
+                            var picture = tagSource.Tag.Pictures[0];
+                            using (var stream = new MemoryStream(picture.Data.Data))
+                            {
+                                var tempFile = Path.Combine(Path.GetTempPath(), "cover.png");
+                                File.WriteAllBytes(tempFile, stream.ToArray());
+                                
+                                ChangeBackgroundImage(new FileInfo(tempFile), applyToAllDifficulties);
+                                
+                                File.Delete(tempFile);
+                            }
+                        }
+                        
+                    }
                 }
             }
             catch (Exception e)

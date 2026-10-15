@@ -199,9 +199,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ClickToSelectTrack => new TranslatableString(getKey(@"click_to_select_track"), @"Click to select a track");
 
         /// <summary>
-        /// "Click to select a background image"
+        /// "Click to select a cover image"
         /// </summary>
-        public static LocalisableString ClickToSelectBackground => new TranslatableString(getKey(@"click_to_select_background"), @"Click to select a background image");
+        public static LocalisableString ClickToSelectBackground => new TranslatableString(getKey(@"click_to_select_background"), @"Click to select a cover image");
 
         /// <summary>
         /// "Video"
@@ -259,9 +259,9 @@ namespace osu.Game.Localisation
         public static LocalisableString DifficultyHeader => new TranslatableString(getKey(@"difficulty_header"), @"Difficulty");
 
         /// <summary>
-        /// "Drag image here to set beatmap background!"
+        /// "Drag image here to set beatmap cover art!"
         /// </summary>
-        public static LocalisableString DragToSetBackground => new TranslatableString(getKey(@"drag_to_set_background"), @"Drag image here to set beatmap background!");
+        public static LocalisableString DragToSetBackground => new TranslatableString(getKey(@"drag_to_set_background"), @"Drag image here to set beatmap cover art!");
 
         /// <summary>
         /// "Drag video here to set beatmap video!"
