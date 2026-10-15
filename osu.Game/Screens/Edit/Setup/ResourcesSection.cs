@@ -313,14 +313,21 @@ namespace osu.Game.Screens.Edit.Setup
             if (source != null)
             {
                 // Choose a new filename that doesn't clash with any other existing files.
-                newFilename = $"{baseFilename}{source.Extension}";
+                var extension = source.Extension;
+
+                if (SupportedExtensions.IMAGE_EXTENSIONS.Contains(extension))
+                {
+                    extension = ".png";
+                }
+                
+                newFilename = $"{baseFilename}{extension}";
 
                 if (set.GetFile(newFilename) != null)
                 {
                     string[] existingFilenames = set.Files.Select(f => f.Filename).Where(f =>
                         f.StartsWith(baseFilename, StringComparison.OrdinalIgnoreCase) &&
-                        f.EndsWith(source.Extension, StringComparison.OrdinalIgnoreCase)).ToArray();
-                    newFilename = NamingUtils.GetNextBestFilename(existingFilenames, $@"{baseFilename}{source.Extension}");
+                        f.EndsWith(extension, StringComparison.OrdinalIgnoreCase)).ToArray();
+                    newFilename = NamingUtils.GetNextBestFilename(existingFilenames, $@"{baseFilename}{extension}");
                 }
 
                 using (var stream = source.OpenRead())
