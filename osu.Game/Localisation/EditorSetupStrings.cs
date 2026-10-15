@@ -214,9 +214,9 @@ namespace osu.Game.Localisation
         public static LocalisableString ClickToSelectVideo => new TranslatableString(getKey(@"click_to_select_video"), @"Click to select a video");
 
         /// <summary>
-        /// "Supported formats: MP4, WebM"
+        /// "Supported formats: .mp4, .webm"
         /// </summary>
-        public static LocalisableString VideoHint => new TranslatableString(getKey(@"video_hint"), @"Supported formats: MP4, WebM");
+        public static LocalisableString VideoHint => new TranslatableString(getKey(@"video_hint"), @"Supported formats: .mp4, .webm");
 
         /// <summary>
         /// "Apply this change to all difficulties?"
