@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Audio;
@@ -25,6 +26,7 @@ using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.UMania.Edit.Preview;
 using osuTK;
 using osuTK.Input;
@@ -32,7 +34,7 @@ using osuTK.Input;
 namespace osu.Game.Rulesets.UMania.Edit;
 
 [Cached]
-public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
+public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer, IKeyBindingHandler<GlobalAction>
 {
     public UnbeatableHitObjectComposer(Ruleset ruleset)
         : base(ruleset)
@@ -758,25 +760,30 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer
                     beatDivisor.SelectNext();
                 }
             }
-
-            if (keyBasedChartingHandler != null && keyBasedChartingHandler.Enabled)
-            {
-                switch (e.Key)
-                {
-                    case Key.Left:
-                        if (keyBasedChartingHandler.TryAdjustHoldByKey(-1, e.ShiftPressed))
-                            return true;
-                        break;
-
-                    case Key.Right:
-                        if (keyBasedChartingHandler.TryAdjustHoldByKey(1, e.ShiftPressed))
-                            return true;
-                        break;
-                }
-            }
         }
 
         return base.OnKeyDown(e);
+    }
+
+    public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+    {
+        switch (e.Action)
+        {
+            case GlobalAction.EditorSeekBackwards:
+                if (keyBasedChartingHandler.TryAdjustHoldByKey(-1, e.ShiftPressed))
+                    return true;
+                break;
+            case GlobalAction.EditorSeekForwards:
+                if (keyBasedChartingHandler.TryAdjustHoldByKey(1, e.ShiftPressed))
+                    return true;
+                break;
+        }
+
+        return false;
+    }
+
+    public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+    {
     }
 
     protected override void OnKeyUp(KeyUpEvent e)
