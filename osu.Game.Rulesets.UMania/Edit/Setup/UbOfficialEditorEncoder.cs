@@ -105,7 +105,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             // FIX: UMania keeps its mode as 5 to still make it different from
             // mania, to stay compatible with the original ruleset.
-            writer.WriteLine("Mode: 5");
             //writer.WriteLine(wasUmaniaRuleset
                 //? FormattableString.Invariant($"Mode: 5")
                 //: FormattableString.Invariant($"Mode: {onlineRulesetID}"));
@@ -155,7 +154,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             writer.WriteLine(FormattableString.Invariant($"Creator:{beatmap.Metadata.Author.Username}"));
             writer.WriteLine(FormattableString.Invariant($"Version:{beatmap.BeatmapInfo.DifficultyName}"));
             //if (!string.IsNullOrEmpty(beatmap.Metadata.Source)) writer.WriteLine(FormattableString.Invariant($"Source: {beatmap.Metadata.Source}"));
-            writer.WriteLine(FormattableString.Invariant($"Source:erikstandalone"));
             if (!string.IsNullOrEmpty(beatmap.Metadata.Tags)) writer.WriteLine(FormattableString.Invariant($"Tags:{beatmap.Metadata.Tags}"));
             //if (beatmap.BeatmapInfo.BeatmapSet?.OnlineID > 0) writer.WriteLine(FormattableString.Invariant($"BeatmapSetID: {beatmap.BeatmapInfo.BeatmapSet.OnlineID}"));
         }
