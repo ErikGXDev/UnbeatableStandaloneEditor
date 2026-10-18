@@ -229,7 +229,7 @@ public partial class VolumeSettingsSection : EditorSettingsSection
 {
     public override LocalisableString Header => "Volume";
 
-    public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.Audio };
+    public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.VolumeUp };
 
     [BackgroundDependencyLoader]
     private void load(AudioManager audio, OverlayColourProvider colourProvider)
@@ -430,7 +430,7 @@ public partial class KeyBindingsSettingsSection : EditorSettingsSection
 {
     public override LocalisableString Header => "Key Bindings";
 
-    public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.Input };
+    public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.Keyboard };
 
     [BackgroundDependencyLoader]
     private void load()
