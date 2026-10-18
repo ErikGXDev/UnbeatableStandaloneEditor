@@ -243,7 +243,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             var playableBeatmap = passConverter.ConvertBeatmap(targetBeatmap, CancellationToken.None);
 
-            UbBeatmapEncoder encoder = new UbBeatmapEncoder(playableBeatmap, null);
+            IUbEncoderLike encoder;
+
+            if (officialEditorCheckbox.Current.Value)
+                encoder = new UbOfficialEditorEncoder(playableBeatmap, null);
+            else
+                encoder = new UbBeatmapEncoder(playableBeatmap, null);
 
             var beatmapStream = new MemoryStream();
             using (var sw = new StreamWriter(beatmapStream, Encoding.UTF8, 1024, leaveOpen: true))
@@ -353,7 +358,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             var playableBeatmap = passConverter.ConvertBeatmap(beatmap, CancellationToken.None);
 
-            UbBeatmapEncoder encoder = new UbBeatmapEncoder(playableBeatmap, null);
+            IUbEncoderLike encoder;
+
+            if (officialEditorCheckbox.Current.Value)
+                encoder = new UbOfficialEditorEncoder(playableBeatmap, null);
+            else
+                encoder = new UbBeatmapEncoder(playableBeatmap, null);
 
             var beatmapStream = new MemoryStream();
             using (var sw = new StreamWriter(beatmapStream, Encoding.UTF8, 1024, leaveOpen: true))
@@ -673,7 +683,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             //warningText.FlashColour(Color4.LightYellow, 500);
             
             Logger.Log("Exporting to " + exportFolderSelector.SelectedDirectory.Value + " with mode " + exportModeBindable.Value + "...");
-            
 
             if (exportModeBindable.Value == ExportMode.Folder)
             {
@@ -963,6 +972,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         
         private void showExportToast(string title, string message, string revealPath, string revealText = "Open in explorer")
         {
+            if (MayHaveIssues && officialEditorCheckbox.Current.Value)
+            {
+                title = "Export successful";
+                message = "Exported with issues! Check the verify tab...";
+            }
+            
             onScreenDisplay?.Display(new UbExportSuccessToast(title, message, revealPath, revealText, revealExportedPath, accentColour));
         }
 
@@ -1012,6 +1027,10 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
         private TooltipNumberInput offsetInput;
         
+        private BindableBool officialEditorFormatBindable = new BindableBool(false);
+        
+        private FormCheckBox officialEditorCheckbox { get; set; }
+        
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
@@ -1027,6 +1046,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     offsetWaveform.Waveform2Offset = FmodOffsetAnalyzer.BiasedToAnalyzedOffset(v.NewValue);
                     offsetWaveform.UpdateWaveforms();
                 }
+            });
+
+            officialEditorFormatBindable.Value = config.Get<bool>(OsuSetting.EditorOfficialEditorCompatExport);
+            officialEditorFormatBindable.BindValueChanged(v =>
+            {
+                config.SetValue(OsuSetting.EditorOfficialEditorCompatExport, v.NewValue);
             });
             
             
@@ -1045,6 +1070,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     Caption = "Export your beatmap locally for easy sharing",
                     ButtonText = "Export map",
                     Action = ExportMap,
+                },
+                officialEditorCheckbox = new UbOfficialEditorCheckbox()
+                {
+                    Caption = "Use official editor format (for charting competition!)",
+                    Current = officialEditorFormatBindable,
                 },
                 new FormEnumDropdown<ExportMode>
                 {
@@ -1205,6 +1235,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 warningText.Alpha = 0f;
             }
         }
+        
+        private bool MayHaveIssues => warningText.Alpha > 0f;
         
         protected override void Update()
         {

@@ -17,7 +17,12 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.UMania.Edit.Setup
 {
-    public partial class UbBeatmapEncoder : UbLegacyBeatmapEncoder
+    public interface IUbEncoderLike
+    {
+        public void EncodeB(TextWriter writer);
+    }
+    
+    public partial class UbBeatmapEncoder : UbLegacyBeatmapEncoder, IUbEncoderLike
     {
         public UbBeatmapEncoder(IBeatmap beatmap, ISkin? skin)
             : base(beatmap, skin)
