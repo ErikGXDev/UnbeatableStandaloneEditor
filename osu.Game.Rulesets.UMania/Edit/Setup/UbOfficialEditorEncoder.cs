@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
         public void Encode(TextWriter writer)
         {
-            writer.WriteLine($"//output from TaroNuke's unity editor v1.05 ");
+            writer.WriteLine($"//output from TaroNuke's unity editor v1.05");
 
             writer.WriteLine();
             handleGeneral(writer);
