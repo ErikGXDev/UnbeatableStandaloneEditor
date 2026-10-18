@@ -26,9 +26,11 @@ namespace osu.Game.Screens.Backgrounds
         private CancellationTokenSource? cancellationTokenSource;
         private Bindable<float> dimLevel = null!;
         private Bindable<bool> showStoryboard = null!;
+        private Bindable<bool> preferCoverArt = null!;
 
         private BeatmapBackground background = null!;
         private Container storyboardContainer = null!;
+        private EditorSkinProvidingContainer storyboardProvidingContainer = null!;
 
         private IFrameBasedClock? clockSource;
 
@@ -53,9 +55,11 @@ namespace osu.Game.Screens.Backgrounds
             dimContainer.AddRange(createContent());
             background = dimContainer.OfType<BeatmapBackground>().Single();
             storyboardContainer = dimContainer.OfType<Container>().Single();
+            storyboardProvidingContainer = dimContainer.OfType<EditorSkinProvidingContainer>().Single();
 
             dimLevel = config.GetBindable<float>(OsuSetting.EditorDim);
             showStoryboard = config.GetBindable<bool>(OsuSetting.EditorShowStoryboard);
+            preferCoverArt = config.GetBindable<bool>(OsuSetting.EditorPreferCoverArt);
         }
 
         private IEnumerable<Drawable> createContent() =>
@@ -82,6 +86,7 @@ namespace osu.Game.Screens.Backgrounds
 
             dimLevel.BindValueChanged(_ => dimContainer.FadeColour(OsuColour.Gray(1 - dimLevel.Value), 500, Easing.OutQuint), true);
             showStoryboard.BindValueChanged(_ => updateState());
+            preferCoverArt.BindValueChanged(_ => updateState());
             updateState(0);
         }
 
@@ -89,6 +94,10 @@ namespace osu.Game.Screens.Backgrounds
         {
             storyboardContainer.FadeTo(showStoryboard.Value ? 1 : 0, duration, Easing.OutQuint);
             background.FadeTo(showStoryboard.Value ? 1 : 0, duration, Easing.OutQuint);
+            
+            var max = showStoryboard.Value ? 1 : 0;
+            
+            storyboardProvidingContainer.FadeTo(preferCoverArt.Value ? 0 : max, duration, Easing.OutQuint);
             // yes, this causes overdraw, but is also a (crude) fix for bad-looking transitions on screen entry
             // caused by the previous background on the background stack poking out from under this one and then instantly fading out
             background.FadeColour(beatmap.Value.Storyboard.ReplacesBackground && showStoryboard.Value ? Colour4.Black : Colour4.White, duration, Easing.OutQuint);

@@ -228,6 +228,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorNew30msWaveformDisable, false); // FIX: 30ms waveform bump for editor
             SetDefault(OsuSetting.EditorImportInverseOffsetOption, false); // FIX: Inverse offset option for editor
             SetDefault(OsuSetting.EditorOfficialEditorCompatExport, false); // FIX: Official editor compat export for editor
+            SetDefault(OsuSetting.EditorPreferCoverArt, false); // FIX: Prefer cover art for editor
             
             SetDefault(OsuSetting.EditorPreviewZoom, 1.0d, 0.1d, 2.5d, 0.001d); // Save zoom level of preview area
             
@@ -540,6 +541,7 @@ namespace osu.Game.Configuration
         Editor40msWaveformBump, // don't use
         EditorImportInverseOffsetOption,
         EditorOfficialEditorCompatExport,
+        EditorPreferCoverArt,
         
         EditorNew30msWaveformDisable,
         

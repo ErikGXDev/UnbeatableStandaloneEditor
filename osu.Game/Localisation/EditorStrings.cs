@@ -25,6 +25,11 @@ namespace osu.Game.Localisation
         public static LocalisableString ShowStoryboard => new TranslatableString(getKey(@"show_storyboard"), @"Show cover art or video");
 
         /// <summary>
+        /// "Prefer cover art"
+        /// </summary>
+        public static LocalisableString PreferCoverArt => new TranslatableString(getKey(@"prefer_cover_art"), @"Prefer cover art");
+        
+        /// <summary>
         /// "Show hit markers"
         /// </summary>
         public static LocalisableString ShowHitMarkers => new TranslatableString(getKey(@"show_hit_markers"), @"Show hit markers");

@@ -236,6 +236,7 @@ namespace osu.Game.Screens.Edit
 
         private Bindable<float> editorBackgroundDim;
         private Bindable<bool> editorShowStoryboard;
+        private Bindable<bool> editorPreferCover;
         private Bindable<bool> editorHitMarkers;
         private Bindable<bool> editorAutoSeekOnPlacement;
         private Bindable<bool> editorLimitedDistanceSnap;
@@ -355,6 +356,7 @@ namespace osu.Game.Screens.Edit
 
             editorBackgroundDim = config.GetBindable<float>(OsuSetting.EditorDim);
             editorShowStoryboard = config.GetBindable<bool>(OsuSetting.EditorShowStoryboard);
+            editorPreferCover = config.GetBindable<bool>(OsuSetting.EditorPreferCoverArt);
             editorHitMarkers = config.GetBindable<bool>(OsuSetting.EditorShowHitMarkers);
             editorAutoSeekOnPlacement = config.GetBindable<bool>(OsuSetting.EditorAutoSeekOnPlacement);
             editorLimitedDistanceSnap = config.GetBindable<bool>(OsuSetting.EditorLimitedDistanceSnap);
@@ -571,6 +573,10 @@ namespace osu.Game.Screens.Edit
                                             new ToggleMenuItem(EditorStrings.ShowStoryboard)
                                             {
                                                 State = { BindTarget = editorShowStoryboard },
+                                            },
+                                            new ToggleMenuItem(EditorStrings.PreferCoverArt)
+                                            {
+                                                State = { BindTarget = editorPreferCover },
                                             },
                                             new OsuMenuItemSpacer(),
                                             /*new ToggleMenuItem(EditorStrings.ShowHitMarkers)
