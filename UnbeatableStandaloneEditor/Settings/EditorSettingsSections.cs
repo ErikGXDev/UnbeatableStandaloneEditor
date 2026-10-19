@@ -85,15 +85,6 @@ public partial class GeneralSettingsSection : EditorSettingsSection
                 Current = new Bindable<bool>(true),
                 Margin = new MarginPadding { Bottom = 10, Top = 5  },
             },
-            new TooltipCheckbox
-            {
-                LabelText = "Nudge by 1ms (J/K)",
-                TooltipText =
-                    "When on, pressing J/K nudges notes 1ms up/down instead of a full beat.\n(This feature may be useful for placement ordering.)",
-                RelativeSizeAxes = Axes.X,
-                Current = osuConfig.GetBindable<bool>(OsuSetting.EditorNudgeByMilliseconds),
-                Margin = new MarginPadding { Bottom = 10 },
-            },
             new TooltipCheckbox()
             {
                 LabelText = "Reverse scroll in editor",
@@ -109,6 +100,15 @@ public partial class GeneralSettingsSection : EditorSettingsSection
                     "When off, hitting notes in the camera lane will not play their hit sound.",
                 RelativeSizeAxes = Axes.X,
                 Current = osuConfig.GetBindable<bool>(OsuSetting.PlaySamplesInCameraLane),
+                Margin = new MarginPadding { Bottom = 10 },
+            },
+            new TooltipCheckbox
+            {
+                LabelText = "Nudge by 1ms (J/K)",
+                TooltipText =
+                    "When on, pressing J/K nudges notes 1ms up/down instead of a full beat.\n(This feature may be useful for placement ordering.)",
+                RelativeSizeAxes = Axes.X,
+                Current = osuConfig.GetBindable<bool>(OsuSetting.EditorNudgeByMilliseconds),
                 Margin = new MarginPadding { Bottom = 10 },
             },
         };
