@@ -760,6 +760,22 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer, IKeyB
                     beatDivisor.SelectNext();
                 }
             }
+
+            if (e.Key == Key.Left && e.ShiftPressed)
+            {
+                
+                var keyEvent = new KeyBindingPressEvent<GlobalAction>(GetContainingInputManager()!.CurrentState, GlobalAction.EditorSeekBackwards);
+                var res = OnPressed(keyEvent);
+                if (res) return true;
+                editor.OnPressed(keyEvent);
+            }
+            else if (e.Key == Key.Right && e.ShiftPressed)
+            {
+                var keyEvent = new KeyBindingPressEvent<GlobalAction>(GetContainingInputManager()!.CurrentState, GlobalAction.EditorSeekForwards);
+                var res = OnPressed(keyEvent);
+                if (res) return true;
+                editor.OnPressed(keyEvent);
+            }
         }
 
         return base.OnKeyDown(e);
