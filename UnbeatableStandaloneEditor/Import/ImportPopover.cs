@@ -21,6 +21,7 @@ using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.OSD;
+using osu.Game.Rulesets.UMania.Edit.Setup;
 using osuTK;
 using osuTK.Graphics;
 
@@ -48,7 +49,7 @@ public partial class ImportPopover : OsuPopover
         {
             Direction = FillDirection.Vertical,
             Width = 600,
-            Height = 355,
+            Height = 380,
             Children = new Drawable[]
             {
                 new FillFlowContainer()
@@ -77,11 +78,34 @@ public partial class ImportPopover : OsuPopover
                 },
                 new Container
                 {
-                    Size = new Vector2(600, 300),
+                    Size = new Vector2(600, 325),
                     Padding = new MarginPadding { Bottom = 1 },
-                    Child = fileSelector = new OsuFileSelector(validFileExtensions: new[] { ".zip", ".txt", ".osu" })
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        fileSelector = new OsuFileSelector(validFileExtensions: new[] { ".zip", ".txt", ".osu" })
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new FormButton.Button()
+                        {
+                            X = 600 - 160 - 2,
+                            Y = 325 - 32 - 2,
+                            Colour = colourProvider.Colour2,
+                            BackgroundColour = colourProvider.Background3,
+                            CornerRadius = 8,
+                            Width = 160f,
+                            Height = 32,
+                            Text = "CustomSongs folder",
+                            Action = () =>
+                            {
+                                var unbeatablePath = UbExportSection.GetCustomSongsDirectory();
+
+                                if (!Directory.Exists(unbeatablePath))
+                                    Directory.CreateDirectory(unbeatablePath);
+
+                                fileSelector.CurrentPath.Value = new DirectoryInfo(unbeatablePath);
+                            }
+                        }
                     },
                 }
 
