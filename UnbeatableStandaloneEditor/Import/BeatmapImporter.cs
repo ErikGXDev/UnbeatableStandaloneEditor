@@ -175,6 +175,11 @@ public class BeatmapImporter
             //Logger.Log($"-> Converted main bank from {mainBank} to {corrected}");
         }
 
+        for (int i = 0; i < hitObject.Samples.Count; i++)
+        {
+            hitObject.Samples[i] = hitObject.Samples[i].With(newVolume: 100);
+        }
+
 
     }
 
