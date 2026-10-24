@@ -261,13 +261,14 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     metadata.AudioFile = name;
 
-                    if (!string.IsNullOrWhiteSpace(artist))
+                    // FIX: Only set artist and title if they're not yet set
+                    if (!string.IsNullOrWhiteSpace(artist) && string.IsNullOrWhiteSpace(metadata.Artist))
                     {
                         metadata.ArtistUnicode = artist;
                         metadata.Artist = MetadataUtils.StripNonRomanisedCharacters(metadata.ArtistUnicode);
                     }
 
-                    if (!string.IsNullOrEmpty(title))
+                    if (!string.IsNullOrEmpty(title) && string.IsNullOrWhiteSpace(metadata.Title))
                     {
                         metadata.TitleUnicode = title;
                         metadata.Title = MetadataUtils.StripNonRomanisedCharacters(metadata.TitleUnicode);
