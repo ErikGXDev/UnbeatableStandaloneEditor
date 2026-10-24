@@ -1,10 +1,11 @@
 ﻿## What's new
 
-- Added View > "Prefer cover art" setting that hides the video but still shows the cover art in the editor
-- Fixed Double notes not working with Key-charting using arrow keys (it works with default bindings for now.)
-- Added a "CustomSongs" folder shortcut in the import menu
-- Made icons for settings sections use the same style
-- Adjusted general settings order
+- Added a "Default charter name" setting, which allows you to set a default author for all new charts
+- Added a "Setpiece" note preset, enable it in the "Experimental" settings to use it
+- Fixed cop notes being very quiet when importing a map
+- Fixed audio metadata overwriting already existing metadata when changing the audio file
+- Changed "Package with Folder" export option wording
+- Removed the default "Guest" chart name
 
 
 **Happy mapping!**
