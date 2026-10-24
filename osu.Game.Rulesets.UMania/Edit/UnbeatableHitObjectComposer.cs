@@ -253,6 +253,9 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer, IKeyB
             { OsuSetting.EditorUnanimated, [
                 new UbNoteCompositionTool("Animate", UbIconType.Animated, [1], [HitSampleInfo.HIT_FINISH]),
                 new UbHoldNoteCompositionTool("Animate Hold", UbIconType.AnimatedHold, [1], [HitSampleInfo.HIT_FINISH]),
+            ]},
+            { OsuSetting.EditorSetpieceNote, [
+                new UbNoteCompositionTool("Setpiece", UbIconType.Setpiece, [2, 3], [HitSampleInfo.HIT_CLAP, HitSampleInfo.HIT_WHISTLE])
             ]}
         };
 

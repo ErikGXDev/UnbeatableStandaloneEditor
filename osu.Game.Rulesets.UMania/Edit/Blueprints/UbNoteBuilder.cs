@@ -288,10 +288,16 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
                         return UbIconType.Flip;
                     }
 
+                    if (HasSample(HitSampleInfo.HIT_CLAP) && HasSample(HitSampleInfo.HIT_WHISTLE))
+                    {
+                        return UbIconType.Setpiece;
+                    }
+                    
                     if (HasSample(HitSampleInfo.HIT_WHISTLE))
                     {
                         return UbIconType.Dodge;
                     }
+                    
 
                     return UbIconType.Note;
                 }

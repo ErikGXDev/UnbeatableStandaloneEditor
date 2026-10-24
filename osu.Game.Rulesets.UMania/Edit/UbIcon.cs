@@ -102,6 +102,8 @@ namespace osu.Game.Rulesets.UMania.Edit
         ModCopHeavy,
         
         Animated,
-        AnimatedHold
+        AnimatedHold,
+        
+        Setpiece
     }
 }
