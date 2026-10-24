@@ -11,6 +11,7 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -37,6 +38,9 @@ public partial class BeatmapPickerScreen : OsuScreen
     [Resolved] private RealmAccess realm { get; set; } = null!;
     [Resolved] private IDialogOverlay? dialogOverlay { get; set; }
     [Resolved] private EditorConfigManager config { get; set; } = null!;
+
+    [Resolved] private OsuConfigManager osuConfig { get; set; } = null!;
+
 
     private readonly Bindable<BeatmapSetInfo?> selectedSet = new();
     private readonly Bindable<string> searchQuery = new();
@@ -495,6 +499,14 @@ public partial class BeatmapPickerScreen : OsuScreen
     private void createNewBeatmap()
     {
         var ruleset = UbRuleset.GetRulesetInfo();
+
+        var newUsername = osuConfig.Get<string>(OsuSetting.EditorDefaultUsername);
+
+        if (!string.IsNullOrEmpty(newUsername))
+        {
+            api.LocalUser.Value.Username = newUsername;
+        }
+
         var working = beatmapManager.CreateNew(ruleset, api.LocalUser.Value);
 
         Beatmap.Value = working;

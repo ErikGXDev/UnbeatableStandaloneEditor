@@ -111,6 +111,13 @@ public partial class GeneralSettingsSection : EditorSettingsSection
                 Current = osuConfig.GetBindable<bool>(OsuSetting.EditorNudgeByMilliseconds),
                 Margin = new MarginPadding { Bottom = 10 },
             },
+            new TooltipTextInput()
+            {
+                LabelText = "Default charter name",
+                TooltipText = "Pre-fills the \"Creator\" field in a newly created map.",
+                RelativeSizeAxes = Axes.X,
+                Current = osuConfig.GetBindable<string>(OsuSetting.EditorDefaultUsername),
+            }
         };
 
         mouseCheckbox.Current.Value = editorConfig.Get<bool>(EditorSetting.ShowSystemCursor);
@@ -206,7 +213,6 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
                 LabelText = "Quick-Export button",
                 TooltipText = "Choose what the Quick Export button does, located in the bottom-right corner of the editor.",
                 Current = quickExportBindable,
-                Margin = new MarginPadding { Bottom = 10 },
             }
         };
 
@@ -427,7 +433,6 @@ public partial class ExperimentalSettingsSection : EditorSettingsSection
                 LabelText = "Enable Setpiece note tool",
                 RelativeSizeAxes = Axes.X,
                 Current = osuConfig.GetBindable<bool>(OsuSetting.EditorSetpieceNote),
-                Margin = new MarginPadding { Bottom = 10 },
             },
         };
     }
