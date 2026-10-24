@@ -1,4 +1,5 @@
 ﻿using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -67,7 +68,6 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
 
         editorConfig = new EditorConfigManager(Storage);
 
-
         if (!editorConfig.Get<bool>(EditorSetting.ShowSystemCursor))
         {
             host.Window.CursorState |= CursorState.Hidden;
@@ -75,6 +75,15 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
 
         if (host.Window != null)
         {
+            bool shouldStartMaximised = editorConfig.Get<bool>(EditorSetting.WindowMaximised);
+            host.Window.WindowState = shouldStartMaximised ? WindowState.Maximised : WindowState.Normal;
+
+            host.Window.WindowStateChanged += state =>
+            {
+                if (host.Window.WindowMode.Value == WindowMode.Windowed)
+                    editorConfig.SetValue(EditorSetting.WindowMaximised, state == WindowState.Maximised);
+            };
+
             host.Window.DragDrop += onWindowDragDrop;
         }
     }

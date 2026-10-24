@@ -18,6 +18,7 @@ public class EditorConfigManager : IniConfigManager<EditorSetting>
         //SetDefault(EditorSetting.UseAutoUpdater, false); // Old, never use
         SetDefault(EditorSetting.NewDisableUpdater, false);
         SetDefault(EditorSetting.GridViewOn, true);
+        SetDefault(EditorSetting.WindowMaximised, false);
     }
 }
 
@@ -28,5 +29,6 @@ public enum EditorSetting
     SortMode,
     //UseAutoUpdater, // Old, never use
     NewDisableUpdater,
-    GridViewOn
+    GridViewOn,
+    WindowMaximised
 }
