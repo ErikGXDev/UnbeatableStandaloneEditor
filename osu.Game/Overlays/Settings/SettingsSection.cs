@@ -106,8 +106,8 @@ namespace osu.Game.Overlays.Settings
                             AutoSizeAxes = Axes.Y,
                             Padding = new MarginPadding
                             {
-                                Top = 24,
-                                Bottom = 32,
+                                Top = 24 - 3,
+                                Bottom = 32 - 3,
                             },
                             Children = new Drawable[]
                             {
