@@ -8,21 +8,24 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.UMania.Edit.Blueprints;
 using osu.Game.Rulesets.UMania.Objects;
 
 namespace osu.Game.Rulesets.UMania.Beatmaps;
 
 public class PassBeatmapConverter : BeatmapConverter<HitObject>
 {
-    public PassBeatmapConverter(IBeatmap beatmap, Ruleset ruleset, bool is4key, int msOffset)
+    public PassBeatmapConverter(IBeatmap beatmap, Ruleset ruleset, bool is4key, int msOffset, bool createSetpieces = false)
         : base(beatmap, ruleset)
     {
         this.is4Key = is4key;
         this.msOffset = msOffset;
+        this.createSetpieces = createSetpieces;
     }
     
     private bool is4Key;
     private int msOffset = 0;
+    private bool createSetpieces = false;
 
     public override bool CanConvert() => true;
 
@@ -30,6 +33,8 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
     {
         return [original];
     }
+    
+    private UbNoteBuilder noteBuilder = new UbNoteBuilder(null);
 
     public new Beatmap<HitObject> ConvertBeatmap(IBeatmap beatmap, CancellationToken token)
     {
@@ -87,6 +92,38 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
             if (cloned is IHasXPosition xPosition && xPosition.X > 6)
             {
                 xPosition.X = GetColumn(xPosition.X);
+            }
+
+            if (createSetpieces && cloned is IHasXPosition xPos2 && (int)xPos2.X != 4)
+            {
+                noteBuilder.ChangeHitObject(cloned);
+
+                if (noteBuilder.HasFileHitSample())
+                {
+                    var data = noteBuilder.GetFileHitSampleData();
+
+                    if (data.StartsWith("setpiece_")) // setpiece_100_100, (scroll speed, distance)
+                    {
+                        var parts = data.Split('_');
+                        if (parts.Length == 3 && float.TryParse(parts[1], out float scrollSpeed) && int.TryParse(parts[2], out int distance))
+                        {
+                            // Setpiece notes have both a Whistle and Clap sample
+                            var time = cloned.StartTime + (1000f / scrollSpeed + 15) - distance;
+                            var setpiece = new Note
+                            {
+                                StartTime = time,
+                                Samples = new List<HitSampleInfo>
+                                {
+                                    new HitSampleInfo(HitSampleInfo.HIT_WHISTLE, HitSampleInfo.BANK_NORMAL, string.Empty, 100),
+                                    new HitSampleInfo(HitSampleInfo.HIT_CLAP, HitSampleInfo.BANK_NORMAL, string.Empty, 100)
+                                },
+                                Column = cloned is IHasXPosition xPos ? (int)xPos.X : 0
+                            };
+
+                            clonedHitObjects.Add(setpiece);
+                        }
+                    }
+                }
             }
 
             if (is4Key && cloned is IHasXPosition xPosition3)

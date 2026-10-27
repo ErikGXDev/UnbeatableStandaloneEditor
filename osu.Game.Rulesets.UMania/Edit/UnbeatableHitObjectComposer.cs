@@ -544,6 +544,11 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer, IKeyB
         if (IsUnanimated)
             RightToolbox.Add(new UbAnimateToolbox());
 
+        if (config.Get<bool>(OsuSetting.EditorSetpieceSillyShenanigans))
+        {
+            RightToolbox.Add(new UbNoteSpawnDelayToolbox());
+        }
+
         if (DrawableRuleset is DrawableManiaEditorRuleset mr)
         {
             mr.ShowSpeedChanges.BindValueChanged(v =>

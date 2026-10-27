@@ -239,7 +239,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             PassBeatmapConverter passConverter =
                 new PassBeatmapConverter(targetBeatmap, targetBeatmap.BeatmapInfo.Ruleset.CreateInstance(), is4Key,
-                    msOffset);
+                    msOffset, true);
 
             var playableBeatmap = passConverter.ConvertBeatmap(targetBeatmap, CancellationToken.None);
 
@@ -354,7 +354,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             Logger.Log(beatmap.HitObjects.Count + " hitobjects found.");
 
             PassBeatmapConverter passConverter =
-                new PassBeatmapConverter(beatmap, beatmap.BeatmapInfo.Ruleset.CreateInstance(), is4Key, msOffset);
+                new PassBeatmapConverter(beatmap, beatmap.BeatmapInfo.Ruleset.CreateInstance(), is4Key, msOffset, true);
 
             var playableBeatmap = passConverter.ConvertBeatmap(beatmap, CancellationToken.None);
 

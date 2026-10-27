@@ -433,6 +433,13 @@ public partial class ExperimentalSettingsSection : EditorSettingsSection
                 LabelText = "Enable Setpiece note tool",
                 RelativeSizeAxes = Axes.X,
                 Current = osuConfig.GetBindable<bool>(OsuSetting.EditorSetpieceNote),
+                Margin = new MarginPadding { Bottom = 10 },
+            },
+            new TooltipCheckbox()
+            {
+                LabelText = "Enable note spawn delay feature",
+                RelativeSizeAxes = Axes.X,
+                Current = osuConfig.GetBindable<bool>(OsuSetting.EditorSetpieceSillyShenanigans),
             },
         };
     }
