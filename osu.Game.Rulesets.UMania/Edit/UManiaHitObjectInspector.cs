@@ -38,12 +38,13 @@ public partial class UManiaHitObjectInspector : HitObjectInspector
             }
             else
             {
-                if (maniaObject.Column is 2 or 3 or 5)
+                /*if (maniaObject.Column is 2 or 3 or 5)
                 {
                     AddHeader("Row");
 
                     AddValue(maniaObject.Column == 2 ? "Top" : maniaObject.Column == 3 ? "Bottom" : "Middle");
                 }
+                */
 
 
                 AddHeader("Side");

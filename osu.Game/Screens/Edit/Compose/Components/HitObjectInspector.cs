@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Threading;
 using osu.Game.Rulesets.Objects;
@@ -112,6 +113,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         AddHeader("Duration");
                         AddValue($"{duration.Duration:#,0.##}ms");
                     }
+                    
+                    var index = EditorBeatmap.FindIndex(selected);
+                    
+                    AddHeader("Index");
+                    AddValue($"{(index + 1)}");
 
                     break;
 
