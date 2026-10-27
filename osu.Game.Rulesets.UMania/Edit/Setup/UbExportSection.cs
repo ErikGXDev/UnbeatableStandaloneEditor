@@ -94,6 +94,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             {
                 using (var ws = new WebSocket("ws://localhost:5080"))
                 {
+                    ws.Log.Output = (_, __) => {};
                     ws.Connect();
 
                     if (ws.ReadyState != WebSocketState.Open)
@@ -115,6 +116,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             {
                 while (!websocketCheckCancellation.IsCancellationRequested)
                 {
+                    if (editor.Mode.Value != EditorScreenMode.SongSetup)
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(5), websocketCheckCancellation.Token);
+                        continue;
+                    }
+                    
                     try
                     {
                         bool available = IsWebsocketAvailable();
