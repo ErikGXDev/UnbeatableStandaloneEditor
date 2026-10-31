@@ -40,6 +40,9 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
 
     private DependencyContainer dependencies = null!;
 
+    [Resolved]
+    private FrameworkConfigManager frameworkConfig { get; set; } = null!;
+
     protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
         dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
@@ -75,13 +78,30 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
 
         if (host.Window != null)
         {
+            /*
+            Logger.Log($"Window state on startup: {host.Window.WindowState}");
+            Logger.Log($"Window mode on startup: {host.Window.WindowMode}");
+            */
+
             bool shouldStartMaximised = editorConfig.Get<bool>(EditorSetting.WindowMaximised);
-            host.Window.WindowState = shouldStartMaximised ? WindowState.Maximised : WindowState.Normal;
+
+            /*
+            Logger.Log($"Should start maximised: {shouldStartMaximised}, {host.Window.WindowState == WindowState.Normal}");
+            */
+
+            if (shouldStartMaximised && host.Window.WindowState == WindowState.Normal)
+                host.Window.WindowState = WindowState.Maximised;
 
             host.Window.WindowStateChanged += state =>
             {
                 if (host.Window.WindowMode.Value == WindowMode.Windowed)
+                {
                     editorConfig.SetValue(EditorSetting.WindowMaximised, state == WindowState.Maximised);
+
+                    /*
+                    Logger.Log($"Window state changed to {state}. Saved maximised state: {editorConfig.Get<bool>(EditorSetting.WindowMaximised)}");
+                    */
+                }
             };
 
             host.Window.DragDrop += onWindowDragDrop;
@@ -242,6 +262,7 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
          // leaves it as DummyWorkingBeatmap
         Beatmap.SetDefault();
 
+        onScreenDisplay.BeginTracking(this, frameworkConfig);
 
         //screenStack.Push(new DirectEditorLoader());
         screenStack.Push(new BeatmapPickerScreen());

@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
@@ -70,6 +71,18 @@ namespace osu.Game.Overlays
                 throw new InvalidOperationException($"{nameof(configManager)} is already registered.");
 
             var trackedSettings = configManager.CreateTrackedSettings();
+
+            // FIX: Only track window mode here
+            if (configManager is FrameworkConfigManager)
+            {
+                trackedSettings?.RemoveAll(s =>
+                {
+                    if (s is not TrackedSetting<WindowMode>)
+                        return true;
+                    return false;
+                });
+            }
+            
             if (trackedSettings == null)
                 return new InvokeOnDisposal(() => { });
 
