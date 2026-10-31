@@ -25,6 +25,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Framework.Testing;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.UMania.Edit.Preview;
@@ -48,6 +49,9 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer, IKeyB
     [Resolved] private Editor editor { get; set; } = null!;
     
     [Resolved] private OsuColour colours { get; set; } = null!;
+    
+    [Resolved] private GlobalCursorDisplay cursorDisplay { get; set; } = null!;
+
 
     public bool Is4Key => config.Get<bool>(OsuSetting.Editor4KeyMode);
     
@@ -205,6 +209,11 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer, IKeyB
         }, true);
         PlayfieldToolbox.Expanded.BindValueChanged(v => showQuickSettings.Value = v.NewValue);
         
+        var paintMode = config.GetBindable<bool>(OsuSetting.EditorPaintMode);
+        paintMode.BindValueChanged(v =>
+        {
+            SettingPaintMode.Value = v.NewValue ? TernaryState.True : TernaryState.False;
+        }, true);
 
         hasTimingHandler = hasTiming =>
         {
@@ -266,6 +275,8 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer, IKeyB
     public Bindable<TernaryState> SettingShowPreview = new Bindable<TernaryState>(TernaryState.True);
 
     private Bindable<TernaryState> SettingUseKeyCharting = new Bindable<TernaryState>(TernaryState.False);
+    
+    private Bindable<TernaryState> SettingPaintMode = new Bindable<TernaryState>(TernaryState.False);
     
     public DrawableTernaryButton ModFlyingButton = null!;
     public DrawableTernaryButton ModInvisibleButton = null!;
@@ -518,7 +529,14 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer, IKeyB
                 Description = "Key-based charting",
                 TooltipText = "Press 1-6 to place notes in the corresponding column, similar to the official editor.\nHold a key and scroll to create hold notes.\nUse Shift to place a Dodge, Double or Zoom note (depending on the column).\nModifier buttons (Q-P) still apply to placed notes.",
                 CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.Keyboard },
-            }
+            },
+            new DrawableTernaryButton
+            {
+                Current = SettingPaintMode,
+                Description = "Paint mode",
+                TooltipText = "Hold the mouse buttons and drag to place or remove many notes at once.",
+                CreateIcon = () => new SpriteIcon { Icon = FontAwesome.Solid.PaintBrush },
+            },
         });
 
         PlayfieldToolbox.Expanded.Value = false;
@@ -801,6 +819,10 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer, IKeyB
                 if (keyBasedChartingHandler.TryAdjustHoldByKey(1, e.ShiftPressed))
                     return true;
                 break;
+            case GlobalAction.EditorEnablePainting:
+                tintCursor(true);
+                SettingPaintMode.Value = TernaryState.True;
+                return true;
         }
 
         return false;
@@ -808,6 +830,22 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer, IKeyB
 
     public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
     {
+        switch (e.Action)
+        {
+            case GlobalAction.EditorEnablePainting:
+                tintCursor(false);
+                SettingPaintMode.Value = TernaryState.False;
+                break;
+        }
+    }
+
+    private void tintCursor(bool tinted)
+    {
+        if (tinted)
+        {
+            cursorDisplay.MenuCursor.Colour = Colour4.LimeGreen;
+        }
+        cursorDisplay.MenuCursor.FadeColour(tinted ? Colour4.LimeGreen : Colour4.White, 40);
     }
 
     protected override void OnKeyUp(KeyUpEvent e)

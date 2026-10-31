@@ -1,5 +1,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
@@ -39,6 +40,10 @@ public partial class EditorKeyBindingsSubsection : KeyBindingsSubsection
         var bindings = realm.All<RealmKeyBinding>()
             .Where(b => b.RulesetName == null && b.Variant == null)
             .Detach();
+
+        var bindCount = bindings.Count();
+
+        Logger.Log($"Found {bindCount} key bindings for editor section.");
 
         var actionsInSection = GlobalActionContainer.GetGlobalActionsFor(GlobalActionCategory.Editor)
             .Where(a => !excluded_actions.Contains(a))

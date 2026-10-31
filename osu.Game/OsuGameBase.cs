@@ -427,6 +427,8 @@ namespace osu.Game
             dependencies.Cache(KeyBindingStore);
 
             dependencies.Cache(globalBindings);
+            
+            dependencies.Cache(GlobalCursorDisplay);
 
             Ruleset.BindValueChanged(onRulesetChanged);
             Beatmap.BindValueChanged(onBeatmapChanged);

@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit;
@@ -232,9 +233,24 @@ namespace osu.Game.Screens.Edit.Compose.Components
             selectionBeforeDrag.Clear();
         }
 
+        [CanBeNull] private InputManager inputManager;
+        
+        [Resolved] private OsuConfigManager config { get; set; }
+
         protected override void Update()
         {
             base.Update();
+            
+            if (inputManager == null)
+                inputManager = GetContainingInputManager();
+
+            if (inputManager != null && config.Get<bool>(OsuSetting.EditorPaintMode))
+            {
+                if (inputManager.CurrentState.Mouse.IsPressed(MouseButton.Right))
+                {
+                    performMouseDownActions(new MouseDownEvent(inputManager.CurrentState, MouseButton.Right, inputManager.CurrentState.Mouse.Position));
+                }
+            }
 
             if (lastDragEvent != null && DragBox.State == Visibility.Visible)
             {

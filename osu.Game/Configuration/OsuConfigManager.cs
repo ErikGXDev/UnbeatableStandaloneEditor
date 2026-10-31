@@ -231,6 +231,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorPreferCoverArt, false); // FIX: Prefer cover art for editor
             SetDefault(OsuSetting.EditorSetpieceNote, false); // FIX: Setpiece note for editor
             SetDefault(OsuSetting.EditorSetpieceSillyShenanigans, false);
+            SetDefault(OsuSetting.EditorPaintMode, false); // FIX: Paint mode for placing multiple notes by dragging
             SetDefault(OsuSetting.EditorDefaultUsername, ""); // FIX: Default charter nameW
             
             SetDefault(OsuSetting.EditorPreviewZoom, 1.0d, 0.1d, 2.5d, 0.001d); // Save zoom level of preview area
@@ -554,6 +555,7 @@ namespace osu.Game.Configuration
         EditorQuickSettingsOpen,
         EditorSetpieceNote,
         EditorSetpieceSillyShenanigans,
+        EditorPaintMode, // FIX: Paint mode for placing multiple notes by dragging
         //EditorSwapPinkInsteadOfCamera,
         
         CreateBackups, // Toggle backup creation on save

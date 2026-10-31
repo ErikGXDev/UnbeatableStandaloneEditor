@@ -134,6 +134,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.J }, GlobalAction.EditorNudgeLeft),
             new KeyBinding(new[] { InputKey.K }, GlobalAction.EditorNudgeRight),
             new KeyBinding(new[] { InputKey.G }, GlobalAction.EditorCycleGridSpacing),
+            new KeyBinding(new[] { InputKey.P }, GlobalAction.EditorEnablePainting),
             new KeyBinding(new[] { InputKey.Shift, InputKey.G }, GlobalAction.EditorCycleGridType),
             new KeyBinding(new[] { InputKey.F5 }, GlobalAction.EditorTestGameplay),
             new KeyBinding(new[] { InputKey.T }, GlobalAction.EditorTapForBPM),
@@ -148,6 +149,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.E }, GlobalAction.EditorToggleScaleControl),
             new KeyBinding(new[] { InputKey.Left }, GlobalAction.EditorSeekBackwards),
             new KeyBinding(new[] { InputKey.Right }, GlobalAction.EditorSeekForwards),
+            
 
             // These two keys are reversed from stable because it feels more natural (and matches mouse wheel scroll directionality).
             new KeyBinding(new[] { InputKey.Up }, GlobalAction.EditorSeekToPreviousTimingPoint),
@@ -563,6 +565,9 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.NextSkin))]
         NextSkin,
+        
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorEnablePainting))]
+        EditorEnablePainting,
     }
 
     public enum GlobalActionCategory
