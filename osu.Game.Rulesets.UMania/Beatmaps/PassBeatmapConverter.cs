@@ -7,6 +7,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UMania.Edit.Blueprints;
 using osu.Game.Rulesets.UMania.Objects;
@@ -199,6 +200,12 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
         var cloned = new List<HitSampleInfo>(samples.Count);
         foreach (var sample in samples)
         {
+            if (sample is ConvertHitObjectParser.FileHitSampleInfo fileSample)
+            {
+                cloned.Add(new ConvertHitObjectParser.FileHitSampleInfo(fileSample.Filename, fileSample.Volume));
+                continue;
+            }
+            
             cloned.Add(new HitSampleInfo(sample.Name, sample.Bank, sample.Suffix, sample.Volume));
         }
         return cloned;

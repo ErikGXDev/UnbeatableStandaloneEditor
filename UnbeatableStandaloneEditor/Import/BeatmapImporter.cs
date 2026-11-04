@@ -84,7 +84,7 @@ public class BeatmapImporter
 
         using (var reader = new LineBufferedReader(beatmapStream))
         {
-            var decoder = Decoder.GetDecoder<Beatmap>(reader);
+            var decoder = new LegacyBeatmapDecoder();
             beatmap = decoder.Decode(reader);
         }
 
@@ -162,6 +162,12 @@ public class BeatmapImporter
             return;
 
         var noteBuilder = new UbNoteBuilder(hitObject);
+
+        if (!string.IsNullOrEmpty(noteBuilder.GetFileHitSampleData()))
+        {
+            if (noteBuilder.HasSample(HitSampleInfo.HIT_FINISH))
+                return;
+        }
 
         //Logger.Log("Main bank: " + noteBuilder.GetMainSample().Bank + " | " + noteBuilder.GetAdditionSample().Bank);
 
