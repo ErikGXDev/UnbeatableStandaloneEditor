@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Backgrounds
 
         private BeatmapBackground background = null!;
         private Container storyboardContainer = null!;
-        private EditorSkinProvidingContainer storyboardProvidingContainer = null!;
+
 
         private IFrameBasedClock? clockSource;
 
@@ -55,7 +55,6 @@ namespace osu.Game.Screens.Backgrounds
             dimContainer.AddRange(createContent());
             background = dimContainer.OfType<BeatmapBackground>().Single();
             storyboardContainer = dimContainer.OfType<Container>().Single();
-            storyboardProvidingContainer = dimContainer.OfType<EditorSkinProvidingContainer>().Single();
 
             dimLevel = config.GetBindable<float>(OsuSetting.EditorDim);
             showStoryboard = config.GetBindable<bool>(OsuSetting.EditorShowStoryboard);
@@ -92,12 +91,12 @@ namespace osu.Game.Screens.Backgrounds
 
         private void updateState(double duration = 500)
         {
-            storyboardContainer.FadeTo(showStoryboard.Value ? 1 : 0, duration, Easing.OutQuint);
+            //storyboardContainer.FadeTo(showStoryboard.Value ? 1 : 0, duration, Easing.OutQuint);
             background.FadeTo(showStoryboard.Value ? 1 : 0, duration, Easing.OutQuint);
             
             var max = showStoryboard.Value ? 1 : 0;
             
-            storyboardProvidingContainer.FadeTo(preferCoverArt.Value ? 0 : max, duration, Easing.OutQuint);
+            storyboardContainer.FadeTo(preferCoverArt.Value ? 0 : max, duration, Easing.OutQuint);
             // yes, this causes overdraw, but is also a (crude) fix for bad-looking transitions on screen entry
             // caused by the previous background on the background stack poking out from under this one and then instantly fading out
             background.FadeColour(beatmap.Value.Storyboard.ReplacesBackground && showStoryboard.Value ? Colour4.Black : Colour4.White, duration, Easing.OutQuint);
