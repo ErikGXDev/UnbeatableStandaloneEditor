@@ -214,6 +214,7 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer, IKeyB
         {
             SettingPaintMode.Value = v.NewValue ? TernaryState.True : TernaryState.False;
         }, true);
+        SettingPaintMode.BindValueChanged(v => paintMode.Value = v.NewValue == TernaryState.True);
 
         hasTimingHandler = hasTiming =>
         {
