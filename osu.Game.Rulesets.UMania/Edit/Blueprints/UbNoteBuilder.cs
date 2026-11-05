@@ -275,6 +275,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
                 {
                     if (column == 5)
                     {
+                        if (HasSample(HitSampleInfo.HIT_WHISTLE))
+                        {
+                            return UbIconType.Friend;
+                        }
+                        
                         return UbIconType.Freestyle;
                     }
 

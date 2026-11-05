@@ -82,11 +82,22 @@ namespace osu.Game.Rulesets.UMania.Edit
             UbIconType.AnimatedHold => Color4.DarkOliveGreen.Opacity(0f),
             UbIconType.Freestyle => Color4.Purple.Lighten(0.3f),
             UbIconType.FreestyleSmall => Color4.Purple.Lighten(0.3f),
+            UbIconType.Friend => desaturate(Color4.Purple.Lighten(0.3f), 0.3f).Lighten(0.25f),
             UbIconType.Spam => Color4.DeepPink,
             UbIconType.Flip => Color4.Blue,
             UbIconType.Zoom => Color4.Orange,
             UbIconType.Brawl => Color4.Red,
             _ => new Color4(1f, 1f, 1f, 1f),
         };
+
+        private static Color4 desaturate(Color4 colour, float scalar)
+        {
+            float grey = (colour.R + colour.G + colour.B) / 3f;
+            return new Color4(
+                grey + (colour.R - grey) * scalar,
+                grey + (colour.G - grey) * scalar,
+                grey + (colour.B - grey) * scalar,
+                colour.A);
+        }
     }
 }

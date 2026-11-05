@@ -82,6 +82,7 @@ namespace osu.Game.Rulesets.UMania.Edit
         Hold,
         Dodge,
         Double,
+        Friend,
         Freestyle,
         FreestyleSmall,
         Spam,
