@@ -10,6 +10,10 @@ namespace osu.Game.Rulesets.UMania.Edit;
 
 public partial class UManiaHitObjectInspector : HitObjectInspector
 {
+    
+    private UbIconType[] forbiddenIndex = [UbIconType.Animated, UbIconType.AnimatedHold, UbIconType.Flip, UbIconType.Zoom, UbIconType.Setpiece];
+
+    
     protected override void AddInspectorValues(HitObject[] objects)
     {
         base.AddInspectorValues(objects);
@@ -18,8 +22,31 @@ public partial class UManiaHitObjectInspector : HitObjectInspector
         {
             var maniaObject = (ManiaHitObject)objects[0];
 
-            findFlipAndZoom(maniaObject, out bool flippedRight, out bool zoomedIn);
+            var noteHelper = new UbNoteBuilder(maniaObject);
 
+            var icon = noteHelper.InferObjectTypeIcon();
+            
+            if (!forbiddenIndex.Contains(icon))
+            {
+                var index = 1;
+                foreach (var h in EditorBeatmap.HitObjects.Where(h => h.StartTime < maniaObject.StartTime))
+                {
+                    noteHelper.ChangeHitObject(h);
+
+                    var type = noteHelper.InferObjectTypeIcon();
+
+                    
+                    if (!forbiddenIndex.Contains(type))
+                    {
+                        index++;
+                    }
+                }
+                
+                AddHeader("Hit Index");
+                AddValue($"{index}");
+            }
+            
+            findFlipAndZoom(maniaObject, out bool flippedRight, out bool zoomedIn);
 
             if (maniaObject.Column == 4)
             {
@@ -67,25 +94,6 @@ public partial class UManiaHitObjectInspector : HitObjectInspector
         
         var indexOfNote = notes.IndexOf(maniaNote);
         var time = maniaNote.StartTime;
-        
-        
-
-        /*foreach (var note in notes)
-        {
-            if (note.StartTime > time) break;
-
-            if (note.Column == 4)
-            {
-                if (isZoomNote(note))
-                {
-                    zoomedIn = !zoomedIn;
-                }
-                else
-                {
-                    flippedRight = !flippedRight;
-                }
-            }
-        }*/
         
         // Rewrite loop above into for-loop with index
         // Not only do we have to check that only flips are included that are under the notes time,

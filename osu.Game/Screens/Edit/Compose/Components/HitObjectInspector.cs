@@ -114,11 +114,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         AddValue($"{duration.Duration:#,0.##}ms");
                     }
                     
-                    var index = EditorBeatmap.FindIndex(selected);
-                    
-                    AddHeader("Index");
-                    AddValue($"{(index + 1)}");
-
                     break;
 
                 default:
