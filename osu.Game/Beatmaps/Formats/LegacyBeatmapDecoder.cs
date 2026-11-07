@@ -403,7 +403,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"CircleSize":
-                    difficulty.CircleSize = Parsing.ParseFloat(pair.Value);
+                    difficulty.CircleSize = 5 /*Parsing.ParseFloat(pair.Value)*/;
                     break;
 
                 case @"OverallDifficulty":
