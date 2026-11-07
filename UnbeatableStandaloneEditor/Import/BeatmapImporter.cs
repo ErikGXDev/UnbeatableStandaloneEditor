@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UMania;
 using osu.Game.Rulesets.UMania.Beatmaps;
 using osu.Game.Rulesets.UMania.Edit.Blueprints;
+using osu.Game.Screens.Edit.Setup;
 using osu.Game.Storyboards;
 
 namespace UnbeatableStandaloneEditor.Import;
@@ -111,6 +112,12 @@ public class BeatmapImporter
         if (storyboard != null)
             storyboard.BeatmapInfo.Metadata.BackgroundFile = beatmap.Metadata.BackgroundFile;
 
+        var difficulty = beatmap.BeatmapInfo.DifficultyName;
+
+        if (Enum.TryParse(difficulty, ignoreCase: true, out MetadataSection.DifficultySlot slot))
+        {
+            beatmap.Metadata.Source = slot.ToString();
+        }
 
         var converter = new ManiaBeatmapConverter(beatmap, new UManiaRuleset());
 

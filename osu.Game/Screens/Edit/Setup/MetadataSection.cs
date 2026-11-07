@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Edit.Setup
         private MusicController music { get; set; } = null!;
 
 
-        enum DifficultySlot
+        public enum DifficultySlot
         {
             Beginner,
             [Description("Normal")]
