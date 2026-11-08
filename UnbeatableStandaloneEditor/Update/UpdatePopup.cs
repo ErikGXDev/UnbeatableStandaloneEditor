@@ -159,11 +159,16 @@ public partial class UpdatePopup : OsuFocusedOverlayContainer
                 catch (Exception ex)
                 {
                     Logger.Log($"Error downloading update: {ex.Message}", LoggingTarget.Runtime, LogLevel.Error);
-                    Schedule(() => updateStatusText.Text = $"Error downloading update (This error has been logged): {ex.Message}");
-                    await Task.Delay(8000).ContinueWith(_ =>
+                    Schedule(() =>
                     {
-                        Hide();
+                        updateStatusText.Text =
+                            $"Error downloading update (This error has been logged): {ex.Message}";
                     });
+                    Task.Delay(8000).ContinueWith(_ =>
+                    {
+                        Schedule(() => { Hide(); });
+                    });
+
                 }
             });
         }
