@@ -137,7 +137,13 @@ public partial class UbPlacementToolbox : EditorToolboxGroup
         {
             // If the item is somehow moved, the menu should just be hidden
             // because the items, etc, are not in the same time anymore
-            item.StartTimeBindable.BindValueChanged(_ => Alpha = 0f);
+            item.StartTimeBindable.BindValueChanged((ev) =>
+            {
+                if (Math.Abs(ev.NewValue - ev.OldValue) > 1)
+                {
+                    Alpha = 0f;
+                }
+            });
         }
         
         refreshItems();
@@ -165,6 +171,15 @@ public partial class UbPlacementToolbox : EditorToolboxGroup
         
         IList modifiableHitObjects = (IList)beatmap.PlayableBeatmap.HitObjects; // This is a hack to make the list modifiable, the original is read-only.
         
+        //sync start times
+        var sharedStartTime = placementOrderList.Items.First().HitObject.StartTime;
+        
+        for (int i = 0; i < placementOrderList.Items.Count; i++)
+        {
+            var item = placementOrderList.Items[i];
+            item.HitObject.StartTime = sharedStartTime;
+        }
+        
         var indices = placementOrderList.Items
             .Select(h => beatmap.FindIndex(h.HitObject))
             .OrderByDescending(i => i)
@@ -183,7 +198,7 @@ public partial class UbPlacementToolbox : EditorToolboxGroup
             
             var hitObject = item.HitObject;
             var index = sortedIndices[i];
-
+            
             if (index >= 0 && index <= modifiableHitObjects.Count)
                 modifiableHitObjects.Insert(index, hitObject);
             else
