@@ -511,6 +511,21 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                     bool holdFlippedRight = flippedRight;
                     if (column < 2 && !zoomedIn) holdFlippedRight = !holdFlippedRight;
 
+                    var isSpamHold = false;
+                    if (isBrawl)
+                    {
+                        var mods = getIconModifiers(note);
+
+                        if (!mods.Contains(UbIconType.ModCopHeavy))
+                        {
+                            isSpamHold = true;
+                        }
+                    }
+                    else if (iconType == UbIconType.Spam)
+                    {
+                        isSpamHold = true;
+                    }
+                    
                     if (isBrawl || iconType == UbIconType.Double)
                     {
                         var holdStart = pos;
@@ -542,6 +557,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                             var previewHold = getPooledHold();
                             if (notesLayer.DrawSize != Vector2.Zero)
                                 previewHold.SetDiagonal(holdStart, tailPos, notesLayer.DrawSize);
+                            
+                            previewHold.SetSpamColour(isSpamHold);
                             previewHold.Show();
 
                             if (time >= startTime)
@@ -571,6 +588,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                         if (!holdFlippedRight)
                             previewHold.Width = Math.Min(previewHold.Width, left_receptor - previewHold.X);
 
+                        previewHold.SetSpamColour(isSpamHold);
                         previewHold.Show();
 
                         if (Math.Abs(pos.X - (holdFlippedRight ? right_receptor : left_receptor)) < 0.01f)
@@ -810,6 +828,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
         {
             noteBuilder.ChangeHitObject(note);
             return noteBuilder.InferObjectTypeIcon();
+        }
+        
+        private List<UbIconType> getIconModifiers(HitObject note)
+        {
+            noteBuilder.ChangeHitObject(note);
+            return noteBuilder.InferObjectModifierIcons();
         }
 
         private PreviewNote makeNote(ManiaHitObject hitObject)

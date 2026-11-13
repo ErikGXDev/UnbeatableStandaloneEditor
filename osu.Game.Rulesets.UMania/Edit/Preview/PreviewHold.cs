@@ -50,9 +50,15 @@ namespace osu.Game.Rulesets.UMania.Edit
             Size = new Vector2(distance, 4);
             Rotation = angle;
         }
+        
+        public void SetSpamColour(bool isSpam)
+        {
+            line.Colour = isSpam ? Color4.LightPink : Color4.LightBlue;
+        }
 
         public void Reset()
         {
+            line.Colour = Color4.LightBlue;
             RelativePositionAxes = Axes.Both;
             RelativeSizeAxes = Axes.X;
             Origin = Anchor.CentreLeft;
