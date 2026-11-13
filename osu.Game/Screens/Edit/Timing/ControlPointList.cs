@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Custom;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -85,6 +86,7 @@ namespace osu.Game.Screens.Edit.Timing
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Padding = new MarginPadding { Left = margins, Vertical = margins, },
+                            Spacing = new Vector2(6),
                             Children = new Drawable[]
                             {
                                 new RoundedButton
@@ -96,6 +98,11 @@ namespace osu.Game.Screens.Edit.Timing
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                 },
+                                new TimingPointPasteButton()
+                                {
+                                    BackgroundColour = colourProvider.Background4,
+                                    TooltipText = "Paste osu! timing points from clipboard",
+                                }
                             }
                         },
                         new Container
