@@ -487,7 +487,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                         hitCircles[innerCircleIndex].FlashColour(colourProvider.Background1, (float)flash_duration);
                     }
                 }
+                
+                var mods = getIconModifiers(note);
 
+                List<Drawable> childNotes = [];
+                Drawable? referenceNote = null;
+              
                 if (isHold && endTime > time && startTime < time + viewField + viewFieldTolerance)
                 {
                     var iconType = getIconType(note);
@@ -502,11 +507,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
 
                     Vector2 getPosition(int col, double t) => isBrawl
                         ? GetBrawlNotePosition(col, t, time, flippedRight, zoomedIn)
-                        : GetPreviewNotePosition(col, t, time, flippedRight, zoomedIn);
+                        : GetPreviewNotePosition(col, t, time, flippedRight, zoomedIn, iconType, mods);
 
                     var pos = getPosition(isBrawl ? brawlColumn : column, startTime);
                     var tailPos = getPosition(endColumn, endTime);
-
+                    
                     // diagonal for double holds
                     bool holdFlippedRight = flippedRight;
                     if (column < 2 && !zoomedIn) holdFlippedRight = !holdFlippedRight;
@@ -514,7 +519,6 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                     var isSpamHold = false;
                     if (isBrawl)
                     {
-                        var mods = getIconModifiers(note);
 
                         if (!mods.Contains(UbIconType.ModCopHeavy))
                         {
@@ -590,6 +594,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
 
                         previewHold.SetSpamColour(isSpamHold);
                         previewHold.Show();
+                        
+                        childNotes.Add(previewHold);
 
                         if (Math.Abs(pos.X - (holdFlippedRight ? right_receptor : left_receptor)) < 0.01f)
                         {
@@ -597,7 +603,9 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                             previewNote2.SetIconType(iconType);
                             previewNote2.Position = pos;
                             previewNote2.Show();
+                            referenceNote = previewNote2;
                         }
+                        
                     }
 
                     var endNote = getPooledNote();
@@ -608,6 +616,8 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                     endNote.Scale = new Vector2(0.5f);
                     endNote.Position = tailPos;
                     endNote.Show();
+                    
+                    childNotes.Add(endNote);
 
                     // Flash the receptor on the opposite lane when a Double hold ends
                     if (iconType == UbIconType.Double && Math.Abs(time - endTime) < hit_window)
@@ -617,6 +627,15 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                             hitCircles[endInnerCircle].FlashColour(colourProvider.Background1, (float)flash_duration);
                     }
                 }
+                
+                if (mods.Contains(UbIconType.ModFlying) && referenceNote != null)
+                {
+                    foreach (var child in childNotes)
+                    {
+                        child.Position = new Vector2(child.Position.X, referenceNote.Position.Y);
+                    }
+                }
+
 
                 // Continue search until window is reached
                 if (note.StartTime < time) continue;
@@ -651,7 +670,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                     previewNote.Position = GetBrawlNotePosition(isForcedLowBrawl(column, note) ? getLowLane() : column,
                         startTime, time, flippedRight, zoomedIn);
                 else
-                    previewNote.Position = GetPreviewNotePosition(column, startTime, time, flippedRight, zoomedIn);
+                    previewNote.Position = GetPreviewNotePosition(column, startTime, time, flippedRight, zoomedIn, previewNote.IconType, mods);
 
                 if (previewNote.IconType == UbIconType.Dodge)
                 {
@@ -659,6 +678,14 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                     {
                         // Flip spike when they are on top lane
                         previewNote.Scale = new Vector2(previewNote.Scale.X, -previewNote.Scale.Y);
+                    }
+                }
+                
+                if (mods.Contains(UbIconType.ModFlying))
+                {
+                    foreach (var child in childNotes)
+                    {
+                        child.Position = new Vector2(child.Position.X, previewNote.Position.Y);
                     }
                 }
 
@@ -894,7 +921,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
             return note;
         }
 
-        private Vector2 GetPreviewNotePosition(int column, double hitTime, double currentTime, bool flippedRight, bool zoomedIn)
+        private Vector2 GetPreviewNotePosition(int column, double hitTime, double currentTime, bool flippedRight, bool zoomedIn, UbIconType noteType, List<UbIconType> modifiers)
         {
             var vector = new Vector2(0);
 
@@ -924,6 +951,15 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
             {
                 vector.Y = middle_receptor;
             }
+            
+            if (column != 5 && modifiers.Contains(UbIconType.ModFlying) && noteType != UbIconType.Double)
+            {
+                // Flying notes move over their path from the view field to their hit time from the middle y to the y of their respective receptor
+                // the note STARTS from the middle and ENDS at the vector Y already calculated above.
+                double travel = Math.Max(0, hitTime - currentTime);
+                float progress = (float)Math.Clamp(travel / viewField * 0.6, 0, 1);
+                vector.Y = vector.Y + (middle_receptor - vector.Y) * progress;
+            }
 
             return vector;
         }
@@ -942,7 +978,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
         
         private Vector2 GetBrawlNotePosition(int column, double hitTime, double currentTime, bool flippedRight, bool zoomedIn)
         {
-            var pos = GetPreviewNotePosition(column, hitTime, currentTime, flippedRight, zoomedIn);
+            var pos = GetPreviewNotePosition(column, hitTime, currentTime, flippedRight, zoomedIn, UbIconType.Note, []);
             
             if (column <= 1 && !zoomedIn)
                 flippedRight = !flippedRight;
