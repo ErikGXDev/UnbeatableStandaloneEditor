@@ -1,10 +1,12 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Screens;
 using osu.Game;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Overlays;
+using osu.Game.Screens;
 
 namespace UnbeatableStandaloneEditor.Import;
 
@@ -63,6 +65,13 @@ public partial class ImportDropper : Drawable, ICanAcceptFiles
 
     private Task importBeatmap(string filePath)
     {
+
+        var screen = this.FindClosestParent<OsuScreen>();
+
+        if (!screen.IsCurrentScreen())
+        {
+            return Task.CompletedTask;
+        }
 
         if (BeatmapImporter.ImportBeatmap(filePath, beatmapManager, config))
         {
