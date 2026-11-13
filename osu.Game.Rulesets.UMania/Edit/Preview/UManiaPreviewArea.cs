@@ -689,6 +689,16 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                     }
                 }
 
+                var timeD = Math.Abs(startTime - time);
+                var fadeStart = 380;
+                double fadeInOutWindow = 70;
+                if (mods.Contains(UbIconType.ModInvisible) && (timeD < fadeStart) && previewNote.IconType == UbIconType.Note)
+                {
+                    // calculate in small 100ms fade in/out window that happens at the start of the 300ms invisible window
+                    // use previewNote.SetAlpha
+                    previewNote.SetAlpha((float)Interpolation.Lerp(0.35, 1, Math.Clamp((timeD - (fadeStart - fadeInOutWindow)) / fadeInOutWindow, 0, 1)));
+                }
+                
                 previewNote.Show();
             }
 
@@ -957,7 +967,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                 // Flying notes move over their path from the view field to their hit time from the middle y to the y of their respective receptor
                 // the note STARTS from the middle and ENDS at the vector Y already calculated above.
                 double travel = Math.Max(0, hitTime - currentTime);
-                float progress = (float)Math.Clamp(travel / viewField * 0.6, 0, 1);
+                float progress = (float)Math.Clamp(travel / viewField * 0.57, 0, 1);
                 vector.Y = vector.Y + (middle_receptor - vector.Y) * progress;
             }
 

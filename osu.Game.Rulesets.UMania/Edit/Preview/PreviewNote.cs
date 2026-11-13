@@ -46,6 +46,7 @@ namespace osu.Game.Rulesets.UMania.Edit
             shape.Scale = type == UbIconType.Spam ? new Vector2(1, 1.5f) : Vector2.One;
             shape.Y = type == UbIconType.Spam ? -5 : 0;
             shape.X = 0;
+            shape.Alpha = 1;
             
             if (type == UbIconType.FreestyleSmall)
             {
@@ -61,6 +62,12 @@ namespace osu.Game.Rulesets.UMania.Edit
         {
             Scale = Vector2.One;
             Position = Vector2.Zero;
+        }
+        
+        public void SetAlpha(float alpha)
+        {
+            if (shape != null)
+                shape.Alpha = alpha;
         }
 
         [BackgroundDependencyLoader]
