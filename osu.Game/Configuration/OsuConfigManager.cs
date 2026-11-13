@@ -232,7 +232,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorSetpieceNote, false); // FIX: Setpiece note for editor
             SetDefault(OsuSetting.EditorSetpieceSillyShenanigans, false);
             SetDefault(OsuSetting.EditorPaintMode, false); // FIX: Paint mode for placing multiple notes by dragging
-            SetDefault(OsuSetting.EditorDefaultUsername, ""); // FIX: Default charter nameW
+            SetDefault(OsuSetting.EditorDefaultUsername, ""); // FIX: Default charter name
+            SetDefault(OsuSetting.EditorInvertKeychartUnanimated, false); // FIX: Invert keychart unanimated notes
             
             SetDefault(OsuSetting.EditorPreviewZoom, 1.0d, 0.1d, 2.5d, 0.001d); // Save zoom level of preview area
             
@@ -556,6 +557,7 @@ namespace osu.Game.Configuration
         EditorSetpieceNote,
         EditorSetpieceSillyShenanigans,
         EditorPaintMode, // FIX: Paint mode for placing multiple notes by dragging
+        EditorInvertKeychartUnanimated,
         //EditorSwapPinkInsteadOfCamera,
         
         CreateBackups, // Toggle backup creation on save

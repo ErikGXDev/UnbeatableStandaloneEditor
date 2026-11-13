@@ -440,6 +440,13 @@ public partial class ExperimentalSettingsSection : EditorSettingsSection
                 LabelText = "Enable note spawn delay feature",
                 RelativeSizeAxes = Axes.X,
                 Current = osuConfig.GetBindable<bool>(OsuSetting.EditorSetpieceSillyShenanigans),
+                Margin = new MarginPadding { Bottom = 10 },
+            },
+            new TooltipCheckbox()
+            {
+                LabelText = "Invert Keycharting shift for UNANIMATED notes",
+                RelativeSizeAxes = Axes.X,
+                Current = osuConfig.GetBindable<bool>(OsuSetting.EditorInvertKeychartUnanimated),
             },
         };
     }

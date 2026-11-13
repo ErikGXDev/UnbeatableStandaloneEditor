@@ -4,6 +4,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UMania.Edit.Blueprints;
@@ -27,6 +28,9 @@ public partial class KeyBasedChartingHandler : Drawable
 
     [Resolved]
     private UnbeatableHitObjectComposer composer { get; set; } = null!;
+    
+    [Resolved]
+    private OsuConfigManager config { get; set; } = null!;
     
     public bool Enabled { get; set; }
 
@@ -203,9 +207,19 @@ public partial class KeyBasedChartingHandler : Drawable
         };
 
         var baseSamples = new List<string>();
-        
-        if (column == 1 && shiftPressed && composer.IsUnanimated && !composer.Is4Key)
-            baseSamples.Add(HitSampleInfo.HIT_FINISH); // UNANIMATED
+
+        // UNANIMATED
+        if (column == 1 && composer.IsUnanimated && !composer.Is4Key)
+        {
+            var invertUnanimated = config.Get<bool>(OsuSetting.EditorInvertKeychartUnanimated);
+            if (invertUnanimated && !shiftPressed)
+            {
+                baseSamples.Add(HitSampleInfo.HIT_FINISH);
+            } else if (!invertUnanimated && shiftPressed)
+            {
+                baseSamples.Add(HitSampleInfo.HIT_FINISH);
+            }
+        }
 
         else if (column >= 0 && column <= 3 && shiftPressed)
             baseSamples.Add(HitSampleInfo.HIT_WHISTLE); // Dodge
