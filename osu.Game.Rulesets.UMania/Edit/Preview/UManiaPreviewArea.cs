@@ -681,7 +681,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                     }
                 }
                 
-                if (mods.Contains(UbIconType.ModFlying))
+                if (mods.Contains(UbIconType.ModFlying) && previewNote.IconType != UbIconType.Double)
                 {
                     foreach (var child in childNotes)
                     {
@@ -962,7 +962,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
                 vector.Y = middle_receptor;
             }
             
-            if (column != 5 && modifiers.Contains(UbIconType.ModFlying) && noteType != UbIconType.Double)
+            if (column != 5 && modifiers.Contains(UbIconType.ModFlying))
             {
                 // Flying notes move over their path from the view field to their hit time from the middle y to the y of their respective receptor
                 // the note STARTS from the middle and ENDS at the vector Y already calculated above.
