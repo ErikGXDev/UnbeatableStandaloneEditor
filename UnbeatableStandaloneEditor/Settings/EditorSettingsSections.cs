@@ -444,6 +444,13 @@ public partial class ExperimentalSettingsSection : EditorSettingsSection
             },
             new TooltipCheckbox()
             {
+                LabelText = "Enable blind sideswap feature",
+                RelativeSizeAxes = Axes.X,
+                Current = osuConfig.GetBindable<bool>(OsuSetting.EditorEvilInAKettle),
+                Margin = new MarginPadding { Bottom = 10 },
+            },
+            new TooltipCheckbox()
+            {
                 LabelText = "Invert Keycharting shift for UNANIMATED notes",
                 RelativeSizeAxes = Axes.X,
                 Current = osuConfig.GetBindable<bool>(OsuSetting.EditorInvertKeychartUnanimated),

@@ -95,15 +95,17 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
                 xPosition.X = GetColumn(xPosition.X);
             }
 
-            if (createSetpieces && cloned is IHasXPosition xPos2 && (int)xPos2.X != 4)
+            if (createSetpieces && cloned is IHasXPosition xPos2)
             {
                 noteBuilder.ChangeHitObject(cloned);
 
                 if (noteBuilder.HasFileHitSample())
                 {
                     var data = noteBuilder.GetFileHitSampleData();
+                    
+                    var type = noteBuilder.InferObjectTypeIcon();
 
-                    if (data.StartsWith("setpiece_")) // setpiece_100_100, (scroll speed, distance)
+                    if (data.StartsWith("setpiece_") && (int)xPos2.X != 4) // setpiece_100_100, (scroll speed, distance), no cam notes
                     {
                         var parts = data.Split('_');
                         if (parts.Length == 3 && float.TryParse(parts[1], out float scrollSpeed) && int.TryParse(parts[2], out int distance))
@@ -124,6 +126,12 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
                             clonedHitObjects.Add(setpiece);
                         }
                     }
+                    
+
+                    if (data.StartsWith("blind") && (int)xPos2.X == 4)
+                    {
+                        cloned.StartTime = -10000;
+                    }
                 }
             }
 
@@ -140,6 +148,7 @@ public class PassBeatmapConverter : BeatmapConverter<HitObject>
                 }
             }
 
+            // 4-key correction
             if (cloned is IHasXPosition xPosition2 && xPosition2.X < 2 && is4Key)
             {
                 // Notes with a Finish samples should be ignored in this logic

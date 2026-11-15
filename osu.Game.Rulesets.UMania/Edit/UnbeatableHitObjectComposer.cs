@@ -567,6 +567,11 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer, IKeyB
         {
             RightToolbox.Add(new UbNoteSpawnDelayToolbox());
         }
+        
+        if (config.Get<bool>(OsuSetting.EditorEvilInAKettle))
+        {
+            RightToolbox.Add(new UbBlindSideswapToolbox());
+        }
 
         if (DrawableRuleset is DrawableManiaEditorRuleset mr)
         {

@@ -162,7 +162,7 @@ public partial class UbNoteSpawnDelayToolbox : EditorToolboxGroup
                 noteBuilder.ChangeHitObject(b);
 
                 var icon = noteBuilder.InferObjectTypeIcon();
-                if (icon == UbIconType.Animated || icon == UbIconType.AnimatedHold)
+                if (icon == UbIconType.Animated || icon == UbIconType.AnimatedHold || icon == UbIconType.Flip || icon == UbIconType.Zoom)
                 {
                     active.Value = false;
                 
