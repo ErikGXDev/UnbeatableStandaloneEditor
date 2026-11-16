@@ -252,9 +252,9 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             IUbEncoderLike encoder;
 
-            if (officialEditorCheckbox.Current.Value)
+            /*if (officialEditorCheckbox.Current.Value)
                 encoder = new UbOfficialEditorEncoder(playableBeatmap, null);
-            else
+            else*/
                 encoder = new UbBeatmapEncoder(playableBeatmap, null);
 
             var beatmapStream = new MemoryStream();
@@ -367,9 +367,9 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             IUbEncoderLike encoder;
 
-            if (officialEditorCheckbox.Current.Value)
+            /*if (officialEditorCheckbox.Current.Value)
                 encoder = new UbOfficialEditorEncoder(playableBeatmap, null);
-            else
+            else*/
                 encoder = new UbBeatmapEncoder(playableBeatmap, null);
 
             var beatmapStream = new MemoryStream();
@@ -1078,10 +1078,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                     ButtonText = "Export map",
                     Action = ExportMap,
                 },
+                // Official editor format should be removed (I will forget)
                 officialEditorCheckbox = new UbOfficialEditorCheckbox()
                 {
                     Caption = "Use official editor format (for charting competition!)",
                     Current = officialEditorFormatBindable,
+                    Alpha = 0f,
                 },
                 new FormEnumDropdown<ExportMode>
                 {
