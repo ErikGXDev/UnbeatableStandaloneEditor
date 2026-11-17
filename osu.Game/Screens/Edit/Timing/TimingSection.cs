@@ -130,7 +130,13 @@ namespace osu.Game.Screens.Edit.Timing
 
                 beatLengthBindable.BindValueChanged(val =>
                 {
-                    Current.Value = BeatLengthToBpm(val.NewValue).ToString("N2");
+                    var effectiveBpm = BeatLengthToBpm(val.NewValue);
+                    
+                    effectiveBpm = Math.Round(effectiveBpm, 3);
+                    if (Math.Round(effectiveBpm * 1000) % 10 == 0)
+                        Current.Value = effectiveBpm.ToString("N2");
+                    else
+                        Current.Value = effectiveBpm.ToString("N3");
                 }, true);
             }
 

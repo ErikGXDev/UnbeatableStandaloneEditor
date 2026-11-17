@@ -268,7 +268,22 @@ namespace osu.Game.Screens.Edit.Timing
         private void updateBpmText()
         {
             bool reachedFinalNumber = interpolatedBpm.Value == effectiveBpm;
-            int decimalPlaces = Math.Min(2, FormatUtils.FindPrecision((decimal)effectiveBpm));
+            
+            int orgDecimalPlaces = Math.Min(3, FormatUtils.FindPrecision((decimal)effectiveBpm));
+            int decimalPlaces;
+            
+            var roundedBpm = Math.Round(effectiveBpm, 3);
+            if (Math.Round(effectiveBpm * 1000) % 10 == 0)
+            {
+                decimalPlaces = 2;
+            }
+            else
+            {
+                decimalPlaces = 3;
+            }
+            
+            if (orgDecimalPlaces < decimalPlaces)
+                decimalPlaces = orgDecimalPlaces;
 
             string text = interpolatedBpm.Value.ToString($"N{decimalPlaces}");
             int? breakPoint = null;
