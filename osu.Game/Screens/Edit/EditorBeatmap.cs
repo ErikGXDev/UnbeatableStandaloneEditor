@@ -533,6 +533,8 @@ namespace osu.Game.Screens.Edit
         }
 
         public double SnapTime(double time, double? referenceTime) => ControlPointInfo.GetClosestSnappedTime(time, BeatDivisor, referenceTime);
+        
+        public double SnapTimeFloored(double time, double? referenceTime) => ControlPointInfo.GetClosestSnappedTimeFloored(time, BeatDivisor, referenceTime);
 
         public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
 

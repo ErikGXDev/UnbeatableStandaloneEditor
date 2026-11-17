@@ -185,6 +185,29 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="time">The time to find the closest snapped time to.</param>
         public double GetClosestSnappedTime(double time) => GetClosestSnappedTime(time, GetClosestBeatDivisor(time));
 
+        // FIX: This function is custom
+        /// <summary>
+        /// Returns the time on the given beat divisor closest to the given time, but rounded down, so no snapped time after the target is selected. (with some leeway)
+        /// </summary>
+        public double GetClosestSnappedTimeFloored(double time, int beatDivisor, double? referenceTime = null)
+        {
+            var timingPoint = TimingPointAt(referenceTime ?? time);
+            double snappedTime = getClosestSnappedTime(timingPoint, time, beatDivisor);
+            
+            var beatTime = timingPoint.BeatLength / beatDivisor;
+
+            var leeway = beatTime * 0.15; // leeway? in my explicitly floored snap function? Preposterous! (yet adequate...)
+            
+            if (snappedTime > time && Math.Abs(snappedTime - time) > leeway)
+                snappedTime -= beatTime;
+
+            if (referenceTime.HasValue)
+                return snappedTime;
+
+            var timingPointAfter = TimingPointAfter(time);
+            return timingPointAfter is null || Math.Abs(time - snappedTime) < Math.Abs(time - timingPointAfter.Time) ? snappedTime : timingPointAfter.Time;
+        }
+
         /// <summary>
         /// Returns the beat snap divisor closest to the given time. If two are equally close, the smallest divisor is returned.
         /// </summary>

@@ -12,6 +12,14 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
         /// <returns>A value that represents <paramref name="time"/> snapped to the closest beat of the timing point.</returns>
         double SnapTime(double time, double? referenceTime = null);
+        
+        /// <summary>
+        /// Snaps a duration to the closest beat of a timing point applicable at the reference time, while a snapped time is always less than or equal to the original time, factoring in the current <see cref="BeatDivisor"/>.
+        /// </summary>
+        /// <param name="time">The time to snap.</param>
+        /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
+        /// <returns>A value that represents <paramref name="time"/> snapped to the closest beat of the timing point.</returns>
+        double SnapTimeFloored(double time, double? referenceTime = null);
 
         /// <summary>
         /// Get the most appropriate beat length at a given time, pre-divided by <see cref="BeatDivisor"/>.

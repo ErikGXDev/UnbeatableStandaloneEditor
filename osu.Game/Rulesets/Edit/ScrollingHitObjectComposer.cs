@@ -135,6 +135,23 @@ namespace osu.Game.Rulesets.Edit
 
             return new SnapResult(screenSpacePosition, targetTime, scrollingPlayfield);
         }
+        
+        public SnapResult FindSnappedPositionAndTimeFloored(Vector2 screenSpacePosition)
+        {
+            var scrollingPlayfield = PlayfieldAtScreenSpacePosition(screenSpacePosition) as ScrollingPlayfield;
+            if (scrollingPlayfield == null)
+                return new SnapResult(screenSpacePosition, null);
+
+            double? targetTime = scrollingPlayfield.TimeAtScreenSpacePosition(screenSpacePosition);
+
+            // apply beat snapping
+            targetTime = BeatSnapProvider.SnapTimeFloored(targetTime.Value, null);
+
+            // convert back to screen space
+            screenSpacePosition = scrollingPlayfield.ScreenSpacePositionAtTime(targetTime.Value);
+
+            return new SnapResult(screenSpacePosition, targetTime, scrollingPlayfield);
+        }
 
         protected override void Dispose(bool isDisposing)
         {

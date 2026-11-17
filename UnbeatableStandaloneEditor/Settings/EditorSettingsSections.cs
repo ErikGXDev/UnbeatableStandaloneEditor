@@ -454,7 +454,14 @@ public partial class ExperimentalSettingsSection : EditorSettingsSection
                 LabelText = "Invert Keycharting shift for UNANIMATED notes",
                 RelativeSizeAxes = Axes.X,
                 Current = osuConfig.GetBindable<bool>(OsuSetting.EditorInvertKeychartUnanimated),
+                Margin = new MarginPadding { Bottom = 10 },
             },
+            new TooltipCheckbox()
+            {
+                LabelText = "Rectangle-aware placement snap",
+                TooltipText = "Makes the range for placing notes \"less far down\".",
+                Current = osuConfig.GetBindable<bool>(OsuSetting.EditorFlooredSnap),
+            }
         };
     }
 }

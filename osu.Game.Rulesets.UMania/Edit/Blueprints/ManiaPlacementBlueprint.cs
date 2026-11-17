@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.UMania.Objects;
@@ -57,10 +58,33 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
             BeginPlacement(true);
             return true;
         }
+        
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+        
+        private bool doFlooredSnap = false;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            doFlooredSnap = config.Get<bool>(OsuSetting.EditorFlooredSnap);
+        }
+        
 
         public override SnapResult UpdateTimeAndPosition(Vector2 screenSpacePosition, double fallbackTime)
         {
-            var result = composer?.FindSnappedPositionAndTime(screenSpacePosition) ?? new SnapResult(screenSpacePosition, fallbackTime);
+            SnapResult? snappedPosTime;
+
+            if (doFlooredSnap)
+            {
+                snappedPosTime = composer?.FindSnappedPositionAndTimeFloored(screenSpacePosition);
+            }
+            else
+            {
+                snappedPosTime = composer?.FindSnappedPositionAndTime(screenSpacePosition);
+            }
+            
+            var result = snappedPosTime ?? new SnapResult(screenSpacePosition, fallbackTime);
 
             base.UpdateTimeAndPosition(result.ScreenSpacePosition, result.Time ?? fallbackTime);
 

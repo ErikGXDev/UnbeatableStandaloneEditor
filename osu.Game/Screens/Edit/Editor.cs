@@ -1883,6 +1883,8 @@ namespace osu.Game.Screens.Edit
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
+        
+        public double SnapTimeFloored(double time, double? referenceTime) => editorBeatmap.SnapTimeFloored(time, referenceTime);
 
         public double GetBeatLengthAtTime(double referenceTime) => editorBeatmap.GetBeatLengthAtTime(referenceTime);
 
