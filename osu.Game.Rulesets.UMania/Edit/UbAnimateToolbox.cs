@@ -322,7 +322,7 @@ public partial class UbAnimateToolbox : EditorToolboxGroup
         
         var selected = beatmap.SelectedHitObjects.OfType<ManiaHitObject>().ToList();
 
-        if (selected.Count == 1 && selected[0].Column == 1)
+        if (selected.Count == 1 && (selected[0].Column == 1 || selected[0].Column == 0))
         {
             noteBuilder.ChangeHitObject(selected[0]);
 

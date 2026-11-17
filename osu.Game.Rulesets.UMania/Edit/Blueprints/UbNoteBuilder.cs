@@ -242,7 +242,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Blueprints
                     return UbIconType.Brawl;
                 }
                 
-                if (column == 1 && HasSample(HitSampleInfo.HIT_FINISH))
+                if ((column == 1 || column == 0) && HasSample(HitSampleInfo.HIT_FINISH))
                 {
                     if (hitObject is HoldNote)
                     {

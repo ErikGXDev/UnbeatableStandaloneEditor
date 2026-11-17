@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
                 
                 
                 var fileSample = b.Samples.FirstOrDefault(s => s is ConvertHitObjectParser.FileHitSampleInfo) as ConvertHitObjectParser.FileHitSampleInfo;
-                if (fileSample != null && xPos == 1)
+                if (fileSample != null && (xPos == 1 || xPos == 0)) // UNANIMATED notes in lane 1 or lane 0
                 {
                     
                     // This is an unanimated note, so write the enable command automatically
@@ -489,7 +489,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             // UNANIMATED Support
             // Hitobjects with a finish note in column 2 are encoded as events above.
             var finishSample = hitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_FINISH);
-            if (finishSample != null && xPos == 1)
+            if (finishSample != null && (xPos == 1 || xPos == 0))
                 return;
             
             Vector2 position = new Vector2(256, 192);

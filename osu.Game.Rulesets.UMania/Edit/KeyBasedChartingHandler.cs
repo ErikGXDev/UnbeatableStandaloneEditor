@@ -209,7 +209,7 @@ public partial class KeyBasedChartingHandler : Drawable
         var baseSamples = new List<string>();
 
         // UNANIMATED
-        if (column == 1 && composer.IsUnanimated && !composer.Is4Key)
+        if ((column == 1 || column == 0) && composer.IsUnanimated && !composer.Is4Key)
         {
             var invertUnanimated = config.Get<bool>(OsuSetting.EditorInvertKeychartUnanimated);
             if (invertUnanimated && !shiftPressed)
@@ -328,7 +328,7 @@ public partial class KeyBasedChartingHandler : Drawable
     {
         var helper = new UbNoteBuilderHelper(composer, holdNote);
         
-        if (column == 1 && shiftPressed && composer.IsUnanimated && !composer.Is4Key)
+        if ((column == 1 || column == 0) && shiftPressed && composer.IsUnanimated && !composer.Is4Key)
             helper.ApplySamples(new List<string> { HitSampleInfo.HIT_FINISH });
         else if (column >= 0 && column <= 3 && shiftPressed)
             helper.ApplySamples(new List<string> { HitSampleInfo.HIT_WHISTLE }); // Double
