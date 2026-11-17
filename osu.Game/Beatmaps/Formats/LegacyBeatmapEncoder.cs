@@ -432,9 +432,9 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case 3:
-                    int totalColumns = (int)Math.Max(1, beatmap.Difficulty.CircleSize);
+                    //int totalColumns = (int)Math.Max(1, beatmap.Difficulty.CircleSize);
                     
-                    if (totalColumns == 5) totalColumns = 6;
+                    int totalColumns = 6;
                     
                     position.X = (int)Math.Floor((((IHasXPosition)hitObject).X + 0.5f) * (512f / totalColumns));
                     break;
