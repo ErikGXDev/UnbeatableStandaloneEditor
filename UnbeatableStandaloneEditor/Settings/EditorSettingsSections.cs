@@ -17,6 +17,10 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.UMania;
+using osu.Game.Rulesets.UMania.Configuration;
+using osu.Game.Rulesets.UMania.UI;
 using osu.Game.Screens.Edit;
 using osuTK;
 
@@ -72,9 +76,11 @@ public partial class GeneralSettingsSection : EditorSettingsSection
     public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.Cog };
 
     private OsuCheckbox mouseCheckbox = null!;
+    private TooltipCheckbox scrollDirectionCheckbox = null!;
+
 
     [BackgroundDependencyLoader]
-    private void load(EditorConfigManager editorConfig, OsuConfigManager osuConfig, GameHost host)
+    private void load(EditorConfigManager editorConfig, OsuConfigManager osuConfig, GameHost host, IRulesetConfigCache rulesetConfigCache)
     {
         Children = new Drawable[]
         {
@@ -87,10 +93,18 @@ public partial class GeneralSettingsSection : EditorSettingsSection
             },
             new TooltipCheckbox()
             {
-                LabelText = "Reverse scroll in editor",
-                TooltipText = "Reverses scrolling for the editor timeline.",
+                LabelText = "Reverse mouse scroll in editor",
+                TooltipText = "Reverses scrolling with your mouse.",
                 RelativeSizeAxes = Axes.X,
                 Current = osuConfig.GetBindable<bool>(OsuSetting.EditorReverseScroll),
+                Margin = new MarginPadding { Bottom = 10 },
+            },
+            scrollDirectionCheckbox = new TooltipCheckbox
+            {
+                LabelText = "Up-scroll playfield",
+                TooltipText = "When enabled, notes travel upwards instead of downwards.",
+                RelativeSizeAxes = Axes.X,
+                Current = new Bindable<bool>(),
                 Margin = new MarginPadding { Bottom = 10 },
             },
             new TooltipCheckbox
@@ -100,15 +114,6 @@ public partial class GeneralSettingsSection : EditorSettingsSection
                     "When off, hitting notes in the camera lane will not play their hit sound.",
                 RelativeSizeAxes = Axes.X,
                 Current = osuConfig.GetBindable<bool>(OsuSetting.PlaySamplesInCameraLane),
-                Margin = new MarginPadding { Bottom = 10 },
-            },
-            new TooltipCheckbox
-            {
-                LabelText = "Nudge by 1ms (J/K)",
-                TooltipText =
-                    "When on, pressing J/K nudges notes 1ms up/down instead of a full beat.\n(This feature may be useful for placement ordering.)",
-                RelativeSizeAxes = Axes.X,
-                Current = osuConfig.GetBindable<bool>(OsuSetting.EditorNudgeByMilliseconds),
                 Margin = new MarginPadding { Bottom = 10 },
             },
             new TooltipTextInput()
@@ -130,6 +135,13 @@ public partial class GeneralSettingsSection : EditorSettingsSection
 
             editorConfig.SetValue(EditorSetting.ShowSystemCursor, e.NewValue);
         };
+
+        var maniaConfig = (ManiaRulesetConfigManager)rulesetConfigCache.GetConfigFor(new UManiaRuleset())!;
+
+        scrollDirectionCheckbox.Current.Value = maniaConfig.Get<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection) == ManiaScrollingDirection.Up;
+        scrollDirectionCheckbox.Current.ValueChanged += e =>
+            maniaConfig.SetValue(ManiaRulesetSetting.ScrollDirection, e.NewValue ? ManiaScrollingDirection.Up : ManiaScrollingDirection.Down);
+
     }
 }
 
@@ -174,6 +186,15 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
             },
             new TooltipCheckbox
             {
+                LabelText = "Nudge by 1ms (J/K)",
+                TooltipText =
+                    "When on, pressing J/K nudges notes 1ms up/down instead of a full beat.\n(This feature may be useful for placement ordering.)",
+                RelativeSizeAxes = Axes.X,
+                Current = osuConfig.GetBindable<bool>(OsuSetting.EditorNudgeByMilliseconds),
+                Margin = new MarginPadding { Bottom = 10 },
+            },
+            new TooltipCheckbox
+            {
                 LabelText = "More hold transparency",
                 TooltipText =
                     "Hold notes are slightly transparent so you can place notes behind them.\nThis setting makes them even more transparent, in case you have many hold notes at once.",
@@ -181,6 +202,7 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
                 Current = osuConfig.GetBindable<bool>(OsuSetting.EditorMoreTransparency),
                 Margin = new MarginPadding { Bottom = 10 },
             },
+
             new TooltipCheckbox
             {
                 LabelText = "Long export path fix",

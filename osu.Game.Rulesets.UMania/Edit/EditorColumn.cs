@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.UMania.Objects.Drawables;
 using osu.Game.Rulesets.UMania.UI;
 using osuTK;
@@ -20,6 +21,11 @@ namespace osu.Game.Rulesets.UMania.Edit
         }
 
         [Resolved] private UnbeatableHitObjectComposer composer { get; set; } = null!;
+
+        // FIX: with upscroll enabled the hit target moves to the top of the column, so the labels
+        // follow it there instead of sitting at the bottom.
+        private const float label_offset = 3f;
+        private const float key_label_offset = 50f;
 
         private SpriteText labelText = null!;
         private SpriteText keyLabel = null!;
@@ -44,9 +50,6 @@ namespace osu.Game.Rulesets.UMania.Edit
                 TopLevelContainer.Add(labelText = new SpriteText
                 {
                     Text = label,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Y = -3,
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                     Colour = Colour4.White.Opacity(0.7f),
                     Shadow = true,
@@ -59,12 +62,9 @@ namespace osu.Game.Rulesets.UMania.Edit
             {
                 labelText.Alpha = 0;
             }
-            
+
             TopLevelContainer.Add(keyLabel = new SpriteText
             {
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre,
-                Y = -50,
                 Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                 Colour = Colour4.White,
                 Shadow = true,
@@ -72,8 +72,28 @@ namespace osu.Game.Rulesets.UMania.Edit
                 Alpha = 0,
             });
 
+            applyLabelAnchoring();
+            Direction.BindValueChanged(_ => applyLabelAnchoring());
+
             updateKeyLabel();
             composer.KeyBasedCharting.BindValueChanged(_ => updateKeyLabel());
+        }
+
+        private void applyLabelAnchoring()
+        {
+            bool upScroll = Direction.Value == ScrollingDirection.Up;
+
+            setLabelAnchor(labelText, upScroll, label_offset);
+            setLabelAnchor(keyLabel, upScroll, key_label_offset);
+        }
+
+        private static void setLabelAnchor(SpriteText label, bool upScroll, float offset)
+        {
+            if (label == null)
+                return;
+
+            label.Anchor = label.Origin = upScroll ? Anchor.TopCentre : Anchor.BottomCentre;
+            label.Y = upScroll ? offset : -offset;
         }
 
         private void updateKeyLabel()

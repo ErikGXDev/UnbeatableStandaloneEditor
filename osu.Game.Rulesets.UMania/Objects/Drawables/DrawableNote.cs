@@ -49,6 +49,8 @@ namespace osu.Game.Rulesets.UMania.Objects.Drawables
 
         protected virtual ManiaSkinComponents Component => ManiaSkinComponents.Note;
 
+        private const float up_scroll_icon_offset = 8f;
+
         private Drawable headPiece;
 
         public DrawableNote()
@@ -174,6 +176,8 @@ namespace osu.Game.Rulesets.UMania.Objects.Drawables
 
             headPiece.Anchor = headPiece.Origin =
                 e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+
+            iconContainer.Y = e.NewValue == ScrollingDirection.Up ? -up_scroll_icon_offset : 0;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

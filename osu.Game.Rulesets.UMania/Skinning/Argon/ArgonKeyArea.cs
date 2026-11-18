@@ -41,13 +41,14 @@ namespace osu.Game.Rulesets.UMania.Skinning.Argon
         {
             RelativeSizeAxes = Axes.Both;
         }
+        
+        const float icon_vertical_offset = -30;
 
         [BackgroundDependencyLoader]
         private void load(IScrollingInfo scrollingInfo)
         {
             const float icon_circle_size = 8;
             const float icon_spacing = 7;
-            const float icon_vertical_offset = -30;
 
             InternalChild = directionContainer = new Container
             {
@@ -172,12 +173,14 @@ namespace osu.Game.Rulesets.UMania.Skinning.Argon
                     directionContainer.Scale = new Vector2(1, -1);
                     directionContainer.Anchor = Anchor.TopLeft;
                     directionContainer.Origin = Anchor.BottomLeft;
+                    bottomIcon.Y = icon_vertical_offset * 1.2f;
                     break;
 
                 case ScrollingDirection.Down:
                     directionContainer.Scale = new Vector2(1, 1);
                     directionContainer.Anchor = Anchor.BottomLeft;
                     directionContainer.Origin = Anchor.BottomLeft;
+                    bottomIcon.Y = icon_vertical_offset;
                     break;
             }
         }
