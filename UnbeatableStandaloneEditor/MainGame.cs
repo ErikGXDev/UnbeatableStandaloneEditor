@@ -223,7 +223,7 @@ public partial class MainGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
             float delta = e.ScrollDelta.Y != 0 ? e.ScrollDelta.Y : e.ScrollDelta.X;
 
             Audio.Volume.Value += delta * 0.05f;
-            Logger.Log("Volume adjusted via scroll wheel: " + Audio.Volume.Value+ " - " +e.ScrollDelta.Y * 0.05);
+            //Logger.Log("Volume adjusted via scroll wheel: " + Audio.Volume.Value+ " - " +e.ScrollDelta.Y * 0.05);
             volumeOverlay?.Show();
             return true;
         }
