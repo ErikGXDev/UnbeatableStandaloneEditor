@@ -122,6 +122,9 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             writer.WriteLine(FormattableString.Invariant($"WidescreenStoryboard: {(beatmap.WidescreenStoryboard ? '1' : '0')}"));
             if (beatmap.SamplesMatchPlaybackRate)
                 writer.WriteLine(@"SamplesMatchPlaybackRate: 1");
+            // FIX: Per-chart Audio offset!
+            if (beatmap.ExportOffset != 0)
+                writer.WriteLine(FormattableString.Invariant($"ExportOffset: {beatmap.ExportOffset}"));
         }
 
         private void handleEditor(TextWriter writer)

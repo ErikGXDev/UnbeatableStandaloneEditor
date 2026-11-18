@@ -83,6 +83,9 @@ namespace osu.Game.Beatmaps
         bool EpilepsyWarning { get; internal set; }
 
         bool SamplesMatchPlaybackRate { get; internal set; }
+        
+        // FIX: Per-chart Audio offset!
+        int ExportOffset { get; internal set; }
 
         /// <summary>
         /// The ratio of distance travelled per time unit.

@@ -51,7 +51,7 @@ public class ProxyArchiveReader : ArchiveReader
                 }
                 else
                 {
-                    // Optional offset test
+                    /*// Optional offset test
                     if (BeatmapImporter.ShouldTestOffset)
                     {
                         if (SupportedExtensions.AUDIO_EXTENSIONS.Contains(Path.GetExtension(entry.Key).ToLowerInvariant()))
@@ -70,7 +70,7 @@ public class ProxyArchiveReader : ArchiveReader
 
                             File.Delete(tempFilePath);
                         }
-                    }
+                    }*/
 
                     list.Add(entry.Key);
                 }

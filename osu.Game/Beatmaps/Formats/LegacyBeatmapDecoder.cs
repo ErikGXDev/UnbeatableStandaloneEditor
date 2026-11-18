@@ -297,6 +297,11 @@ namespace osu.Game.Beatmaps.Formats
                 case @"SamplesMatchPlaybackRate":
                     beatmap.SamplesMatchPlaybackRate = Parsing.ParseInt(pair.Value) == 1;
                     break;
+                
+                // FIX: Per-chart Audio offset!
+                case @"ExportOffset":
+                    beatmap.ExportOffset = Parsing.ParseInt(pair.Value);
+                    break;
 
                 case @"Countdown":
                     beatmap.Countdown = Enum.Parse<CountdownType>(pair.Value);

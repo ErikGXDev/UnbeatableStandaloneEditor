@@ -39,9 +39,6 @@ public partial class ImportPopover : OsuPopover
 
     [Resolved] private IAPIProvider api { get; set; } = null!;
 
-    [Resolved] private OsuConfigManager config { get; set; } = null!;
-
-
     [BackgroundDependencyLoader]
     private void load(OverlayColourProvider colourProvider)
     {
@@ -165,7 +162,7 @@ public partial class ImportPopover : OsuPopover
     private Task importBeatmap(string filePath)
     {
 
-        if (BeatmapImporter.ImportBeatmap(filePath, beatmapManager, config))
+        if (BeatmapImporter.ImportBeatmap(filePath, beatmapManager))
         {
             showToast("Imported chart successfully!");
         }

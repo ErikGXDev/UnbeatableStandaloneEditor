@@ -391,6 +391,13 @@ namespace osu.Game.Rulesets.Difficulty
                 get => baseBeatmap.SamplesMatchPlaybackRate;
                 set => baseBeatmap.SamplesMatchPlaybackRate = value;
             }
+            
+            // FIX: Per-chart Audio offset!
+            public int ExportOffset
+            {
+                get => baseBeatmap.ExportOffset;
+                set => baseBeatmap.ExportOffset = value;
+            }
 
             public double DistanceSpacing
             {

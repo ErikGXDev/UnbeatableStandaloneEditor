@@ -22,16 +22,16 @@ namespace UnbeatableStandaloneEditor.Import;
 public class BeatmapImporter
 {
 
-    public static OsuConfigManager config;
-    public static bool ShouldTestOffset => config.Get<bool>(OsuSetting.EditorImportInverseOffsetOption);
-    public static int offsetMs = 0;
+    //public static OsuConfigManager config;
+    //public static bool ShouldTestOffset => config.Get<bool>(OsuSetting.EditorImportInverseOffsetOption);
+    //public static int offsetMs = 0;
 
-    public static bool ImportBeatmap(string filePath, BeatmapManager beatmapManager, OsuConfigManager config)
+    public static bool ImportBeatmap(string filePath, BeatmapManager beatmapManager /*OsuConfigManager config*/)
     {
         try
         {
-            BeatmapImporter.offsetMs = 0;
-            BeatmapImporter.config = config;
+            //BeatmapImporter.offsetMs = 0;
+            //BeatmapImporter.config = config;
 
             if (filePath.EndsWith(".txt") || filePath.EndsWith(".osu"))
             {
@@ -125,7 +125,7 @@ public class BeatmapImporter
 
         reverseExportTransformations(converted);
 
-        PassBeatmapConverter passConverter = new PassBeatmapConverter(converted, converted.BeatmapInfo.Ruleset.CreateInstance(), false, -offsetMs);
+        PassBeatmapConverter passConverter = new PassBeatmapConverter(converted, converted.BeatmapInfo.Ruleset.CreateInstance(), false, -beatmap.ExportOffset);
 
         var pass = passConverter.ConvertBeatmap(converted, CancellationToken.None);
 

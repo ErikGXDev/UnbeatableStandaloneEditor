@@ -256,6 +256,12 @@ namespace osu.Game.Screens.Edit
             set => PlayableBeatmap.SamplesMatchPlaybackRate = value;
         }
 
+        // FIX: Per-chart Audio offset!
+        public int ExportOffset { 
+            get => PlayableBeatmap.ExportOffset;
+            set => PlayableBeatmap.ExportOffset = value;
+        }
+
         public double DistanceSpacing
         {
             get => PlayableBeatmap.DistanceSpacing;

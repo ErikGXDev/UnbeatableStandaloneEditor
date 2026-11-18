@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
         private bool is4Key => config.Get<bool>(OsuSetting.Editor4KeyMode);
 
-        private int msOffset => config.Get<int>(OsuSetting.EditorExportOffsetMs);
+        private int msOffset => beatmap.ExportOffset;
 
         private UbPlaytestButton websocketButton = null!;
         private CancellationTokenSource websocketCheckCancellation = new CancellationTokenSource();
@@ -1041,10 +1041,12 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
-            offsetBindable.Value = config.Get<int>(OsuSetting.EditorExportOffsetMs);
+            offsetBindable.Value = beatmap.ExportOffset;
+            
             offsetBindable.BindValueChanged(v =>
             {
-                config.SetValue(OsuSetting.EditorExportOffsetMs, v.NewValue);
+                beatmap.ExportOffset = v.NewValue;
+                //config.SetValue(OsuSetting.EditorExportOffsetMs, v.NewValue);
 
                 if (offsetWaveform == null) return;
                 

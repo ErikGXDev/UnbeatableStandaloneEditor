@@ -199,7 +199,7 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
                 Current = waveformBumpBindable,
                 Margin = new MarginPadding { Bottom = 10 },
             },
-            new TooltipNumberInput
+            /*new TooltipNumberInput
             {
                 LabelText = "Export note offset (ms)",
                 TooltipText = TooltipNumberInput.OffsetTooltip,
@@ -207,7 +207,7 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
                 MinimumValue = -1000,
                 MaximumValue = 1000,
                 Margin = new MarginPadding { Bottom = 6 },
-            },
+            },*/
             new EnumDropdownSettingsInput<QuickExportAction>()
             {
                 LabelText = "Quick-Export button",
@@ -421,13 +421,13 @@ public partial class ExperimentalSettingsSection : EditorSettingsSection
                 Colour = colourProvider.Content1.Opacity(0.85f),
                 Margin = new MarginPadding { Bottom = 8 },
             },
-            new TooltipCheckbox()
+            /*new TooltipCheckbox()
             {
-                LabelText = "Add inverse offset detection on imports",
+                LabelText = "Add inverse audio offset on imports",
                 RelativeSizeAxes = Axes.X,
                 Current = osuConfig.GetBindable<bool>(OsuSetting.EditorImportInverseOffsetOption),
                 Margin = new MarginPadding { Bottom = 10 },
-            },
+            },*/
             new TooltipCheckbox()
             {
                 LabelText = "Enable Setpiece note tool",

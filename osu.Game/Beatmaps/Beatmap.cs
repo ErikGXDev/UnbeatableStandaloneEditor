@@ -136,6 +136,9 @@ namespace osu.Game.Beatmaps
 
         public bool SamplesMatchPlaybackRate { get; set; }
 
+        // FIX: Per-chart Audio offset!
+        public int ExportOffset { get; set; }
+
         public double DistanceSpacing { get; set; } = 1.0;
 
         public int GridSize { get; set; }

@@ -19,9 +19,6 @@ public partial class ImportDropper : Drawable, ICanAcceptFiles
 
     [Resolved] private BeatmapManager beatmapManager { get; set; } = null!;
 
-    [Resolved] private OsuConfigManager config { get; set; } = null!;
-
-
     public ImportDropper() {}
 
     protected override void LoadComplete()
@@ -73,7 +70,7 @@ public partial class ImportDropper : Drawable, ICanAcceptFiles
             return Task.CompletedTask;
         }
 
-        if (BeatmapImporter.ImportBeatmap(filePath, beatmapManager, config))
+        if (BeatmapImporter.ImportBeatmap(filePath, beatmapManager))
         {
             showToast("Imported chart successfully!");
         }
