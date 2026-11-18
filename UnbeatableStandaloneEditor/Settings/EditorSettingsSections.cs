@@ -461,6 +461,13 @@ public partial class ExperimentalSettingsSection : EditorSettingsSection
                 LabelText = "Rectangle-aware placement snap",
                 TooltipText = "Makes the range for placing notes \"less far down\".",
                 Current = osuConfig.GetBindable<bool>(OsuSetting.EditorFlooredSnap),
+                Margin = new MarginPadding { Bottom = 10 },
+            },
+            new TooltipCheckbox()
+            {
+                LabelText = "Remove <tags> from exported file names",
+                TooltipText = "Prevent filename bloat from <uppercase> tags.",
+                Current = osuConfig.GetBindable<bool>(OsuSetting.EditorRemoveTagsForFilename),
             }
         };
     }

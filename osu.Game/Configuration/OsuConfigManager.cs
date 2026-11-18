@@ -243,6 +243,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorShowPreview, true); // FIX: Show preview in editor
             SetDefault(OsuSetting.EditorQuickSettingsOpen, false); // FIX: Quick settings should be closed by default
             //SetDefault(OsuSetting.EditorSwapPinkInsteadOfCamera, false); // FIX: Swap pink instead of camera
+            SetDefault(OsuSetting.EditorRemoveTagsForFilename, false);
             
             SetDefault(OsuSetting.HideCountryFlags, false);
 
@@ -562,6 +563,7 @@ namespace osu.Game.Configuration
         EditorInvertKeychartUnanimated,
         EditorEvilInAKettle,
         EditorFlooredSnap,
+        EditorRemoveTagsForFilename,
         //EditorSwapPinkInsteadOfCamera,
         
         CreateBackups, // Toggle backup creation on save

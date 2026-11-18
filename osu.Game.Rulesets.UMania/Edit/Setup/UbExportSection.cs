@@ -7,6 +7,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
@@ -173,6 +174,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
         }
 
 
+        private string stripTags(string input)
+        {
+            return Regex.Replace(input, "<[^>]*>", string.Empty);
+        }
+
         private string getBaseFilename(string artist, string title, string author)
         {
             if (string.IsNullOrWhiteSpace(artist))
@@ -188,8 +194,15 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             {
                 author = author.Truncate(20, "...");
             }
+            
+            var baseFile = $"{artist} - {title} ({author})";
+            
+            if (config.Get<bool>(OsuSetting.EditorRemoveTagsForFilename))
+            {
+                baseFile = stripTags(baseFile);
+            }
 
-            return $"{artist} - {title} ({author})".GetValidFilename();
+            return baseFile.GetValidFilename();
         }
         
         private string getBaseFilenameWithDiff(string artist, string title, string author, string difficulty)
@@ -208,10 +221,22 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
 
             if (config.Get<bool>(OsuSetting.EditorShortNames))
             {
+                if (config.Get<bool>(OsuSetting.EditorRemoveTagsForFilename))
+                {
+                    difficulty = stripTags(difficulty);
+                }
+                
                 return $"[{difficulty}]".GetValidFilename();
             }
 
-            return $"{artist} - {title} ({author}) [{difficulty}]".GetValidFilename();
+            var baseFile = $"{artist} - {title} ({author}) [{difficulty}]";
+
+            if (config.Get<bool>(OsuSetting.EditorRemoveTagsForFilename))
+            {
+                baseFile = stripTags(baseFile);
+            }
+
+            return baseFile.GetValidFilename();
         }
         
         
