@@ -225,8 +225,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorShortNames, false);
             SetDefault(OsuSetting.EditorQuickExportMode, 0); // FIX: Quick export mode for editor
             //SetDefault(OsuSetting.Editor40msWaveformBump, false); // FIX: 40ms waveform bump for editor
-            SetDefault(OsuSetting.EditorNew30msWaveformDisable, false); // FIX: 30ms waveform bump for editor
-            SetDefault(OsuSetting.EditorImportInverseOffsetOption, false); // FIX: Inverse offset option for editor
+            //SetDefault(OsuSetting.EditorNew30msWaveformDisable, false); // FIX: 30ms waveform bump for editor
+            //SetDefault(OsuSetting.EditorImportInverseOffsetOption, false); // FIX: Inverse offset option for editor
             SetDefault(OsuSetting.EditorOfficialEditorCompatExport, false); // FIX: Official editor compat export for editor
             SetDefault(OsuSetting.EditorPreferCoverArt, false); // FIX: Prefer cover art for editor
             SetDefault(OsuSetting.EditorSetpieceNote, false); // FIX: Setpiece note for editor

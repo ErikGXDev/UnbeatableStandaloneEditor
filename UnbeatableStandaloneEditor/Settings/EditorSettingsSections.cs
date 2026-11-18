@@ -144,8 +144,6 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
     {
         var quickExportBindable = new Bindable<QuickExportAction>();
 
-        var waveformBumpBindable = new BindableBool();
-
         Children = new Drawable[]
         {
             new TooltipCheckbox
@@ -191,14 +189,6 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
                 Current = osuConfig.GetBindable<bool>(OsuSetting.EditorShortNames),
                 Margin = new MarginPadding { Bottom = 10 },
             },
-            new TooltipCheckbox()
-            {
-                LabelText = "Disable new waveform offset",
-                TooltipText = "The waveform visual offset was changed from 20ms to 30ms in order to improve sync with hitsounds. Disable this here if you don't want to adjust your notes on old charts.",
-                RelativeSizeAxes = Axes.X,
-                Current = waveformBumpBindable,
-                Margin = new MarginPadding { Bottom = 10 },
-            },
             /*new TooltipNumberInput
             {
                 LabelText = "Export note offset (ms)",
@@ -220,13 +210,6 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
         quickExportBindable.BindValueChanged(e =>
         {
             osuConfig.SetValue(OsuSetting.EditorQuickExportMode, (int)e.NewValue);
-        });
-
-        waveformBumpBindable.Value = osuConfig.Get<bool>(OsuSetting.EditorNew30msWaveformDisable);
-        waveformBumpBindable.BindValueChanged(e =>
-        {
-            osuConfig.SetValue(OsuSetting.EditorNew30msWaveformDisable, e.NewValue);
-            Editor.WAVEFORM_VISUAL_OFFSET = e.NewValue ? 20 : 30;
         });
     }
 }
