@@ -38,7 +38,7 @@ public partial class BeatmapPickerScreen : OsuScreen
     [Resolved] private RealmAccess realm { get; set; } = null!;
     [Resolved] private IDialogOverlay? dialogOverlay { get; set; }
     [Resolved] private EditorConfigManager config { get; set; } = null!;
-
+    [Resolved(canBeNull: true)] private OnScreenDisplay? onScreenDisplay { get; set; }
     [Resolved] private OsuConfigManager osuConfig { get; set; } = null!;
 
 
@@ -350,6 +350,7 @@ public partial class BeatmapPickerScreen : OsuScreen
 
     private void rebuildBeatmapList(bool withAnimation = true)
     {
+        Logger.Log("rebuildBeatmapList");
         rebuildCancellation?.Cancel();
         rebuildCancellation?.Dispose();
 
@@ -519,6 +520,9 @@ public partial class BeatmapPickerScreen : OsuScreen
         if (selectedSet.Value == null) return;
 
         // Update selectedSet.Value.DateAdded
+
+        // Re-fetch the selected seta (reviving deleted difficulties issue)
+        BeatmapSetInfo? updatedSelectedSet = null;
         realm.Write(r =>
         {
             var realmSet = r.Find<BeatmapSetInfo>(selectedSet.Value.ID);
@@ -526,16 +530,32 @@ public partial class BeatmapPickerScreen : OsuScreen
             if (realmSet != null)
             {
                 realmSet.DateAdded = DateTime.Now;
+                updatedSelectedSet = realmSet.Detach();
             }
         });
-        selectedSet.Value.DateAdded = DateTime.Now;
 
+        if (updatedSelectedSet == null)
+        {
+            showToast("Failed to find beatmap set. Please contact Erik!");
+            Logger.Log($"Failed to find beatmap set with ID {selectedSet.Value.ID} in realm database.");
+            Logger.Log($"Old selectedSet: {selectedSet.Value.Metadata.Title} by {selectedSet.Value.Metadata.Author.Username}");
+            return;
+        }
 
-        var beatmap = selectedSet.Value.Beatmaps.OrderBy(b => b.StarRating).First();
+        updatedSelectedSet.DateAdded = DateTime.Now;
+
+        var beatmap = updatedSelectedSet.Beatmaps.OrderBy(b => b.StarRating).First();
+
         var working = beatmapManager.GetWorkingBeatmap(beatmap);
+
         Beatmap.Value = working;
         Ruleset.Value = UbRuleset.GetRulesetInfo();
         this.Push(new EditorLoader(false));
+    }
+
+    private void showToast(string title)
+    {
+        onScreenDisplay?.Display(new ImportPopover.BeatmapEditorToast(title));
     }
 
     private void promptDelete()
