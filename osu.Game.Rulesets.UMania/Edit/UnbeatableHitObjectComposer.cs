@@ -776,9 +776,9 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer, IKeyB
 
     protected override bool OnKeyDown(KeyDownEvent e)
     {
-        if (!e.ControlPressed && !e.AltPressed && !e.SuperPressed)
+        if (!e.ControlPressed /*&& !e.AltPressed*/ && !e.SuperPressed)
         {
-            if (keyBasedChartingHandler != null && keyBasedChartingHandler.TryPlaceNote(e.Key, e.ShiftPressed))
+            if (keyBasedChartingHandler != null && keyBasedChartingHandler.TryPlaceNote(e.Key, e.ShiftPressed, e.AltPressed))
                 return true;
 
             if (e.Key == Key.G)

@@ -54,7 +54,7 @@ public partial class KeyBasedChartingHandler : Drawable
         ? new[] { 0, 2, 3, 1, 4, 5 }
         : new[] { 0, 1, 2, 3, 4, 5 };
 
-    public bool TryPlaceNote(Key key, bool shiftPressed)
+    public bool TryPlaceNote(Key key, bool shiftPressed, bool altPressed)
     {
         if (!Enabled)
             return false;
@@ -69,7 +69,7 @@ public partial class KeyBasedChartingHandler : Drawable
         if (heldNotes[column] != null || noteWasRemoved[column])
             return true;
 
-        placeOrRemoveNote(column, shiftPressed);
+        placeOrRemoveNote(column, shiftPressed, altPressed);
         return true;
     }
 
@@ -173,14 +173,14 @@ public partial class KeyBasedChartingHandler : Drawable
         return false;
     }
 
-    private void placeOrRemoveNote(int column, bool shiftPressed)
+    private void placeOrRemoveNote(int column, bool shiftPressed, bool altPressed)
     {
         double snappedTime = beatSnapProvider.SnapTime(editorClock.CurrentTime, null);
         
         var existing = editorBeatmap.HitObjects.OfType<ManiaHitObject>()
             .FirstOrDefault(h => h.Column == column && Math.Abs(h.StartTime - snappedTime) < 1.0);
 
-        if (existing != null)
+        if (existing != null && !altPressed)
         {
             editorBeatmap.Remove(existing);
             heldNotes[column] = null;
