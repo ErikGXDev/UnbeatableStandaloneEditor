@@ -912,6 +912,7 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             }
             catch (Exception e)
             {
+                Logger.Log("Offset approximation failed: " + e.Message);
                 showToast("Could not approximate offset", e.Message);
                 return;
             }
