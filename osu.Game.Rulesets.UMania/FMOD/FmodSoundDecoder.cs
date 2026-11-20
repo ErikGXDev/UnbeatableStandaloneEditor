@@ -54,18 +54,30 @@ namespace osu.Game.Rulesets.UMania.FMOD
                 }
 
                 if (sound.getFormat(out _, out SOUND_FORMAT format, out int channels, out int bits) != RESULT.OK)
+                {
+                    Logger.Log($"FMOD analysis: getFormat failed ({result}).");
                     return false;
+                }
 
                 if (sound.getDefaults(out float defaultFrequency, out _) != RESULT.OK)
+                {
+                    Logger.Log($"FMOD analysis: getDefaults failed ({result}).");
                     return false;
+                }
 
                 if (sound.getLength(out uint pcmBytes, TIMEUNIT.PCMBYTES) != RESULT.OK || pcmBytes == 0)
+                {
+                    Logger.Log($"FMOD analysis: getLength failed ({result}).");
                     return false;
+                }
                 
                 int bytes = bits / 8;
 
                 if (defaultFrequency <= 0 || channels <= 0 || bytes <= 0)
+                {
+                    Logger.Log($"FMOD analysis: invalid defaultFrequency ({defaultFrequency}), channels ({channels}), or bytes ({bytes}).");
                     return false;
+                }
 
                 frequency = (int)Math.Round(defaultFrequency);
 
@@ -73,7 +85,10 @@ namespace osu.Game.Rulesets.UMania.FMOD
                 int byteCount = (int)Math.Min(pcmBytes, (uint)(defaultFrequency * (maxMilliseconds / 1000.0) * channels * bytes));
 
                 if (byteCount <= 0)
+                {
+                    Logger.Log($"FMOD analysis: invalid byteCount ({byteCount}).");
                     return false;
+                }
 
                 var buffer = new byte[byteCount];
 
