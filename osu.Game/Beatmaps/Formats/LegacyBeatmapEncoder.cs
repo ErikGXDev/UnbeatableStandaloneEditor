@@ -91,6 +91,11 @@ namespace osu.Game.Beatmaps.Formats
             handleHitObjects(writer);
         }
 
+        public void EncodeHitObjects(TextWriter writer)
+        {
+            handleHitObjects(writer);
+        }
+
         private void handleGeneral(TextWriter writer)
         {
             writer.WriteLine("[General]");

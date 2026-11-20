@@ -186,6 +186,14 @@ public partial class AdvancedSettingsSection : EditorSettingsSection
             },
             new TooltipCheckbox
             {
+                LabelText = "Note snippets",
+                TooltipText = "Adds a new \"Snippets\" menu which allows you to save and re-use patterns of notes.",
+                RelativeSizeAxes = Axes.X,
+                Current = osuConfig.GetBindable<bool>(OsuSetting.EditorNoteSnippets),
+                Margin = new MarginPadding { Bottom = 10 },
+            },
+            new TooltipCheckbox
+            {
                 LabelText = "Nudge by 1ms (J/K)",
                 TooltipText =
                     "When on, pressing J/K nudges notes 1ms up/down instead of a full beat.\n(This feature may be useful for placement ordering.)",

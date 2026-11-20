@@ -236,6 +236,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.EditorInvertKeychartUnanimated, false); // FIX: Invert keychart unanimated notes
             SetDefault(OsuSetting.EditorEvilInAKettle, false);
             SetDefault(OsuSetting.EditorFlooredSnap, false); // FIX: Floored snap for editor
+            SetDefault(OsuSetting.EditorNoteSnippets, false); // FIX: Prefabs for editor
             
             SetDefault(OsuSetting.EditorPreviewZoom, 1.0d, 0.1d, 2.5d, 0.001d); // Save zoom level of preview area
             
@@ -551,6 +552,7 @@ namespace osu.Game.Configuration
         EditorOfficialEditorCompatExport,
         EditorPreferCoverArt,
         EditorDefaultUsername,
+        EditorNoteSnippets,
         
         EditorNew30msWaveformDisable,
         

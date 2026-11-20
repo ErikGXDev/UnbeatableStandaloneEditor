@@ -573,6 +573,11 @@ public partial class UnbeatableHitObjectComposer : ManiaHitObjectComposer, IKeyB
             RightToolbox.Add(new UbBlindSideswapToolbox());
         }
 
+        if (config.Get<bool>(OsuSetting.EditorNoteSnippets))
+        {
+            RightToolbox.Add(new UbPrefabsToolbox());
+        }
+
         if (DrawableRuleset is DrawableManiaEditorRuleset mr)
         {
             mr.ShowSpeedChanges.BindValueChanged(v =>
