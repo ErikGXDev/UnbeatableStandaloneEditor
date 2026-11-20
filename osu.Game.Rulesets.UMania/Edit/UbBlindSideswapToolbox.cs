@@ -110,17 +110,6 @@ public partial class UbBlindSideswapToolbox : EditorToolboxGroup
     {
         updateActiveState();
     }
-
-    private void removeFromSelection()
-    {
-        foreach (var b in beatmap.SelectedHitObjects)
-        {
-            noteBuilder.ChangeHitObject(b);
-            noteBuilder.SetFileHitSampleData("");
-        }
-        
-        beatmap.SelectedHitObjects.Clear();
-    }
     
     private void updateActiveState()
     {
