@@ -35,9 +35,6 @@ namespace osu.Game.Rulesets.UMania.Edit
             this.iconType = iconType;
         }
 
-        [Resolved]
-        private Editor editor { get; set; } = null!;
-
         [BackgroundDependencyLoader]
         private void load(GameHost host, IRenderer renderer)
         {
@@ -49,7 +46,7 @@ namespace osu.Game.Rulesets.UMania.Edit
                 {
                     if (sharedTextureStore == null)
                     {
-                        sharedResources = editor.Ruleset.Value.CreateInstance().CreateResourceStore();
+                        sharedResources = new UManiaRuleset().CreateResourceStore();
                         sharedTextureStore = new TextureStore(renderer, host.CreateTextureLoaderStore(sharedResources), false);
                     }
 
@@ -105,6 +102,8 @@ namespace osu.Game.Rulesets.UMania.Edit
         Animated,
         AnimatedHold,
         
-        Setpiece
+        Setpiece,
+        
+        LegallyDistinctQuaver
     }
 }

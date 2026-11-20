@@ -2,10 +2,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.UMania.Edit;
 using osuTK;
 using UnbeatableStandaloneEditor.Components;
 using OsuSpriteText = osu.Game.Graphics.Sprites.OsuSpriteText;
@@ -58,6 +60,7 @@ public partial class ExpandableCredits : FillFlowContainer
     }
 
     private OsuTextFlowContainer creditsTextFlow = null!;
+    private ClickableQuaver clickableQuaver = null!;
 
     [BackgroundDependencyLoader]
     private void load(OverlayColourProvider colourProvider)
@@ -107,6 +110,7 @@ public partial class ExpandableCredits : FillFlowContainer
             },
             button,
             creditsTextFlow,
+            clickableQuaver = new ClickableQuaver() { Alpha = 0 },
             dummy = new Container
             {
                 RelativeSizeAxes = Axes.X,
@@ -123,6 +127,7 @@ public partial class ExpandableCredits : FillFlowContainer
         expanded = !expanded;
 
         creditsTextFlow.FadeTo(expanded ? 1 : 0, 200, Easing.OutQuint);
+        clickableQuaver.FadeTo(expanded ? 1 : 0, 200, Easing.OutQuint);
 
         // Scroll to bottom to show the expanded credits
         if (expanded)
@@ -133,6 +138,38 @@ public partial class ExpandableCredits : FillFlowContainer
                 panel?.SectionsContainer.ScrollTo(dummy);
             });
         }
+    }
+}
+
+public partial class ClickableQuaver : OsuClickableContainer
+{
+    public ClickableQuaver()
+    {
+        RelativeSizeAxes = Axes.X;
+        Height = 1;
+    }
+
+    [BackgroundDependencyLoader]
+    private void load()
+    {
+        Child = new UbIcon(UbIconType.LegallyDistinctQuaver)
+        {
+            ForShow = true,
+            Origin = Anchor.Centre,
+            Anchor = Anchor.Centre,
+            Margin = new MarginPadding() { Top = 8 },
+        };
+
+        Height = Child.DrawHeight;
+
+        Action = () =>
+        {
+            Child.FinishTransforms();
+            Child.ClearTransforms();
+            Child.Scale = new Vector2(1f, 0.75f);
+            Child.ScaleTo(new Vector2(1f, 1f), 700, Easing.OutElastic);
+
+        };
     }
 }
 
