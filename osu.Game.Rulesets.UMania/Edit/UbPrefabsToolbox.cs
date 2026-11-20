@@ -157,7 +157,7 @@ public partial class UbPrefabsToolbox : EditorToolboxGroup
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Text = "Snippets are reusable patters that you can insert into your map.",
+                        Text = "Tip: Select some notes to start creating a snippet!",
                         Colour = colourProvider.Content1.Opacity(0.8f),
                         Margin = new MarginPadding { Top = 4 },
                     }
