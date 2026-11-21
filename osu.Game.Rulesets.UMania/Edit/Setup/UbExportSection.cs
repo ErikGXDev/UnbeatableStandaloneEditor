@@ -1071,7 +1071,11 @@ namespace osu.Game.Rulesets.UMania.Edit.Setup
             
             offsetBindable.BindValueChanged(v =>
             {
+                Beatmap.BeginChange();
                 beatmap.ExportOffset = v.NewValue;
+                Beatmap.EndChange();
+                Logger.Log("ExportOffset changed from " + v.OldValue + " to " + v.NewValue);
+                
                 //config.SetValue(OsuSetting.EditorExportOffsetMs, v.NewValue);
 
                 if (offsetWaveform == null) return;
