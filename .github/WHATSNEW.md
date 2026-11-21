@@ -7,7 +7,7 @@
 - Added a "Up-scroll playfield" general setting, which makes notes go upwards instead of downwards.
 - You can now press Alt + [column] in key-based charting mode to add stacked notes. 
 - Changed export note offset to be stored in the chart itself
-  - The export note offset and "apply inverse offset" settings have been removed (the latter happens automatically now)
+  - The export note offset and "apply inverse offset" settings have been removed (this happens by default now!)
 - Added a new "Rectangle-aware placement snap" experimental option which slightly changes the snapping of note placement.
   - (Please try it out, it may become the default if it works well!)
 - You can now place UNANIMATED notes in the first lane
