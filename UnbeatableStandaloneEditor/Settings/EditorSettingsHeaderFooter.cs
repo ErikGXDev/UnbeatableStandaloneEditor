@@ -4,6 +4,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
@@ -150,25 +151,47 @@ public partial class ClickableQuaver : OsuClickableContainer
     }
 
     [BackgroundDependencyLoader]
-    private void load()
+    private void load(OsuConfigManager config)
     {
-        Child = new UbIcon(UbIconType.LegallyDistinctQuaver)
+        OsuSpriteText t;
+        UbIcon quaverIcon;
+        var configBindable = config.GetBindable<int>(OsuSetting.EditorPats);
+
+
+        Children = new Drawable[]
         {
-            ForShow = true,
-            Origin = Anchor.Centre,
-            Anchor = Anchor.Centre,
-            Margin = new MarginPadding() { Top = 8 },
+            quaverIcon = new UbIcon(UbIconType.LegallyDistinctQuaver)
+            {
+                ForShow = true,
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+                Margin = new MarginPadding() { Top = 8 },
+            },
+            t = new OsuSpriteText()
+            {
+                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                Margin = new MarginPadding() { Left = 80 },
+                Alpha = 0,
+                Text = configBindable.Value.ToString()
+            }
         };
 
-        Height = Child.DrawHeight;
+        Height = quaverIcon.DrawHeight;
 
         Action = () =>
         {
-            Child.FinishTransforms();
-            Child.ClearTransforms();
-            Child.Scale = new Vector2(1f, 0.75f);
-            Child.ScaleTo(new Vector2(1f, 1f), 700, Easing.OutElastic);
-
+            quaverIcon.FinishTransforms();
+            quaverIcon.ClearTransforms();
+            quaverIcon.Scale = new Vector2(1f, 0.75f);
+            quaverIcon.ScaleTo(new Vector2(1f, 1f), 700, Easing.OutElastic);
+            configBindable.Value++;
+            t.Text = configBindable.Value.ToString();
+            t.FinishTransforms();
+            t.ClearTransforms();
+            t.Alpha = 1;
+            t.FadeTo(0, 2000, Easing.OutQuint);
         };
     }
 }
