@@ -87,6 +87,7 @@ namespace osu.Game.Beatmaps
             beatmap.CountdownOffset = original.CountdownOffset;
             beatmap.Bookmarks = original.Bookmarks;
             beatmap.BeatmapVersion = original.BeatmapVersion;
+            beatmap.ExportOffset = original.ExportOffset;
 
             return beatmap;
         }
