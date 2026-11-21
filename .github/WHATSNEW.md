@@ -2,8 +2,8 @@
 
 - Added a Snippets menu, which allows you to create reusable note patterns.
   - Enable it in the settings under the "Advanced" category.
-  - Create a snippet by selecting notes and entering a name for it in the new Snippets panel.
-  - Snippets are stored as text files and can be easily shared with others.
+  - Create a snippet by selecting notes and entering a name for it in the menu.
+  - Snippets are stored as text files and can be easily shared with others!
 - Added a "Up-scroll playfield" general setting, which makes notes go upwards instead of downwards.
 - You can now press Alt + [column] in key-based charting mode to add stacked notes. 
 - Changed export note offset to be stored in the chart itself
