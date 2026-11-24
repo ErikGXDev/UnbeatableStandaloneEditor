@@ -103,14 +103,22 @@ namespace osu.Game.Screens.Edit.Timing
                     }
 
                     if (ControlPoint.Value == null)
+                    {
+                        // FIX: Track timing point change
+                        ChangeHandler?.BeginChange();
                         SelectedGroup.Value.Add(ControlPoint.Value = CreatePoint());
+                        ChangeHandler?.EndChange();
+                    }
                 }
                 else
                 {
                     if (ControlPoint.Value != null)
                     {
+                        // FIX: Track timing point change
+                        ChangeHandler?.BeginChange();
                         SelectedGroup.Value.Remove(ControlPoint.Value);
                         ControlPoint.Value = null;
+                        ChangeHandler?.EndChange();
                     }
                 }
 

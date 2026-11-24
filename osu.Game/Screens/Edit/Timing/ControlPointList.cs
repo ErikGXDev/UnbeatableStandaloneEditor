@@ -218,13 +218,19 @@ namespace osu.Game.Screens.Edit.Timing
             if (selectedGroup.Value == null)
                 return;
 
+            // FIX: Track timing point change
+            Beatmap.BeginChange();
             Beatmap.ControlPointInfo.RemoveGroup(selectedGroup.Value);
 
             selectedGroup.Value = Beatmap.ControlPointInfo.Groups.FirstOrDefault(g => g.Time >= clock.CurrentTime);
+            Beatmap.EndChange();
         }
 
         private void addNew()
         {
+            // FIX: Track timing point change
+            Beatmap.BeginChange();
+
             bool isFirstControlPoint = !Beatmap.ControlPointInfo.TimingPoints.Any();
 
             var group = Beatmap.ControlPointInfo.GroupAt(clock.CurrentTime, true);
@@ -245,7 +251,15 @@ namespace osu.Game.Screens.Edit.Timing
                 }
             }
 
+            // FIX: Always have a timing point ready
+            if (!group.ControlPoints.OfType<TimingControlPoint>().Any())
+            {
+                var timingPoint = Beatmap.ControlPointInfo.TimingPointAt(clock.CurrentTime);
+                group.Add(timingPoint.DeepClone());
+            }
+
             selectedGroup.Value = group;
+            Beatmap.EndChange();
         }
 
         private void onUndoRedo()

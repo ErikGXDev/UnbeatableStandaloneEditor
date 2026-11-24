@@ -82,6 +82,8 @@ namespace osu.Game.Screens.Edit.Timing
                 return;
 
             effectPoint.ScrollSpeedBindable.Value = scrollSpeed.NewValue;
+            // FIX: Track timing point change
+            ChangeHandler?.SaveState();
         }
 
         protected override EffectControlPoint CreatePoint()
