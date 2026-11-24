@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -36,6 +37,11 @@ public partial class UbPlacementToolbox : EditorToolboxGroup
         AutoSizeAxes = Axes.Y;
     }
     
+    [Resolved] private OsuConfigManager config { get; set; } = null!;
+    
+    private bool reversedOrder => config.Get<bool>(OsuSetting.EditorInvertPlacementOrder);
+    
+    
     [BackgroundDependencyLoader]
     private void load(OverlayColourProvider colourProvider)
     {
@@ -49,7 +55,7 @@ public partial class UbPlacementToolbox : EditorToolboxGroup
                 new OsuSpriteText()
                 {
                     Margin = new MarginPadding() { Left = 24 },
-                    Text = "Last",
+                    Text = reversedOrder ? "First" : "Last",
                     Font = OsuFont.Default.With(size: 14),
                     Colour = colourProvider.Content2.Darken(0.1f)
                 },
@@ -61,7 +67,7 @@ public partial class UbPlacementToolbox : EditorToolboxGroup
                 new OsuSpriteText()
                 {
                     Margin = new MarginPadding() { Left = 24 },
-                    Text = "First",
+                    Text = reversedOrder ? "Last" : "First",
                     Font = OsuFont.Default.With(size: 14),
                     Colour = colourProvider.Content2.Darken(0.1f)
                 },
@@ -156,9 +162,10 @@ public partial class UbPlacementToolbox : EditorToolboxGroup
         
         for (int i = 0; i < targetHitObjects.Count; i++)
         {
-            var hitObject = targetHitObjects[targetHitObjects.Count - i - 1];
+            var index = reversedOrder ? i : targetHitObjects.Count - i - 1;
+            var hitObject = targetHitObjects[index];
             var info = new UbPlacementHitObjectInfo(hitObject);
-            info.Index.Value = targetHitObjects.Count - i - 1;
+            info.Index.Value = index;
             placementOrderList.Items.Add(info);
         }
     }
@@ -189,11 +196,13 @@ public partial class UbPlacementToolbox : EditorToolboxGroup
             modifiableHitObjects.RemoveAt(index);
 
         var sortedIndices = indices.OrderBy(x => x).ToList();
+        var insertionOrder = reversedOrder
+            ? placementOrderList.Items.ToList()
+            : placementOrderList.Items.Reverse().ToList();
 
         for (int i = 0; i < placementOrderList.Items.Count; i++)
         {
-            var reversedIndex = placementOrderList.Items.Count - i - 1;
-            var item = placementOrderList.Items[reversedIndex];
+            var item = insertionOrder[i];
             item.Index.Value = i;
             
             var hitObject = item.HitObject;

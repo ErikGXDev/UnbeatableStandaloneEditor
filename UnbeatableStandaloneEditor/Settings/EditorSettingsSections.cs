@@ -471,6 +471,13 @@ public partial class ExperimentalSettingsSection : EditorSettingsSection
             },
             new TooltipCheckbox()
             {
+                LabelText = "Invert Placement Order list order",
+                RelativeSizeAxes = Axes.X,
+                Current = osuConfig.GetBindable<bool>(OsuSetting.EditorInvertPlacementOrder),
+                Margin = new MarginPadding { Bottom = 10 },
+            },
+            new TooltipCheckbox()
+            {
                 LabelText = "Rectangle-aware placement snap",
                 TooltipText = "Makes the range for placing notes \"less far down\".",
                 Current = osuConfig.GetBindable<bool>(OsuSetting.EditorFlooredSnap),
