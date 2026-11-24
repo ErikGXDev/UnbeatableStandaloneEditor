@@ -302,13 +302,7 @@ namespace osu.Game.Rulesets.Edit
                     SetSelectTool();
             });
 
-            EditorBeatmap.HasTiming.BindValueChanged(hasTiming =>
-            {
-                foreach (var item in toolboxCollection.Items)
-                {
-                    item.Selected.Disabled = !hasTiming.NewValue;
-                }
-            }, true);
+            EditorBeatmap.HasTiming.BindValueChanged(onHasTimingChanged, true);
 
             composerFocusMode.BindValueChanged(_ =>
             {
@@ -510,6 +504,12 @@ namespace osu.Game.Rulesets.Edit
             return index >= 0;
         }
 
+        private void onHasTimingChanged(ValueChangedEvent<bool> hasTiming)
+        {
+            foreach (var item in toolboxCollection.Items)
+                item.Selected.Disabled = !hasTiming.NewValue;
+        }
+
         private void selectionChanged(object sender, NotifyCollectionChangedEventArgs changedArgs)
         {
             if (EditorBeatmap.SelectedHitObjects.Any())
@@ -570,6 +570,20 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="screenSpacePosition">The screen-space position to query.</param>
         /// <returns>The most relevant <see cref="Playfield"/>.</returns>
         protected virtual Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) => drawableRulesetWrapper.Playfield;
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (EditorBeatmap != null)
+            {
+                EditorBeatmap.SelectedHitObjects.CollectionChanged -= selectionChanged;
+                EditorBeatmap.HasTiming.ValueChanged -= onHasTimingChanged;
+            }
+
+            hasTiming?.UnbindAll();
+            composerFocusMode.UnbindAll();
+        }
 
         #endregion
     }

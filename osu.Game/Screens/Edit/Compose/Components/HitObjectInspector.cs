@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Specialized;
 using System.Linq;
 using Humanizer;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Threading;
 using osu.Game.Rulesets.Objects;
@@ -17,11 +19,28 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.LoadComplete();
 
-            EditorBeatmap.SelectedHitObjects.CollectionChanged += (_, _) => updateInspectorText();
-            EditorBeatmap.PlacementObject.BindValueChanged(_ => updateInspectorText());
+            EditorBeatmap.SelectedHitObjects.CollectionChanged += onSelectedHitObjectsChanged;
+            EditorBeatmap.PlacementObject.BindValueChanged(onPlacementChanged);
             EditorBeatmap.TransactionBegan += updateInspectorText;
             EditorBeatmap.TransactionEnded += updateInspectorText;
             updateInspectorText();
+        }
+
+        private void onSelectedHitObjectsChanged(object sender, NotifyCollectionChangedEventArgs args) => updateInspectorText();
+
+        private void onPlacementChanged(ValueChangedEvent<HitObject> args) => updateInspectorText();
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (EditorBeatmap != null)
+            {
+                EditorBeatmap.SelectedHitObjects.CollectionChanged -= onSelectedHitObjectsChanged;
+                EditorBeatmap.PlacementObject.ValueChanged -= onPlacementChanged;
+                EditorBeatmap.TransactionBegan -= updateInspectorText;
+                EditorBeatmap.TransactionEnded -= updateInspectorText;
+            }
         }
 
         private ScheduledDelegate? rollingTextUpdate;

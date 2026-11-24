@@ -43,9 +43,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
             createStateBindables();
 
             // bring in updates from selection changes
-            EditorBeatmap.HitObjectUpdated += _ => Scheduler.AddOnce(UpdateTernaryStates);
+            EditorBeatmap.HitObjectUpdated += onHitObjectUpdated;
 
             SelectedItems.CollectionChanged += onSelectedItemsChanged;
+        }
+
+        private void onHitObjectUpdated(HitObject hitObject) => Scheduler.AddOnce(UpdateTernaryStates);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (EditorBeatmap != null)
+                EditorBeatmap.HitObjectUpdated -= onHitObjectUpdated;
         }
 
         protected override bool ShouldQuickDelete(MouseButtonEvent e)

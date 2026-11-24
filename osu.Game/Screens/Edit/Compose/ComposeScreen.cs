@@ -4,9 +4,11 @@
 #nullable disable
 
 using System.Diagnostics;
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
@@ -122,10 +124,30 @@ namespace osu.Game.Screens.Edit.Compose
             if (composer == null)
                 return;
 
-            EditorBeatmap.SelectedHitObjects.BindCollectionChanged((_, _) => updateClipboardActionAvailability());
-            clipboard.BindValueChanged(_ => updateClipboardActionAvailability());
-            composer.OnLoadComplete += _ => updateClipboardActionAvailability();
+            EditorBeatmap.SelectedHitObjects.CollectionChanged += onSelectedHitObjectsChanged;
+            clipboard.ValueChanged += onClipboardChanged;
+            composer.OnLoadComplete += onComposerLoaded;
             updateClipboardActionAvailability();
+        }
+
+        private void onSelectedHitObjectsChanged(object sender, NotifyCollectionChangedEventArgs args) => updateClipboardActionAvailability();
+
+        private void onClipboardChanged(ValueChangedEvent<string> args) => updateClipboardActionAvailability();
+
+        private void onComposerLoaded(Drawable drawable) => updateClipboardActionAvailability();
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (EditorBeatmap != null)
+                EditorBeatmap.SelectedHitObjects.CollectionChanged -= onSelectedHitObjectsChanged;
+
+            if (clipboard != null)
+                clipboard.ValueChanged -= onClipboardChanged;
+
+            if (composer != null)
+                composer.OnLoadComplete -= onComposerLoaded;
         }
 
         #region Clipboard operations

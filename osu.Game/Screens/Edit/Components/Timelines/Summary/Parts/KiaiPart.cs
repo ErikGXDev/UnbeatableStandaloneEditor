@@ -81,6 +81,14 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             }
         });
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (EditorBeatmap != null)
+                EditorBeatmap.ControlPointInfo.ControlPointsChanged -= updateParts;
+        }
+
         private partial class KiaiVisualisation : PoolableDrawable, IHasTooltip
         {
             private KiaiSection section;

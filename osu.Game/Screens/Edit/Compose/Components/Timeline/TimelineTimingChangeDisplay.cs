@@ -32,14 +32,18 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private readonly Cached groupCache = new Cached();
 
         private ControlPointInfo controlPointInfo = null!;
+        private EditorBeatmap beatmap = null!;
 
         protected override void LoadBeatmap(EditorBeatmap beatmap)
         {
             base.LoadBeatmap(beatmap);
 
-            beatmap.ControlPointInfo.ControlPointsChanged += () => groupCache.Invalidate();
+            this.beatmap = beatmap;
+            beatmap.ControlPointInfo.ControlPointsChanged += invalidateGroups;
             controlPointInfo = beatmap.ControlPointInfo;
         }
+
+        private void invalidateGroups() => groupCache.Invalidate();
 
         protected override void Update()
         {
@@ -93,6 +97,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         private bool shouldBeVisible(TimingControlPoint point) => point.Time >= visibleRange.min && point.Time <= visibleRange.max;
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (beatmap != null)
+                beatmap.ControlPointInfo.ControlPointsChanged -= invalidateGroups;
+        }
 
         public partial class TimingPointPiece : CompositeDrawable
         {
