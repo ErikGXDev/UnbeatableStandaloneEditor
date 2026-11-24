@@ -184,7 +184,7 @@ public partial class ClickableQuaver : OsuClickableContainer
         {
             quaverIcon.FinishTransforms();
             quaverIcon.ClearTransforms();
-            quaverIcon.Scale = new Vector2(1f, 0.75f);
+            quaverIcon.Scale = new Vector2(1.25f, 0.75f);
             quaverIcon.ScaleTo(new Vector2(1f, 1f), 700, Easing.OutElastic);
             configBindable.Value++;
             t.Text = configBindable.Value.ToString();
