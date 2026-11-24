@@ -1393,10 +1393,8 @@ namespace osu.Game.Screens.Edit
         {
             screenContainer.SingleOrDefault(s => s.Type == EditorScreenMode.Compose)?.RemoveAndDisposeImmediately();
 
-            // If not currently on compose screen, the reload will happen on next mode change.
-            // That said, control points *can* change on compose screen (e.g. via undo), so we have to handle that case too.
             if (Mode.Value == EditorScreenMode.Compose)
-                Mode.TriggerChange();
+                Mode.Value = EditorScreenMode.Timing;
         }
 
         [CanBeNull]
