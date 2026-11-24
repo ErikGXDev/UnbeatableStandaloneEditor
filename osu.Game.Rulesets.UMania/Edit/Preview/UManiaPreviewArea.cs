@@ -212,6 +212,14 @@ namespace osu.Game.Rulesets.UMania.Edit.Preview
 
             if (changeHandler != null)
                 changeHandler.OnStateChange -= onEditorStateChanged;
+
+            hitCircles.Clear();
+            copHitCircles.Clear();
+            notePool.Clear();
+            holdPool.Clear();
+
+            foreach (var spans in copSpans)
+                spans.Clear();
         }
         
         // Tracks when cops are dead/alive across whole beatmap
