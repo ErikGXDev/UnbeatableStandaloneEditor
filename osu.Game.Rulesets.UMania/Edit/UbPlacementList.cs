@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -29,7 +30,25 @@ public partial class UbPlacementList : OsuRearrangeableListContainer<UbPlacement
     {
         return new UbPlacementListItem(item);
     }
+
+    protected override ScrollContainer<Drawable> CreateScrollContainer()
+    {
+        return new UnscrollableScrollContainer();
+    }
     
+    private partial class UnscrollableScrollContainer : OsuScrollContainer
+    {
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            return false;
+        }
+        
+        public UnscrollableScrollContainer() : base()
+        {
+            ClampExtension = 0;
+        }
+    }
+
     private FillFlowContainer<RearrangeableListItem<UbPlacementHitObjectInfo>> listFillFlowContainer = null!;
 
     protected override void Update()
