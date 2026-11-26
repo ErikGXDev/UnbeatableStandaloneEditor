@@ -46,6 +46,8 @@ namespace osu.Game.Utils
         {
             this.game = game;
 
+            return;
+
             if (Environment.GetEnvironmentVariable("OSU_DISABLE_ERROR_REPORTING") == "1")
                 return;
 
