@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -382,11 +383,11 @@ public partial class UbAnimateToolboxData
             finalFloatBindable.BindValueChanged(v => onValueChanged?.Invoke());
             
             var sliderBindable = new BindableFloat() { MinValue = Min, MaxValue = Max, Default = DefaultValue, Precision = Precision };
-            var boxBindable = new Bindable<string>() { Default = DefaultValue.ToString() };
+            var boxBindable = new Bindable<string>() { Default = DefaultValue.ToString(CultureInfo.InvariantCulture) };
             
             var slider = new FormSliderBar<float>()
             {
-                LabelFormat = i => i.ToString(),
+                LabelFormat = i => i.ToString(CultureInfo.InvariantCulture),
                 Caption = Label,
                 Current = sliderBindable,
                 KeyboardStep = 1,
@@ -394,7 +395,7 @@ public partial class UbAnimateToolboxData
             
             boxBindable.BindValueChanged(v =>
             {
-                var newFloat = float.TryParse(v.NewValue, out var parsed) ? parsed : sliderBindable.Value;
+                var newFloat = float.TryParse(v.NewValue, CultureInfo.InvariantCulture, out var parsed) ? parsed : sliderBindable.Value;
                 
                 if (sliderBindable.Value != newFloat)
                     sliderBindable.Value = newFloat;
@@ -405,8 +406,8 @@ public partial class UbAnimateToolboxData
             
             sliderBindable.BindValueChanged(v =>
             {
-                if (boxBindable.Value != v.NewValue.ToString())
-                    boxBindable.Value = v.NewValue.ToString();
+                if (boxBindable.Value != v.NewValue.ToString(CultureInfo.InvariantCulture))
+                    boxBindable.Value = v.NewValue.ToString(CultureInfo.InvariantCulture);
                 
                 if (finalFloatBindable.Value != v.NewValue)
                     finalFloatBindable.Value = v.NewValue;
@@ -417,8 +418,8 @@ public partial class UbAnimateToolboxData
                 if (sliderBindable.Value != v.NewValue)
                     sliderBindable.Value = v.NewValue;
                 
-                if (boxBindable.Value != v.NewValue.ToString())
-                    boxBindable.Value = v.NewValue.ToString();
+                if (boxBindable.Value != v.NewValue.ToString(CultureInfo.InvariantCulture))
+                    boxBindable.Value = v.NewValue.ToString(CultureInfo.InvariantCulture);
             });
             
             var numberBox = new FormNumberBox(allowDecimals: Precision < 1)
@@ -452,7 +453,7 @@ public partial class UbAnimateToolboxData
                     slider.Alpha = 1;
                     
                     // Clamp the slider value to the min/max if the textbox value is out of bounds
-                    var numberBoxValue = float.TryParse(boxBindable.Value, out var parsed) ? parsed : sliderBindable.Value;
+                    var numberBoxValue = float.TryParse(boxBindable.Value, CultureInfo.InvariantCulture, out var parsed) ? parsed : sliderBindable.Value;
                     
                     // Clamp the value to precision
                     numberBoxValue = (float)Math.Round(numberBoxValue / Precision) * Precision;
@@ -461,7 +462,7 @@ public partial class UbAnimateToolboxData
                     {
                         var clampedValue = Math.Clamp(numberBoxValue, Min, Max);
                         sliderBindable.Value = clampedValue;
-                        boxBindable.Value = clampedValue.ToString();
+                        boxBindable.Value = clampedValue.ToString(CultureInfo.InvariantCulture);
                     }
                     
                 }
@@ -661,7 +662,7 @@ public partial class UbAnimateToolboxData
                 { UnanimatedAction.DefaultStageScene, [new EnumStringOption<StageSceneAction>("Stage")] },
                 { UnanimatedAction.ShowBackgroundVideo, [] },
                 { UnanimatedAction.DisableCountdown, [] },
-                { UnanimatedAction.CustomCountdown, [new FloatOption("Beat Length (60000/bpm)", 500, -999999999, 9999999999, 0.0001f), new StringOption("Beats", CountdownBeatsText)]},
+                { UnanimatedAction.CustomCountdown, [new FloatOption("Beat Length (60000/bpm)", 500, 0, 60000, 0.01f), new StringOption("Beats", "", CountdownBeatsText)]},
                 { UnanimatedAction.LegacyCameraUnits, [] },
             }
         },
@@ -779,6 +780,8 @@ public partial class UbAnimateToolboxData
         { CategoryType.StageScene, new CategoryInfo(typeof(StageSceneAction), "New Stage") },
         { CategoryType.UI, new CategoryInfo(typeof(UIAction), "Type") },
         { CategoryType.Visuals, new CategoryInfo(typeof(VisualsAction), "Type") },
+        { CategoryType.Countdown, new CategoryInfo(typeof(CountdownAction), "Type") },
+        { CategoryType.BackgroundVideo, new CategoryInfo(typeof(BackgroundVideoAction), "Type") }
     };
     
     
