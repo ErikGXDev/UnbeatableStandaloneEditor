@@ -338,6 +338,95 @@ public partial class UbPrefabsToolbox : EditorToolboxGroup
         
         return snippets;
     }
+
+    private partial class SnippetItem : Container
+    {
+        private Snippet snippet;
+        private Action insertSnippet;
+        private Action deleteSnippet;
+        
+        public SnippetItem(Snippet snippet, Action insertSnippet, Action deleteSnippet)
+        {
+            this.snippet = snippet;
+            this.insertSnippet = insertSnippet;
+            this.deleteSnippet = deleteSnippet;
+            RelativeSizeAxes = Axes.X;
+            Height = 30;
+            Masking = true;
+            CornerRadius = 5;
+        }
+        
+        private bool deletePressOnce = false;
+        
+        private SquaredRoundedButton deleteButton;
+        
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider, OsuColour colours)
+        {
+            Children = new Drawable[]
+            {
+                new Box() { Colour = colourProvider.Background3, RelativeSizeAxes = Axes.Both },
+                new OsuSpriteText()
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Margin = new MarginPadding { Left = 8 },
+                    Text = snippet.Name,
+                    Font = OsuFont.Default.With(size: 14, weight: FontWeight.Regular)
+                },
+                new SquaredRoundedButton()
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    Width = 20,
+                    Height = 20,
+                    Margin = new MarginPadding { Right = 28 },
+                    BackgroundColour = colourProvider.Colour4,
+                    HasTriangles = false,
+                    Text = ">",
+                    TooltipText = "Insert Snippet",
+                    Action = () =>
+                    {
+                        insertSnippet();
+                    }
+                },
+                deleteButton = new SquaredRoundedButton()
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    Width = 20,
+                    Height = 20,
+                    Margin = new MarginPadding { Right = 5 },
+                    BackgroundColour = colours.Red3,
+                    HasTriangles = false,
+                    Text = "X",
+                    TooltipText = "Delete Snippet (!)",
+                    Action = () =>
+                    {
+                        if (!deletePressOnce)
+                        {
+                            deletePressOnce = true;
+                            deleteButton.BackgroundColour = colours.Red4;
+                            deleteButton.Text = "!!";
+                            deleteButton.TooltipText = "Click again to confirm deletion";
+                            
+                            Scheduler.AddDelayed(() =>
+                            {
+                                deletePressOnce = false;
+                                deleteButton.BackgroundColour = colours.Red3;
+                                deleteButton.Text = "X";
+                                deleteButton.TooltipText = "Delete Snippet (!)";
+                            }, 2000);
+                        }
+                        else
+                        {
+                            deleteSnippet();
+                        }
+                    }
+                }
+            };
+        }
+    }
     
     private void rebuildSnippetList()
     {
@@ -347,58 +436,13 @@ public partial class UbPrefabsToolbox : EditorToolboxGroup
         
         foreach (var snippet in snippets)
         {
-            var button = new Container()
-            {
-                RelativeSizeAxes = Axes.X,
-                Height = 30,
-                Masking = true,
-                CornerRadius = 5,
-                Children = new Drawable[]
+            var button = new SnippetItem(snippet,
+                () => { insertSnippet(snippet); },
+                () =>
                 {
-                    new Box() { Colour = colourProvider.Background3, RelativeSizeAxes = Axes.Both },
-                    new OsuSpriteText()
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Margin = new MarginPadding { Left = 8 },
-                        Text = snippet.Name,
-                        Font = OsuFont.Default.With(size: 14, weight: FontWeight.Regular)
-                    },
-                    new SquaredRoundedButton()
-                    {
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Width = 20,
-                        Height = 20,
-                        Margin = new MarginPadding { Right = 28 },
-                        BackgroundColour = colourProvider.Colour4,
-                        HasTriangles = false,
-                        Text = ">",
-                        TooltipText = "Insert Snippet",
-                        Action = () =>
-                        {
-                            insertSnippet(snippet);
-                        }
-                    },
-                    new SquaredRoundedButton()
-                    {
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Width = 20,
-                        Height = 20,
-                        Margin = new MarginPadding { Right = 5 },
-                        BackgroundColour = colours.Red3,
-                        HasTriangles = false,
-                        Text = "X",
-                        TooltipText = "Delete Snippet (!)",
-                        Action = () =>
-                        {
-                            deleteSnippet(snippet);
-                            rebuildSnippetList();
-                        }
-                    }
-                }
-            };
+                    deleteSnippet(snippet); 
+                    rebuildSnippetList(); 
+                });
             
             snippetListContainer.Add(button);
         }
