@@ -290,6 +290,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (e.Action)
             {
                 case PlatformAction.SelectAll:
+                    if (inputManager?.FocusedDrawable is OsuTextBox)
+                        return false;
+
                     SelectAll();
                     return true;
             }
