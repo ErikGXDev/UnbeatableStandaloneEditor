@@ -61,7 +61,7 @@ public partial class ExpandableCredits : FillFlowContainer
     }
 
     private OsuTextFlowContainer creditsTextFlow = null!;
-    private ClickableQuaver clickableQuaver = null!;
+    private QuaverClicker clickableQuaver = null!;
 
     [BackgroundDependencyLoader]
     private void load(OverlayColourProvider colourProvider)
@@ -111,7 +111,7 @@ public partial class ExpandableCredits : FillFlowContainer
             },
             button,
             creditsTextFlow,
-            clickableQuaver = new ClickableQuaver() { Alpha = 0 },
+            clickableQuaver = new QuaverClicker() { Alpha = 0 },
             dummy = new Container
             {
                 RelativeSizeAxes = Axes.X,
@@ -142,59 +142,6 @@ public partial class ExpandableCredits : FillFlowContainer
     }
 }
 
-public partial class ClickableQuaver : OsuClickableContainer
-{
-    public ClickableQuaver()
-    {
-        RelativeSizeAxes = Axes.X;
-        Height = 1;
-    }
-
-    [BackgroundDependencyLoader]
-    private void load(OsuConfigManager config)
-    {
-        OsuSpriteText t;
-        UbIcon quaverIcon;
-        var configBindable = config.GetBindable<int>(OsuSetting.EditorPats);
-
-
-        Children = new Drawable[]
-        {
-            quaverIcon = new UbIcon(UbIconType.LegallyDistinctQuaver)
-            {
-                ForShow = true,
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Margin = new MarginPadding() { Top = 8 },
-            },
-            t = new OsuSpriteText()
-            {
-                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                Margin = new MarginPadding() { Left = 80 },
-                Alpha = 0,
-                Text = configBindable.Value.ToString()
-            }
-        };
-
-        Height = quaverIcon.DrawHeight;
-
-        Action = () =>
-        {
-            quaverIcon.FinishTransforms();
-            quaverIcon.ClearTransforms();
-            quaverIcon.Scale = new Vector2(1.25f, 0.75f);
-            quaverIcon.ScaleTo(new Vector2(1f, 1f), 700, Easing.OutElastic);
-            configBindable.Value++;
-            t.Text = configBindable.Value.ToString();
-            t.FinishTransforms();
-            t.ClearTransforms();
-            t.Alpha = 1;
-            t.FadeTo(0, 2000, Easing.OutQuint);
-        };
-    }
-}
 
 public partial class EditorSettingsFooter : FillFlowContainer
 {
