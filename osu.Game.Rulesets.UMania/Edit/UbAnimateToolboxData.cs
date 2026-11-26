@@ -20,6 +20,9 @@ public enum CategoryType
     StageScene,
     Visuals,
     UI,
+    Countdown,
+    [Description("Background Video")]
+    BackgroundVideo
 }
 
 public enum UnanimatedAction
@@ -29,6 +32,12 @@ public enum UnanimatedAction
     
     [Description("Show background video")]
     ShowBackgroundVideo,
+    
+    [Description("Disable Countdown")]
+    DisableCountdown,
+    
+    [Description("Custom Countdown")]
+    CustomCountdown,
     
     [Description("Use old units (pre-0.1.14)")]
     LegacyCameraUnits,
@@ -187,7 +196,16 @@ public enum UIAction
     SlideIn,
     
     [Description("Slide Out")]
-    SlideOut
+    SlideOut,
+    
+    Pulse,
+}
+
+public enum PulseMode
+{
+    Both,
+    Even,
+    Odd
 }
 
 
@@ -248,6 +266,37 @@ public enum CameraEasing
     InOutFlash,
 }
 
+public enum CountdownAction
+{
+    Count,
+    Tick,
+    Display,
+    Text
+}
+
+public enum BackgroundVideoAction
+{
+    Show,
+    Hide,
+    AspectRatioMode
+}
+
+public enum AspectRatioMode
+{
+    [Description("No Scaling")]
+    NoScaling,
+    [Description("Fit Vertically")]
+    FitVertically,
+    [Description("Fit Horizontally")]
+    FitHorizontally,
+    [Description("Fit Inside (Default)")]
+    FitInside,
+    [Description("Fit Outside")]
+    FitOutside,
+    [Description("Stretch")]
+    Stretch
+}
+
 
 
 public partial class UbAnimateToolboxData
@@ -274,18 +323,25 @@ public partial class UbAnimateToolboxData
                                          """;
 
     public static string ShowHideText = """
-                                        Show or hide UI elements by entering them here, separated by semicolons (;).
+                                        Show or hide UI elements by entering them here, separated by semicolons (;). Leave empty to target all.
                                         
                                         List of available UI elements:
                                         Score, Accuracy, MaxCombo, VignetteBars, BlackBGBars, FourByThreeBars, Health, LeftJudgementLine, RightJudgementLine, MeasureBars, SpeedLines, UpNextIndicators, Reticle, Notes
                                         """;
     
     public static string SlideInOutText = """
-                                        Show or hide UI elements with a transition by entering them here, separated by semicolons (;).
+                                        Show or hide UI elements with a transition by entering them here, separated by semicolons (;). Leave empty to target all.
 
                                         List of available UI elements:
                                         AllOverlayUI, LeftJudgementLine, RightJudgementLine, BackgroundGradient, HealthBar, SpeedLines, FourByThreeBars, BlackBGBars
                                         """;
+
+    public static string CountdownBeatsText = """
+                                              List of numbers the countdown should show, separated by semicolons (;). 
+                                              0 does nothing and -1 will clear the countdown.
+
+                                              Example: 1;0;2;0;1;2;3;4
+                                              """;
     
     public abstract class BaseOption
     {
@@ -604,7 +660,9 @@ public partial class UbAnimateToolboxData
             {
                 { UnanimatedAction.DefaultStageScene, [new EnumStringOption<StageSceneAction>("Stage")] },
                 { UnanimatedAction.ShowBackgroundVideo, [] },
-                { UnanimatedAction.LegacyCameraUnits, [] }
+                { UnanimatedAction.DisableCountdown, [] },
+                { UnanimatedAction.CustomCountdown, [new FloatOption("Beat Length (60000/bpm)", 500, -999999999, 9999999999, 0.0001f), new StringOption("Beats", CountdownBeatsText)]},
+                { UnanimatedAction.LegacyCameraUnits, [] },
             }
         },
         {
@@ -682,13 +740,31 @@ public partial class UbAnimateToolboxData
                 { UIAction.Show, [new StringOption("Elements", "", ShowHideText)] },
                 { UIAction.Hide, [new StringOption("Elements", "", ShowHideText)] },
                 { UIAction.SlideIn, [new StringOption("Elements", "", SlideInOutText)] },
-                { UIAction.SlideOut, [new StringOption("Elements", "", SlideInOutText)] }
+                { UIAction.SlideOut, [new StringOption("Elements", "", SlideInOutText)] },
+                { UIAction.Pulse, [new StringOption("Elements", "", SlideInOutText), new EnumStringOption<PulseMode>("Mode")] }
             }
         },
         {
             CategoryType.Visuals, new Dictionary<Enum, List<BaseOption>>
             {
                 { VisualsAction.TimeAndWeather, [new EnumStringOption<WeatherOption>("Weather")] }
+            }
+        },
+        {
+            CategoryType.Countdown, new Dictionary<Enum, List<BaseOption>>
+            {
+                { CountdownAction.Count, [new FloatOption("Number", 1, -1, 4, 1f )] },
+                { CountdownAction.Tick, [] },
+                { CountdownAction.Display, [new FloatOption("Number", 1, -1, 4, 1f )] },
+                { CountdownAction.Text, [new StringOption("Message", "")] }
+            }
+        },
+        {
+            CategoryType.BackgroundVideo, new Dictionary<Enum, List<BaseOption>>
+            {
+                { BackgroundVideoAction.Show, [] },
+                { BackgroundVideoAction.Hide, [] },
+                { BackgroundVideoAction.AspectRatioMode, [new EnumStringOption<AspectRatioMode>("Aspect Ratio Mode")] }
             }
         }
         
