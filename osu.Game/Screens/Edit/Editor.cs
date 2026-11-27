@@ -659,6 +659,7 @@ namespace osu.Game.Screens.Edit
         
         [Resolved] private OsuConfigManager osuConfig { get; set; }
 
+        [Resolved] private GameHost host { get; set; }
 
         public bool MakeBackup(bool sendToast = false)
         {
@@ -699,20 +700,29 @@ namespace osu.Game.Screens.Edit
                 beatmapStream.CopyTo(stream);
             }
             
-            if (!storage.Exists("backups/_HOW_TO_RESTORE_A_BACKUP.txt"))
+           
+            if (storage.Exists("backups/_HOW_TO_RESTORE_A_BACKUP.txt"))
             {
-                using (var stream = storage.CreateFileSafely("backups/_HOW_TO_RESTORE_A_BACKUP.txt"))
+                storage.Delete("backups/_HOW_TO_RESTORE_A_BACKUP.txt");
+            }
+            
+            if (storage.Exists("backups/__HOW_TO_RESTORE_A_BACKUP.txt"))
+            {
+                storage.Delete("backups/__HOW_TO_RESTORE_A_BACKUP.txt");
+            }
+            
+            using (var stream = storage.CreateFileSafely("backups/__HOW_TO_RESTORE_A_BACKUP.txt"))
+            {
+                using (var writer = new StreamWriter(stream))
                 {
-                    using (var writer = new StreamWriter(stream))
-                    {
-                        writer.WriteLine("How to restore a backup:");
-                        writer.WriteLine("You can simply import a backup like a normal chart in 2 ways:");
-                        writer.WriteLine("1. Use the import menu on the start screen and select the file there");
-                        writer.WriteLine("2. Drag-and-drop the backup file into the window while the main menu is open");
-                        writer.WriteLine("You will need to re-add your audio and cover art, they are not backed up to save space.");
-                        writer.WriteLine("Do not change the file name or contents of the backup files to avoid breaking things.");
-                        
-                    }
+                    writer.WriteLine("How to restore a backup:");
+                    writer.WriteLine("You can simply import a backup like a normal chart in 3 ways:");
+                    writer.WriteLine("1. Use the import menu on the start screen and select the file there");
+                    writer.WriteLine("2. Drag-and-drop the backup file into the window while the main menu is open");
+                    writer.WriteLine("3. Paste the chart contents into your chart by using the Edit Externally feature.");
+                    writer.WriteLine("You will need to re-add your audio and cover art, they are not backed up to save space.");
+                    writer.WriteLine("Do not change the file name or contents of the backup files to avoid breaking things.");
+                    
                 }
             }
 
@@ -722,6 +732,11 @@ namespace osu.Game.Screens.Edit
             }
 
             return true;
+        }
+
+        public void OpenBackups()
+        {
+            host.OpenFileExternally(storage.GetFullPath("backups"));
         }
 
         protected override void Dispose(bool isDisposing)
@@ -1567,9 +1582,13 @@ namespace osu.Game.Screens.Edit
             }
             
             // FIX: Make backup button
-            var makeBackup = new EditorMenuItem("Make Backup", MenuItemType.Standard, () => { MakeBackup(true);});
+            var makeBackup = new EditorMenuItem("Make backup", MenuItemType.Standard, () => { MakeBackup(true);});
             saveRelatedMenuItems.Add(makeBackup);
             yield return makeBackup;
+            
+            var openBackup = new EditorMenuItem("Open backups folder...", MenuItemType.Standard, () => { OpenBackups(); });
+            saveRelatedMenuItems.Add(openBackup);
+            yield return openBackup;
             
             
 
