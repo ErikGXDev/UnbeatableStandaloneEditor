@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
@@ -363,9 +364,24 @@ public partial class UbPrefabsToolbox : EditorToolboxGroup
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuColour colours)
         {
+            
+            var isBeatSnapped = snippet.DataBeatmap.Metadata.Source == "beat";
+            
+            var color = isBeatSnapped ? colours.Orange3 : colours.Blue3;
+            var darkColor = isBeatSnapped ? colours.Orange4 : colours.Blue4;
+            
             Children = new Drawable[]
             {
                 new Box() { Colour = colourProvider.Background3, RelativeSizeAxes = Axes.Both },
+                new Box() { Colour = color, Width = 12, Height = 12, Rotation = 45, Anchor = Anchor.TopRight, Origin = Anchor.Centre},
+                new Box()
+                {
+                    Colour = ColourInfo.GradientHorizontal(colourProvider.Background3, darkColor.Opacity(0.35f)),
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    Width = 80,
+                    RelativeSizeAxes = Axes.Y,
+                },
                 new OsuSpriteText()
                 {
                     Anchor = Anchor.CentreLeft,
