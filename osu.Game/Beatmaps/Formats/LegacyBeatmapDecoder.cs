@@ -497,7 +497,7 @@ namespace osu.Game.Beatmaps.Formats
                 return;
             }
             // Only handle line if it was not yet marked as supported
-            if (splitLine.Length >= 3 && !lineSupportedByEncoder)
+            if (splitLine.Length >= 3 && !lineSupportedByEncoder && !Enum.TryParse(splitLine[0], out LegacyEventType _))
             {
                 Logger.Log("[UNANIMATED] I will try to parse: " + line, LoggingTarget.Runtime, LogLevel.Debug);
                 
