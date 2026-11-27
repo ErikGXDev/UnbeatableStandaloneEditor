@@ -113,7 +113,16 @@ public enum CharacterAction
     Reset,
     
     [Description("Set Character")]
-    SetCharacter
+    SetCharacter,
+    
+    [Description("Show Assist")]
+    ShowAssist,
+    
+    [Description("Set Opacity")] 
+    SetOpacity,
+    
+    [Description("Set BG Opacity")]
+    SetBGOpacity,
 }
 
 public enum GameplayAction
@@ -161,7 +170,10 @@ public enum StageSceneAction
 public enum VisualsAction
 {
     [Description("Time and Weather")]
-    TimeAndWeather
+    TimeAndWeather,
+    
+    [Description("Cloud Rotation")]
+    CloudRotation
 }
 
 public enum WeatherOption
@@ -343,6 +355,13 @@ public partial class UbAnimateToolboxData
 
                                               Example: 1;0;2;0;1;2;3;4
                                               """;
+
+    public static string BGOpacityHint = """
+                                         Target specific background characters, separated by semicolons (;). Use 'All' to target all.
+                                         
+                                         List of available characters:
+                                         Left, LeftMiddle, Middle, RightMiddle, Right
+                                         """;
     
     public abstract class BaseOption
     {
@@ -723,7 +742,10 @@ public partial class UbAnimateToolboxData
             CategoryType.Character, new Dictionary<Enum, List<BaseOption>>
             {
                 { CharacterAction.Reset, new List<BaseOption>() },
-                { CharacterAction.SetCharacter, [new StringOption("Character 1", "Beat", CharacterListText), new StringOption("Character 2", "Quaver", CharacterListText)] }
+                { CharacterAction.SetCharacter, [new StringOption("Character 1", "Beat", CharacterListText), new StringOption("Character 2", "Quaver", CharacterListText)] },
+                { CharacterAction.ShowAssist, [new IntCheckboxOption("Enable?", 1)] },
+                { CharacterAction.SetOpacity, [new FloatOption("Opacity", 1, 0, 1)] },
+                { CharacterAction.SetBGOpacity, [new FloatOption("Opacity", 1, 0, 1), new StringOption("Characters", "", BGOpacityHint)] }
             }
         },
         {
@@ -748,7 +770,8 @@ public partial class UbAnimateToolboxData
         {
             CategoryType.Visuals, new Dictionary<Enum, List<BaseOption>>
             {
-                { VisualsAction.TimeAndWeather, [new EnumStringOption<WeatherOption>("Weather")] }
+                { VisualsAction.TimeAndWeather, [new EnumStringOption<WeatherOption>("Weather")] },
+                { VisualsAction.CloudRotation, [new FloatOption("Degrees", 0, -720, 720)] }
             }
         },
         {
